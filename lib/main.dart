@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'engine/game_engine.dart';
 import 'painters/background_painter.dart';
 import 'painters/game_painter.dart';
+import 'ui/fleet_panel.dart';
+import 'ui/game_over_dialog.dart';
+import 'ui/hud.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const DeliveryMetroApp());
 }
 
@@ -12,9 +16,14 @@ class DeliveryMetroApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      title: 'Логистическая Стратегия Мегаполиса',
       debugShowCheckedModeBanner: false,
-      home: GameScreen(),
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF141416),
+        primaryColor: const Color(0xFF1E88E5),
+      ),
+      home: const GameScreen(),
     );
   }
 }
@@ -27,7 +36,7 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  late GameEngine _engine;
+  late final GameEngine _engine;
 
   @override
   void initState() {
@@ -45,11 +54,14 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: const Color(0xFF141416),
       body: SafeArea(
         child: Column(
           children: [
-            // Игровое поле с фиксированными пропорциями для идеальной работы сетки
+            // Верхняя панель: Часы, Контроль скорости (||, >, >>), Слоты линий и Счет
+            GameHud(engine: _engine),
+
+            // Игровое поле с фиксированными пропорциями (400x800)
             Expanded(
               child: Center(
                 child: AspectRatio(
@@ -61,6 +73,7 @@ class _GameScreenState extends State<GameScreen> {
                       height: 800,
                       child: Stack(
                         children: [
+                          // 1. Статический слой фона (кэшируется в GPU)
                           RepaintBoundary(
                             child: CustomPaint(
                               isComplex: true,
@@ -68,7 +81,10 @@ class _GameScreenState extends State<GameScreen> {
                               size: const Size(400, 800),
                             ),
                           ),
+
+                          // 2. Динамический интерактивный слой игры
                           GestureDetector(
+                            behavior: HitTestBehavior.opaque,
                             onPanStart: _engine.onPanStart,
                             onPanUpdate: _engine.onPanUpdate,
                             onPanEnd: _engine.onPanEnd,
@@ -77,22 +93,9 @@ class _GameScreenState extends State<GameScreen> {
                               size: const Size(400, 800),
                             ),
                           ),
-                          ListenableBuilder(
-                            listenable: _engine,
-                            builder: (context, _) {
-                              if (!_engine.isGameOver) return const SizedBox.shrink();
-                              return Container(
-                                color: Colors.black87,
-                                child: Center(
-                                  child: Text(
-                                    'Коллапс службы доставки\nСчет: ${_engine.score}',
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(color: Colors.redAccent, fontSize: 24, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+
+                          // 3. Оверлей поражения (Game Over)
+                          GameOverOverlay(engine: _engine),
                         ],
                       ),
                     ),
@@ -100,54 +103,9 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
-            
-            // Панель управления и корректировки линий
-            Container(
-              height: 100,
-              padding: const EdgeInsets.all(12),
-              color: Colors.black54,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: ListenableBuilder(
-                      listenable: _engine,
-                      builder: (context, _) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Счет: ${_engine.score}', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            const Text('Активные линии (Нажмите для отмены):', style: TextStyle(color: Colors.white70, fontSize: 12)),
-                            Expanded(
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: _engine.lines.length,
-                                itemBuilder: (context, index) {
-                                  final line = _engine.lines[index];
-                                  return GestureDetector(
-                                    onTap: () => _engine.deleteLine(line.id),
-                                    child: Container(
-                                      margin: const EdgeInsets.only(right: 8, top: 4),
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        color: line.color.withOpacity(0.3),
-                                        border: Border.all(color: line.color, width: 2),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(Icons.delete_outline, color: Colors.white, size: 20),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            )
+
+            // Нижняя панель: Управление линиями и курьерским флотом (Пешие/Вело/Авто)
+            FleetPanel(engine: _engine),
           ],
         ),
       ),
