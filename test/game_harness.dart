@@ -99,18 +99,23 @@ class StubAdService extends AdService {
 }
 
 /// Loads the real UI font so golden-file screenshots show proper text.
-Future<void> loadAppFonts() async {
-  final loader = FontLoader('FlowlineSans');
-  for (final path in const <String>[
-    'assets/fonts/DejaVuSans.ttf',
-    'assets/fonts/DejaVuSans-Bold.ttf',
-  ]) {
-    final bytes = File(path).readAsBytesSync();
-    loader.addFont(Future<ByteData>.value(
-      ByteData.view(bytes.buffer, bytes.offsetInBytes, bytes.lengthInBytes),
-    ));
-  }
-  await loader.load();
+///
+/// Runs through [WidgetTester.runAsync]: font registration is real engine
+/// IO, which must not run inside the fake async zone (it would hang).
+Future<void> loadAppFonts(WidgetTester tester) async {
+  await tester.runAsync(() async {
+    final loader = FontLoader('FlowlineSans');
+    for (final path in const <String>[
+      'assets/fonts/DejaVuSans.ttf',
+      'assets/fonts/DejaVuSans-Bold.ttf',
+    ]) {
+      final bytes = File(path).readAsBytesSync();
+      loader.addFont(Future<ByteData>.value(
+        ByteData.view(bytes.buffer, bytes.offsetInBytes, bytes.lengthInBytes),
+      ));
+    }
+    await loader.load();
+  });
 }
 
 /// The live game session plus helpers to read the real widget geometry.

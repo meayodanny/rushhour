@@ -19,7 +19,7 @@ import 'game_harness.dart';
 /// Run with `flutter test --update-goldens` to (re)generate the files.
 void main() {
   testWidgets('evidence: hit boxes over the live map', (WidgetTester tester) async {
-    await loadAppFonts();
+    await loadAppFonts(tester);
     final harness = await pumpGameScreen(
       tester,
       debugHitBoxes: true,
@@ -68,7 +68,7 @@ void main() {
   testWidgets('evidence: off-centre drag sequence (finger ~22px off the icon)', (
     WidgetTester tester,
   ) async {
-    await loadAppFonts();
+    await loadAppFonts(tester);
     final harness = await pumpGameScreen(
       tester,
       debugHitBoxes: true,

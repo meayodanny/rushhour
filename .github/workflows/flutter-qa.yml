@@ -30,11 +30,38 @@ jobs:
           set -o pipefail
           flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee qa_logs/analyze.txt
 
-      - name: Test (regenerating QA goldens)
+      - name: Test — existing suites
         if: always()
         run: |
           set -o pipefail
-          flutter test --update-goldens --reporter expanded 2>&1 | tee qa_logs/test.txt
+          flutter test --update-goldens --timeout 90s --reporter expanded \
+            test/city_data_test.dart test/entities_test.dart \
+            test/geo_projection_test.dart test/road_graph_test.dart \
+            2>&1 | tee qa_logs/test_existing.txt
+
+      - name: Test — map camera unit tests
+        if: always()
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 90s --reporter expanded \
+            test/map_camera_test.dart \
+            2>&1 | tee qa_logs/test_map_camera.txt
+
+      - name: Test — POI hit areas (acceptance)
+        if: always()
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 120s --reporter expanded \
+            test/poi_hit_area_test.dart \
+            2>&1 | tee qa_logs/test_poi_hit_area.txt
+
+      - name: Test — QA evidence goldens
+        if: always()
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 120s --reporter expanded \
+            test/hitbox_evidence_test.dart \
+            2>&1 | tee qa_logs/test_evidence.txt
 
       - name: Assemble evidence GIF
         if: always()
