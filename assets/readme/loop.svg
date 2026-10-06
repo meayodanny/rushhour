@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 180">
+<rect width="900" height="180" rx="26" fill="#283238"/><g fill="none" stroke="#f7f3e9" stroke-width="3" opacity=".5"><path d="M120 90H780"/></g>
+<g font-family="Arial" font-weight="800" font-size="15" text-anchor="middle" fill="#f7f3e9"><text x="120" y="145">СПРОС</text><text x="340" y="145">МАРШРУТ</text><text x="560" y="145">ДОСТАВКА</text><text x="780" y="145">АДАПТАЦИЯ</text></g>
+<circle cx="120" cy="90" r="28" fill="#ffbd4a"><animate attributeName="opacity" values=".4;1;.4" dur="2s" repeatCount="indefinite"/></circle>
+<path d="M340 60l30 55h-60z" fill="#ef476f"/><circle cx="560" cy="90" r="25" fill="#118ab2"/><rect x="755" y="65" width="50" height="50" rx="8" fill="#2a9d8f"/>
+<circle r="8" fill="#fff"><animateMotion dur="4s" repeatCount="indefinite" path="M120 90H780"/></circle></svg>
