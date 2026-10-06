@@ -12,7 +12,37 @@ import '../models/entities.dart';
 import '../services/ad_service.dart';
 import '../services/audio_service.dart';
 import '../services/persistence_service.dart';
+import 'line_geometry.dart';
 import 'road_graph.dart';
+
+class _ProjectionRoute {
+  const _ProjectionRoute({required this.points, required this.edgeIds, required this.distance});
+  final List<Offset> points;
+  final List<String> edgeIds;
+  final double distance;
+}
+
+class LineDraft {
+  LineDraft({
+    required this.colorIndex,
+    required this.points,
+    required this.startNodeId,
+    this.startEntityId,
+    this.targetEntityId,
+    this.editingLineId,
+    this.editingEndpoint,
+    this.bodyEdgeIndex,
+  });
+
+  final int colorIndex;
+  final String startNodeId;
+  final String? startEntityId;
+  final String? editingLineId;
+  final int? editingEndpoint;
+  final int? bodyEdgeIndex;
+  String? targetEntityId;
+  List<Offset> points;
+}
 
 final persistenceProvider = Provider<PersistenceService>((Ref ref) => throw UnimplementedError());
 final adServiceProvider = Provider<AdService>((Ref ref) => throw UnimplementedError());
@@ -32,6 +62,11 @@ class GameSessionController extends ChangeNotifier {
     session = saved ?? _newSession(Difficulty.normal);
     for (final customer in session.customers) {
       _customerAppearance[customer.id] = 1;
+      _seedDemandAppearance(customer);
+    }
+    for (final restaurant in session.restaurants) {
+      _restaurantAppearance[restaurant.id] = 1;
+      for (final dish in restaurant.dishes) dish.appearance = 1;
     }
     _ticker = Timer.periodic(const Duration(milliseconds: 33), _onFrame);
   }
@@ -43,6 +78,10 @@ class GameSessionController extends ChangeNotifier {
   final RoadGraph graph;
   final math.Random _random = math.Random();
   final Map<String, double> _customerAppearance = <String, double>{};
+  final Map<String, double> _restaurantAppearance = <String, double>{};
+  final Map<String, double> _demandAppearance = <String, double>{};
+  LineDraft? _lineDraft;
+  String? _draggedCourierId;
 
   late GameSnapshot session;
   late Timer _ticker;
@@ -89,14 +128,16 @@ class GameSessionController extends ChangeNotifier {
       elapsed: 0,
       day: 1,
       minute: 8 * 60,
-      availableLines: sandbox ? 6 : 3,
+      // Two line tokens and two concrete Walk couriers are the MVP opening
+      // loadout. Additional vehicle types arrive only through rewards.
+      availableLines: sandbox ? 6 : GameConfig.startingLines,
       ferryTokens: 0,
       houseTokens: 0,
       weather: WeatherType.clear,
       fleet: <CourierType, int>{
-        CourierType.walk: sandbox ? 8 : 3,
-        CourierType.bike: sandbox ? 8 : 2,
-        CourierType.car: sandbox ? 8 : 1,
+        CourierType.walk: sandbox ? 8 : GameConfig.startingWalkCouriers,
+        CourierType.bike: sandbox ? 8 : 0,
+        CourierType.car: sandbox ? 8 : 0,
       },
     );
   }
@@ -114,6 +155,13 @@ class GameSessionController extends ChangeNotifier {
     tutorialVisible = false;
     timeScale = TimeScale.normal;
     _customerAppearance.clear();
+    _restaurantAppearance
+      ..clear()
+      ..addAll(<String, double>{for (final restaurant in session.restaurants) restaurant.id: 1});
+    _demandAppearance.clear();
+    for (final customer in session.customers) _seedDemandAppearance(customer);
+    _lineDraft = null;
+    _draggedCourierId = null;
     _firstCustomerTimer = 2 + _random.nextDouble() * 2;
     _nextCustomerTimer = 34 + _random.nextDouble() * 12;
     _nextRestaurantTimer = 68 + _random.nextDouble() * 18;
@@ -131,7 +179,18 @@ class GameSessionController extends ChangeNotifier {
     _lastFrame = now;
     animation += realDt;
     for (final entry in _customerAppearance.entries.toList()) {
-      if (entry.value < 1) _customerAppearance[entry.key] = math.min(1, entry.value + realDt / .72);
+      if (entry.value < 1) _customerAppearance[entry.key] = math.min(1, entry.value + realDt / .42);
+    }
+    for (final entry in _restaurantAppearance.entries.toList()) {
+      if (entry.value < 1) _restaurantAppearance[entry.key] = math.min(1, entry.value + realDt / .42);
+    }
+    for (final restaurant in session.restaurants) {
+      for (final dish in restaurant.dishes) {
+        if (dish.appearance < 1) dish.appearance = math.min(1, dish.appearance + realDt / .42);
+      }
+    }
+    for (final entry in _demandAppearance.entries.toList()) {
+      if (entry.value < 1) _demandAppearance[entry.key] = math.min(1, entry.value + realDt / .42);
     }
     final dt = realDt * timeScale.value;
     if (dt > 0 && !gameOver && !rewardPending) _tick(dt);
@@ -184,6 +243,11 @@ class GameSessionController extends ChangeNotifier {
     final customer = Customer(id: poi.id, nodeId: poi.nodeId, demand: <Cuisine, int>{cuisine: 1});
     session.customers.add(customer);
     _customerAppearance[customer.id] = 0;
+    // The initial demand belongs to the new point and therefore appears with
+    // it rather than popping in a frame later.
+    for (final entry in customer.demand.entries) {
+      for (var i = 0; i < entry.value; i++) _demandAppearance[_demandKey(customer, entry.key, i)] = 0;
+    }
     if (first && !persistence.tutorialSeen('routeGesture')) {
       tutorialVisible = true;
       unawaited(persistence.markTutorialSeen('routeGesture'));
@@ -202,9 +266,32 @@ class GameSessionController extends ChangeNotifier {
       nodeId: poi.nodeId,
       cuisine: cuisines[session.restaurants.length % cuisines.length],
     ));
+    _restaurantAppearance[poi.id] = 0;
   }
 
   double customerAppearance(Customer customer) => _customerAppearance[customer.id] ?? 1;
+  double restaurantAppearance(Restaurant restaurant) => _restaurantAppearance[restaurant.id] ?? 1;
+  double demandAppearance(Customer customer, Cuisine cuisine, int index) =>
+      _demandAppearance[_demandKey(customer, cuisine, index)] ?? 1;
+
+  String _demandKey(Customer customer, Cuisine cuisine, int index) => '${customer.id}:${cuisine.name}:$index';
+
+  void _seedDemandAppearance(Customer customer) {
+    for (final entry in customer.demand.entries) {
+      for (var i = 0; i < entry.value; i++) {
+        _demandAppearance[_demandKey(customer, entry.key, i)] = 1;
+      }
+    }
+  }
+
+  LineDraft? get lineDraft => _lineDraft;
+  int get nextLineColorIndex {
+    final used = session.lines.map((DeliveryLine line) => line.colorIndex).toSet();
+    for (var i = 0; i < GameConfig.lineColors.length; i++) {
+      if (!used.contains(i)) return i;
+    }
+    return session.lines.length % GameConfig.lineColors.length;
+  }
 
   List<Offset> get tutorialRoutePoints {
     if (!tutorialVisible || session.restaurants.isEmpty || session.customers.isEmpty) return const <Offset>[];
@@ -255,7 +342,9 @@ class GameSessionController extends ChangeNotifier {
     final customer = session.customers[_random.nextInt(session.customers.length)];
     if (customer.demandSuspended) return;
     final cuisine = session.restaurants[_random.nextInt(session.restaurants.length)].cuisine;
-    customer.demand[cuisine] = (customer.demand[cuisine] ?? 0) + 1;
+    final oldCount = customer.demand[cuisine] ?? 0;
+    customer.demand[cuisine] = oldCount + 1;
+    _demandAppearance[_demandKey(customer, cuisine, oldCount)] = 0;
   }
 
   void _tickRestaurants(double dt) {
@@ -269,7 +358,7 @@ class GameSessionController extends ChangeNotifier {
       restaurant.production += dt * (.045 + unmet * .009);
       if (restaurant.production >= 1) {
         restaurant.production = 0;
-        restaurant.dishes.add(Dish(id: 'd${_id++}', cuisine: restaurant.cuisine));
+        restaurant.dishes.add(Dish(id: 'd${_id++}', cuisine: restaurant.cuisine, appearance: 0));
         unawaited(audio.play(SoundCue.dishReady));
       }
     }
@@ -452,6 +541,286 @@ class GameSessionController extends ChangeNotifier {
     }
   }
 
+  LineGeometry get _lineGeometry => LineGeometry(city, session.lines, nodeForEntity: nodeForEntity);
+
+  /// The initial pointer-down decision is deliberately made once. This keeps
+  /// a drag that started on a POI/line from turning into a camera pan halfway
+  /// through the gesture.
+  Courier? courierNear(Offset point, {double radius = 26}) {
+    final geometry = _lineGeometry;
+    Courier? result;
+    var best = radius;
+    for (final courier in session.couriers) {
+      final line = lineById(courier.lineId);
+      if (line == null) continue;
+      final distance = (geometry.pointOnRoute(line, courier.progress) - point).distance;
+      if (distance <= best) {
+        result = courier;
+        best = distance;
+      }
+    }
+    return result;
+  }
+
+  bool beginLineGesture(Offset point) {
+    if (gameOver || rewardPending) return false;
+    final courier = courierNear(point);
+    if (courier != null) {
+      _draggedCourierId = courier.id;
+      return true;
+    }
+    final nearbyLine = _lineGeometry.lineNear(point, radius: 30);
+    if (nearbyLine != null) {
+      final nearbyRoute = _lineGeometry.offsetRoutePointsFor(nearbyLine, nodeForEntity);
+      final endpoint = nearbyRoute.length < 2
+          ? null
+          : ((point - nearbyRoute.first).distance <= 34
+              ? 0
+              : ((point - nearbyRoute.last).distance <= 34 ? 1 : null));
+      // A line endpoint is an explicit edit affordance even when its POI is
+      // underneath it. This keeps endpoint editing reachable on a phone.
+      if (endpoint != null) {
+        _lineDraft = LineDraft(
+          colorIndex: nearbyLine.colorIndex,
+          startNodeId: nodeForEntity(endpoint == 0 ? nearbyLine.stopIds.last : nearbyLine.stopIds.first)!,
+          points: List<Offset>.of(nearbyRoute),
+          editingLineId: nearbyLine.id,
+          editingEndpoint: endpoint,
+        );
+        return true;
+      }
+    }
+
+    final entity = entityNear(point);
+    if (entity != null) {
+      final node = nodeForEntity(entity);
+      if (node == null) return false;
+      _lineDraft = LineDraft(
+        colorIndex: nextLineColorIndex,
+        startNodeId: node,
+        startEntityId: entity,
+        points: <Offset>[city.nodes[node]!.point],
+      );
+      return true;
+    }
+
+    final line = nearbyLine;
+    if (line == null) return false;
+    final route = _lineGeometry.offsetRoutePointsFor(line, nodeForEntity);
+    if (route.length < 2) return false;
+    _lineDraft = LineDraft(
+      colorIndex: line.colorIndex,
+      startNodeId: nodeForEntity(line.stopIds.first)!,
+      points: List<Offset>.of(route),
+      editingLineId: line.id,
+      bodyEdgeIndex: _nearestRouteSegment(point, route),
+    );
+    return true;
+  }
+
+  int _nearestRouteSegment(Offset point, List<Offset> route) {
+    var best = 0;
+    var distance = double.infinity;
+    for (var i = 1; i < route.length; i++) {
+      final current = LineGeometry.distanceToSegment(point, route[i - 1], route[i]);
+      if (current < distance) {
+        distance = current;
+        best = i - 1;
+      }
+    }
+    return best;
+  }
+
+  void updateLineGesture(Offset point) {
+    if (_draggedCourierId != null) return;
+    final draft = _lineDraft;
+    if (draft == null) return;
+    final target = entityNear(point);
+    if (draft.editingLineId == null) {
+      if (target != null && target != draft.startEntityId) {
+        final path = graph.findPath(draft.startNodeId, nodeForEntity(target)!, allowFerry: session.ferryTokens > 0);
+        draft.targetEntityId = target;
+        draft.points = path == null ? _projectionRoute(draft.startNodeId, point).points : _pointsForPath(draft.startNodeId, path.edgeIds);
+      } else {
+        draft.targetEntityId = null;
+        draft.points = _projectionRoute(draft.startNodeId, point).points;
+      }
+      notifyListeners();
+      return;
+    }
+
+    final line = lineById(draft.editingLineId);
+    if (line == null) return;
+    if (draft.editingEndpoint != null) {
+      final fixed = draft.editingEndpoint == 0 ? line.stopIds.last : line.stopIds.first;
+      final fixedNode = nodeForEntity(fixed);
+      final targetNode = target == null ? null : nodeForEntity(target);
+      draft.targetEntityId = target;
+      if (targetNode != null && target != fixed) {
+        final path = graph.findPath(targetNode, fixedNode!, allowFerry: session.ferryTokens > 0);
+        draft.points = path == null ? draft.points : _pointsForPath(targetNode, path.edgeIds);
+      } else {
+        draft.targetEntityId = null;
+        final projected = _projectionRoute(fixedNode!, point);
+        draft.points = projected.points.reversed.toList();
+      }
+    } else {
+      // A body grab previews a local graph-snapped detour. It is committed
+      // only when released over an existing POI, preventing freehand routes.
+      draft.targetEntityId = target;
+      if (target != null) {
+        final start = nodeForEntity(line.stopIds.first)!;
+        final end = nodeForEntity(target)!;
+        final path = graph.findPath(start, end, allowFerry: session.ferryTokens > 0);
+        if (path != null) draft.points = _pointsForPath(start, path.edgeIds);
+      } else {
+        final startPart = _projectionRoute(nodeForEntity(line.stopIds.first)!, point).points;
+        final endPart = _projectionRoute(nodeForEntity(line.stopIds.last)!, point).points;
+        draft.points = <Offset>[...startPart, ...endPart.reversed.skip(1)];
+      }
+    }
+    notifyListeners();
+  }
+
+  bool endLineGesture(Offset point) {
+    final draggedCourier = _draggedCourierId;
+    if (draggedCourier != null) {
+      _draggedCourierId = null;
+      Courier? courier;
+      for (final candidate in session.couriers) {
+        if (candidate.id == draggedCourier) {
+          courier = candidate;
+          break;
+        }
+      }
+      final line = _lineGeometry.lineNear(point, radius: 32);
+      if (courier != null && line != null) {
+        courier.lineId = line.id;
+        courier.state = CourierState.reassigning;
+        notifyListeners();
+        return true;
+      }
+      notifyListeners();
+      return false;
+    }
+    final draft = _lineDraft;
+    if (draft == null) return false;
+    // Update one last time so the release position is authoritative.
+    updateLineGesture(point);
+    final current = _lineDraft;
+    _lineDraft = null;
+    if (current == null) return false;
+    if (current.editingLineId == null) {
+      final target = current.targetEntityId;
+      if (target == null || target == current.startEntityId) {
+        notifyListeners();
+        return false;
+      }
+      createLine(current.startEntityId!, target);
+      notifyListeners();
+      return true;
+    }
+
+    final line = lineById(current.editingLineId);
+    final target = current.targetEntityId;
+    if (line == null || target == null || nodeForEntity(target) == null) {
+      notifyListeners();
+      return false;
+    }
+    if (current.editingEndpoint != null) {
+      final fixed = current.editingEndpoint == 0 ? line.stopIds.last : line.stopIds.first;
+      final path = graph.findPath(nodeForEntity(target)!, nodeForEntity(fixed)!, allowFerry: session.ferryTokens > 0);
+      if (path != null && path.edgeIds.isNotEmpty) {
+        if (current.editingEndpoint == 0) {
+          line.stopIds[0] = target;
+        } else {
+          line.stopIds[line.stopIds.length - 1] = target;
+        }
+        line.edgeIds
+          ..clear()
+          ..addAll(path.edgeIds);
+      }
+    } else {
+      // Body editing is a purposeful graph edit rather than a new line. The
+      // nearest valid POI becomes the new terminal stop for this MVP route.
+      final path = graph.findPath(nodeForEntity(line.stopIds.first)!, nodeForEntity(target)!, allowFerry: session.ferryTokens > 0);
+      if (path != null && path.edgeIds.isNotEmpty) {
+        line.stopIds[line.stopIds.length - 1] = target;
+        line.edgeIds
+          ..clear()
+          ..addAll(path.edgeIds);
+      }
+    }
+    notifyListeners();
+    return true;
+  }
+
+  void cancelLineGesture() {
+    if (_lineDraft == null && _draggedCourierId == null) return;
+    _lineDraft = null;
+    _draggedCourierId = null;
+    notifyListeners();
+  }
+
+  List<Offset> _pointsForPath(String startNode, List<String> edgeIds) {
+    final result = <Offset>[];
+    var current = startNode;
+    for (final id in edgeIds) {
+      final edge = city.edgeById(id);
+      if (edge == null) continue;
+      final forward = edge.from == current;
+      final points = forward ? edge.points : edge.points.reversed.toList();
+      if (result.isEmpty) result.addAll(points); else result.addAll(points.skip(1));
+      current = forward ? edge.to : edge.from;
+    }
+    return result;
+  }
+
+  _ProjectionRoute _projectionRoute(String startNode, Offset point) {
+    final projection = graph.nearestGraphPoint(point);
+    final edge = city.edgeById(projection.edgeId)!;
+    final candidates = <_ProjectionRoute>[];
+    final fromPath = graph.findPath(startNode, edge.from, blocked: <String>{edge.id});
+    if (fromPath != null) {
+      final points = _pointsForPath(startNode, fromPath.edgeIds);
+      final segment = _partialEdge(edge, from: edge.from, to: projection.point);
+      candidates.add(_ProjectionRoute(
+        points: <Offset>[...points, ...segment.skip(points.isEmpty ? 0 : 1)],
+        edgeIds: <String>[...fromPath.edgeIds, edge.id],
+        distance: fromPath.distance + projection.along,
+      ));
+    }
+    final toPath = graph.findPath(startNode, edge.to, blocked: <String>{edge.id});
+    if (toPath != null) {
+      final points = _pointsForPath(startNode, toPath.edgeIds);
+      final segment = _partialEdge(edge, from: edge.to, to: projection.point);
+      candidates.add(_ProjectionRoute(
+        points: <Offset>[...points, ...segment.skip(points.isEmpty ? 0 : 1)],
+        edgeIds: <String>[...toPath.edgeIds, edge.id],
+        distance: toPath.distance + edge.length - projection.along,
+      ));
+    }
+    if (candidates.isNotEmpty) return candidates.reduce((_ProjectionRoute a, _ProjectionRoute b) => a.distance <= b.distance ? a : b);
+    return _ProjectionRoute(points: <Offset>[city.nodes[startNode]!.point, projection.point], edgeIds: <String>[edge.id], distance: projection.distance);
+  }
+
+  List<Offset> _partialEdge(RoadEdge edge, {required String from, required Offset to}) {
+    final points = edge.from == from ? edge.points : edge.points.reversed.toList();
+    final result = <Offset>[points.first];
+    var remaining = (to - points.first).distance;
+    for (var i = 1; i < points.length; i++) {
+      final segment = (points[i] - points[i - 1]).distance;
+      if (remaining <= segment) {
+        result.add(to);
+        break;
+      }
+      result.add(points[i]);
+      remaining -= segment;
+    }
+    if (result.last != to) result.add(to);
+    return result;
+  }
+
   void handleMapTap(Offset point) {
     final entity = entityNear(point);
     if (entity == null) {
@@ -483,9 +852,9 @@ class GameSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  String? entityNear(Offset point) {
+  String? entityNear(Offset point, {double radius = 54}) {
     String? result;
-    var best = 42.0;
+    var best = radius;
     for (final restaurant in session.restaurants) {
       final node = city.nodes[restaurant.nodeId];
       if (node == null) continue;
@@ -514,13 +883,15 @@ class GameSessionController extends ChangeNotifier {
     if (fromNode == null || toNode == null) return;
     final path = graph.findPath(fromNode, toNode, allowFerry: session.ferryTokens > 0);
     if (path == null || path.edgeIds.isEmpty) return;
-    session.lines.add(DeliveryLine(
+    final line = DeliveryLine(
       id: 'l${_id++}',
-      colorIndex: session.lines.length % GameConfig.lineColors.length,
+      colorIndex: nextLineColorIndex,
       stopIds: <String>[fromEntity, toEntity],
       edgeIds: path.edgeIds,
-    ));
+    );
+    session.lines.add(line);
     session.availableLines--;
+    _autoAssignCourier(line);
   }
 
   void createManualLine(List<Offset> points) {
@@ -528,6 +899,18 @@ class GameSessionController extends ChangeNotifier {
     final first = entityNear(points.first);
     final last = entityNear(points.last);
     if (first != null && last != null && first != last) createLine(first, last);
+  }
+
+  void _autoAssignCourier(DeliveryLine line) {
+    // Deterministic priority keeps the two opening Walk couriers predictable,
+    // while still accepting any later unlocked type.
+    for (final type in CourierType.values) {
+      final available = session.fleet[type] ?? 0;
+      if (available <= 0) continue;
+      session.fleet[type] = available - 1;
+      session.couriers.add(Courier(id: 'c${_id++}', type: type, lineId: line.id));
+      return;
+    }
   }
 
   void assignCourier(CourierType type, Offset point) {

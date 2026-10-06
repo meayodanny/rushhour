@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:collection/collection.dart';
 
@@ -9,6 +10,14 @@ class PathResult {
   const PathResult(this.edgeIds, this.distance);
   final List<String> edgeIds;
   final double distance;
+}
+
+class GraphProjection {
+  const GraphProjection({required this.edgeId, required this.point, required this.distance, required this.along});
+  final String edgeId;
+  final Offset point;
+  final double distance;
+  final double along;
 }
 
 class _Step {
@@ -64,19 +73,47 @@ class RoadGraph {
     };
   }
 
-  String nearestEdgeId(double x, double y) {
-    var result = city.edges.first.id;
-    var best = double.infinity;
+  String nearestEdgeId(double x, double y) => nearestGraphPoint(Offset(x, y)).edgeId;
+
+  GraphProjection nearestGraphPoint(Offset point) {
+    if (city.edges.isEmpty) {
+      throw StateError('Cannot snap a gesture without roads.');
+    }
+    var best = GraphProjection(
+      edgeId: city.edges.first.id,
+      point: city.edges.first.points.first,
+      distance: double.infinity,
+      along: 0,
+    );
     for (final edge in city.edges) {
+      var travelled = 0.0;
       for (var i = 1; i < edge.points.length; i++) {
-        final a = edge.points[i - 1]; final b = edge.points[i];
-        final abx = b.dx - a.dx; final aby = b.dy - a.dy;
-        final length2 = abx * abx + aby * aby;
-        final t = length2 == 0 ? 0.0 : (((x - a.dx) * abx + (y - a.dy) * aby) / length2).clamp(0.0, 1.0);
-        final d = math.sqrt(math.pow(x - (a.dx + abx * t), 2) + math.pow(y - (a.dy + aby * t), 2));
-        if (d < best) { best = d; result = edge.id; }
+        final a = edge.points[i - 1];
+        final b = edge.points[i];
+        final delta = b - a;
+        final lengthSquared = delta.dx * delta.dx + delta.dy * delta.dy;
+        final segmentLength = delta.distance;
+        final t = lengthSquared == 0
+            ? 0.0
+            : (((point.dx - a.dx) * delta.dx + (point.dy - a.dy) * delta.dy) /
+                    lengthSquared)
+                .clamp(0.0, 1.0);
+        final projection = Offset(
+          a.dx + delta.dx * t.toDouble(),
+          a.dy + delta.dy * t.toDouble(),
+        );
+        final distance = (point - projection).distance;
+        if (distance < best.distance) {
+          best = GraphProjection(
+            edgeId: edge.id,
+            point: projection,
+            distance: distance,
+            along: travelled + segmentLength * t.toDouble(),
+          );
+        }
+        travelled += segmentLength;
       }
     }
-    return result;
+    return best;
   }
 }
