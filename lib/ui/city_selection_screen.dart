@@ -184,10 +184,10 @@ class _CitySelectionScreenState extends State<CitySelectionScreen> {
                   ),
                 ),
               ),
+            )
             ],
           );
         },
-      ),
-    );
+      );
   }
 }

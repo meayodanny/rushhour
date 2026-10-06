@@ -430,7 +430,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
     final scene = _scenePoint(details.focalPoint);
     _lastGestureScene = scene;
     _cameraAnimation.stop();
-    if (game.beginLineGesture(scene)) {
+    if (game!.beginLineGesture(scene)) {
       _cameraGesture = false;
       return;
     }
@@ -445,7 +445,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
     final game = _game ?? ref.read(gameControllerProvider);
     if (!_cameraGesture) {
       _lastGestureScene = _scenePoint(details.focalPoint);
-      game.updateLineGesture(_lastGestureScene);
+      game!.updateLineGesture(_lastGestureScene);
       return;
     }
     final viewport = _viewportSize;
@@ -463,7 +463,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   void _onMapScaleEnd(ScaleEndDetails details) {
     final game = _game ?? ref.read(gameControllerProvider);
     if (!_cameraGesture) {
-      game.endLineGesture(_lastGestureScene);
+      game!.endLineGesture(_lastGestureScene);
     } else {
       _animateCameraBack();
     }
@@ -477,7 +477,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   // Requirement 40.2: Camera bounds clamped to active reveal bounds
   Rect _mapBounds() {
     final game = _game ?? ref.read(gameControllerProvider);
-    final activeGeo = game.activeRevealBounds;
+    final activeGeo = game!.activeRevealBounds;
     final rect = game.city.projectBounds(activeGeo);
     return rect.inflate(45);
   }
