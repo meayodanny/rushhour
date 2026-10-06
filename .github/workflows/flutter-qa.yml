@@ -38,15 +38,26 @@ jobs:
         if: always()
         run: |
           set +e
-          python3 -m pip install --user pillow
-          python3 tools/make_evidence_gif.py 2>&1 | tee qa_logs/gif.log
+          python3 -m pip install --user pillow 2>&1 | tee -a qa_logs/gif.log
+          python3 tools/make_evidence_gif.py 2>&1 | tee -a qa_logs/gif.log
+          echo "gif_exit=$?" | tee -a qa_logs/gif.log
 
       - name: Commit & push QA evidence and logs
         if: always()
         run: |
+          {
+            echo "=== workspace listing ==="
+            ls -la
+            echo "=== test/goldens ==="
+            ls -la test/goldens 2>&1 || true
+            echo "=== docs ==="
+            find docs -type f 2>&1 || true
+          } > qa_logs/workspace.txt 2>&1
           git config user.name "arena-agent"
           git config user.email "arena-agent@users.noreply.github.com"
-          git add qa_logs test/goldens docs/qa
+          for p in qa_logs test/goldens docs/qa; do
+            if [ -e "$p" ]; then git add -A "$p"; fi
+          done
           if git diff --cached --quiet; then
             echo "No evidence changes to commit."
           else
