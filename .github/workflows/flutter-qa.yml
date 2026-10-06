@@ -1,0 +1,48 @@
+name: Flutter QA
+
+on:
+  push:
+    branches: ['arena/c208a14e-rushhour', main']
+  workflow_dispatch:
+
+jobs:
+  analyze-test-evidence:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter --version
+
+      - name: Pub get
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test (regenerating QA goldens)
+        run: flutter test --update-goldens --reporter expanded
+
+      - name: Assemble evidence GIF
+        run: |
+          python3 -m pip install --user pillow
+          python3 tools/make_evidence_gif.py
+
+      - name: Commit & push QA evidence
+        run: |
+          git config user.name "arena-agent"
+          git config user.email "arena-agent@users.noreply.github.com"
+          git add test/goldens docs/qa
+          if git diff --cached --quiet; then
+            echo "No evidence changes to commit."
+          else
+            git commit -m "QA: regenerate hitbox evidence artifacts [skip ci]"
+            git push
+          fi

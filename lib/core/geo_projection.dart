@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart' show Matrix4, MatrixUtils;
 
 /// Requirement 43: the single source of truth for geographic -> world space.
 ///
@@ -84,6 +85,16 @@ class GeoProjection {
   /// Convenience for `[lat, lng]` pairs coming straight out of JSON.
   Offset projectPair(List<double> pair) => project(pair[0], pair[1]);
 
+  /// Geographic coordinate -> screen space (Requirement 44.2 / 44.5).
+  ///
+  /// This is THE single entry point every consumer must use to place
+  /// interactive elements (POI hit areas, debug overlays) on screen: it is
+  /// literally [project] followed by the very same camera matrix that the
+  /// `Transform` widget applies when rendering the world, so a hit area
+  /// placed through this method can never drift away from the painted icon.
+  Offset geoToScreen(double lat, double lng, MapCamera camera) =>
+      camera.worldToScreen(project(lat, lng));
+
   /// World space -> geographic coordinate (exact inverse of [project]).
   /// Used by hit-testing/debug tooling that needs to report lat/lng.
   ({double lat, double lng}) unproject(Offset point) {
@@ -134,4 +145,47 @@ abstract class GeoSpan {
   double get maxLat;
   double get minLng;
   double get maxLng;
+}
+
+/// The camera: world space <-> screen (map-viewport-local) space.
+///
+/// Requirement 44.5: the matrix wrapped here is the one and only camera
+/// transform of the game screen — the identical `Matrix4` that the
+/// `TransformationController` feeds into the `Transform` widget which
+/// renders the world painters. Because both the painters (through the
+/// transform) and the POI hit areas (through [worldToScreen]) are driven by
+/// this single matrix, "where the icon is painted" and "where the touch zone
+/// sits" are the same computation.
+///
+/// The matrix is always a uniform-scale similarity transform (translate +
+/// scale, see `_matrix` in the game screen), so distances measured in world
+/// space map to screen space by a single scalar factor and hit-testing can be
+/// done in world space with screen-sized radii (see [worldRadiusFor]).
+@immutable
+class MapCamera {
+  const MapCamera(this.matrix);
+
+  final Matrix4 matrix;
+
+  /// Camera of an unmoved, unzoomed viewport.
+  factory MapCamera.identity() => MapCamera(Matrix4.identity());
+
+  /// Uniform scale factor (screen px per world px).
+  double get scale => matrix.getMaxScaleOnAxis();
+
+  /// World space -> screen space.
+  Offset worldToScreen(Offset worldPoint) =>
+      MatrixUtils.transformPoint(matrix, worldPoint);
+
+  /// Screen space -> world space (exact inverse of [worldToScreen]).
+  Offset screenToWorld(Offset screenPoint) =>
+      MatrixUtils.transformPoint(matrix.clone()..invert(), screenPoint);
+
+  /// World-space radius whose on-screen size is exactly [screenPx] pixels.
+  ///
+  /// The camera scale is uniform, so a world circle of this radius is a
+  /// screen circle of `screenPx` radius — this is how touch targets keep a
+  /// constant physical size regardless of zoom (Requirement 44.6 requires
+  /// 44-48 px zones that do not shrink when the map is zoomed out).
+  double worldRadiusFor(double screenPx) => screenPx / scale;
 }

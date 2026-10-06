@@ -1,7 +1,7 @@
 {
-  "schemaVersion": 2,
-  "cityId": "your_city_id",
-  "displayName": "Your City Name",
+  "schemaVersion": 3,
+  "cityId": "rivergate",
+  "displayName": "Rivergate",
   "attribution": "© OpenStreetMap contributors",
   "boundingBox": {
     "minLat": 51.48416574,
@@ -57495,8 +57495,330 @@
   },
   "ferryPoints": [],
   "poiPool": {
-    "restaurants": [],
-    "customers": []
+    "restaurants": [
+      {
+        "id": "r001",
+        "nodeId": "n223"
+      },
+      {
+        "id": "r002",
+        "nodeId": "n2335"
+      },
+      {
+        "id": "r003",
+        "nodeId": "n145"
+      },
+      {
+        "id": "r004",
+        "nodeId": "n1234"
+      },
+      {
+        "id": "r005",
+        "nodeId": "n30"
+      },
+      {
+        "id": "r006",
+        "nodeId": "n195"
+      },
+      {
+        "id": "r007",
+        "nodeId": "n3662"
+      },
+      {
+        "id": "r008",
+        "nodeId": "n2402"
+      },
+      {
+        "id": "r009",
+        "nodeId": "n2105"
+      },
+      {
+        "id": "r010",
+        "nodeId": "n1032"
+      },
+      {
+        "id": "r011",
+        "nodeId": "n726"
+      },
+      {
+        "id": "r012",
+        "nodeId": "n772"
+      },
+      {
+        "id": "r013",
+        "nodeId": "n68"
+      },
+      {
+        "id": "r014",
+        "nodeId": "n1973"
+      },
+      {
+        "id": "r015",
+        "nodeId": "n939"
+      },
+      {
+        "id": "r016",
+        "nodeId": "n1181"
+      },
+      {
+        "id": "r017",
+        "nodeId": "n1167"
+      },
+      {
+        "id": "r018",
+        "nodeId": "n1681"
+      },
+      {
+        "id": "r019",
+        "nodeId": "n2054"
+      },
+      {
+        "id": "r020",
+        "nodeId": "n182"
+      },
+      {
+        "id": "r021",
+        "nodeId": "n3447"
+      },
+      {
+        "id": "r022",
+        "nodeId": "n643"
+      },
+      {
+        "id": "r023",
+        "nodeId": "n2254"
+      },
+      {
+        "id": "r024",
+        "nodeId": "n1284"
+      }
+    ],
+    "customers": [
+      {
+        "id": "c001",
+        "nodeId": "n869"
+      },
+      {
+        "id": "c002",
+        "nodeId": "n2381"
+      },
+      {
+        "id": "c003",
+        "nodeId": "n1447"
+      },
+      {
+        "id": "c004",
+        "nodeId": "n846"
+      },
+      {
+        "id": "c005",
+        "nodeId": "n1830"
+      },
+      {
+        "id": "c006",
+        "nodeId": "n1347"
+      },
+      {
+        "id": "c007",
+        "nodeId": "n251"
+      },
+      {
+        "id": "c008",
+        "nodeId": "n1805"
+      },
+      {
+        "id": "c009",
+        "nodeId": "n2371"
+      },
+      {
+        "id": "c010",
+        "nodeId": "n1772"
+      },
+      {
+        "id": "c011",
+        "nodeId": "n82"
+      },
+      {
+        "id": "c012",
+        "nodeId": "n2187"
+      },
+      {
+        "id": "c013",
+        "nodeId": "n215"
+      },
+      {
+        "id": "c014",
+        "nodeId": "n1894"
+      },
+      {
+        "id": "c015",
+        "nodeId": "n283"
+      },
+      {
+        "id": "c016",
+        "nodeId": "n505"
+      },
+      {
+        "id": "c017",
+        "nodeId": "n2451"
+      },
+      {
+        "id": "c018",
+        "nodeId": "n1963"
+      },
+      {
+        "id": "c019",
+        "nodeId": "n639"
+      },
+      {
+        "id": "c020",
+        "nodeId": "n2232"
+      },
+      {
+        "id": "c021",
+        "nodeId": "n493"
+      },
+      {
+        "id": "c022",
+        "nodeId": "n307"
+      },
+      {
+        "id": "c023",
+        "nodeId": "n114"
+      },
+      {
+        "id": "c024",
+        "nodeId": "n2662"
+      },
+      {
+        "id": "c025",
+        "nodeId": "n681"
+      },
+      {
+        "id": "c026",
+        "nodeId": "n2630"
+      },
+      {
+        "id": "c027",
+        "nodeId": "n1509"
+      },
+      {
+        "id": "c028",
+        "nodeId": "n2506"
+      },
+      {
+        "id": "c029",
+        "nodeId": "n51"
+      },
+      {
+        "id": "c030",
+        "nodeId": "n9"
+      },
+      {
+        "id": "c031",
+        "nodeId": "n1633"
+      },
+      {
+        "id": "c032",
+        "nodeId": "n807"
+      },
+      {
+        "id": "c033",
+        "nodeId": "n1129"
+      },
+      {
+        "id": "c034",
+        "nodeId": "n1517"
+      },
+      {
+        "id": "c035",
+        "nodeId": "n11"
+      },
+      {
+        "id": "c036",
+        "nodeId": "n3497"
+      },
+      {
+        "id": "c037",
+        "nodeId": "n176"
+      },
+      {
+        "id": "c038",
+        "nodeId": "n1787"
+      },
+      {
+        "id": "c039",
+        "nodeId": "n107"
+      },
+      {
+        "id": "c040",
+        "nodeId": "n64"
+      },
+      {
+        "id": "c041",
+        "nodeId": "n2317"
+      },
+      {
+        "id": "c042",
+        "nodeId": "n1046"
+      },
+      {
+        "id": "c043",
+        "nodeId": "n1814"
+      },
+      {
+        "id": "c044",
+        "nodeId": "n356"
+      },
+      {
+        "id": "c045",
+        "nodeId": "n200"
+      },
+      {
+        "id": "c046",
+        "nodeId": "n2780"
+      },
+      {
+        "id": "c047",
+        "nodeId": "n269"
+      },
+      {
+        "id": "c048",
+        "nodeId": "n773"
+      },
+      {
+        "id": "c049",
+        "nodeId": "n1351"
+      },
+      {
+        "id": "c050",
+        "nodeId": "n1404"
+      },
+      {
+        "id": "c051",
+        "nodeId": "n1183"
+      },
+      {
+        "id": "c052",
+        "nodeId": "n301"
+      },
+      {
+        "id": "c053",
+        "nodeId": "n1818"
+      },
+      {
+        "id": "c054",
+        "nodeId": "n118"
+      },
+      {
+        "id": "c055",
+        "nodeId": "n2805"
+      },
+      {
+        "id": "c056",
+        "nodeId": "n45"
+      }
+    ]
   },
   "availableCuisines": [
     "pizza",
@@ -70772,6 +71094,34 @@
           -0.012271699999999998
         ]
       ]
+    }
+  ],
+  "startViewport": {
+    "minLat": 51.48992361,
+    "maxLat": 51.50399839,
+    "minLng": -0.01876027,
+    "maxLng": -0.00481173
+  },
+  "revealStages": [
+    {
+      "stageIndex": 1,
+      "bounds": {
+        "minLat": 51.48790835,
+        "maxLat": 51.50601365,
+        "minLng": -0.02120126,
+        "maxLng": -0.00237074
+      },
+      "unlockAfterLevel": 2
+    },
+    {
+      "stageIndex": 2,
+      "bounds": {
+        "minLat": 51.48416574,
+        "maxLat": 51.50975626,
+        "minLng": -0.02573454,
+        "maxLng": 0.00216254
+      },
+      "unlockAfterLevel": 4
     }
   ]
 }

@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../core/game_config.dart';
+import '../core/geo_projection.dart';
+import '../core/touch_targets.dart';
 import '../models/city.dart';
 import '../models/entities.dart';
 import '../services/ad_service.dart';
@@ -672,23 +674,37 @@ class GameSessionController extends ChangeNotifier {
     return result;
   }
 
-  /// Requirement 22 & 26: 44px hit-zone and Mini Metro snap line drag editing
-  bool beginLineGesture(Offset point) {
+  /// Requirement 22 & 26 (fixed per Requirement 44): the map-level gesture
+  /// recognizer (pan/zoom layer) calls this when the pointer did NOT land in
+  /// any of the positioned POI hit-area widgets that sit above it.
+  ///
+  /// Priority inside this recognizer: couriers first, then existing lines.
+  /// Points of interest are deliberately NOT probed here — they are owned by
+  /// the dedicated hit-area widgets (Requirement 44.2/44.3), and a manual
+  /// "did the finger land on a POI" check inside the pan handler would be
+  /// exactly the architecture this patch forbids.
+  ///
+  /// All radii are screen pixels converted to world units through [camera],
+  /// so the touch targets keep their physical size at any zoom level.
+  bool beginMapGesture(MapCamera camera, Offset screenPoint) {
     if (gameOver || rewardPending) return false;
-    final courier = courierNear(point, radius: 36);
+    final world = camera.screenToWorld(screenPoint);
+    final courier = courierNear(world, radius: camera.worldRadiusFor(TouchTargets.courierHitRadius));
     if (courier != null) {
       _draggedCourierId = courier.id;
       return true;
     }
 
     // Check hit on existing line (any segment or endpoint)
-    final nearbyLine = _lineGeometry.lineNear(point, radius: 36);
+    final nearbyLine =
+        _lineGeometry.lineNear(world, radius: camera.worldRadiusFor(TouchTargets.lineHitRadius));
     if (nearbyLine != null) {
       final nearbyRoute = _lineGeometry.offsetRoutePointsFor(nearbyLine, nodeForEntity);
       if (nearbyRoute.isNotEmpty) {
-        final distToStart = (point - nearbyRoute.first).distance;
-        final distToEnd = (point - nearbyRoute.last).distance;
-        final endpoint = distToStart <= 38 ? 0 : (distToEnd <= 38 ? 1 : null);
+        final endpointRadius = camera.worldRadiusFor(TouchTargets.poiHitRadius);
+        final distToStart = (world - nearbyRoute.first).distance;
+        final distToEnd = (world - nearbyRoute.last).distance;
+        final endpoint = distToStart <= endpointRadius ? 0 : (distToEnd <= endpointRadius ? 1 : null);
 
         final fixedNode = endpoint == 0
             ? nodeForEntity(nearbyLine.stopIds.last)!
@@ -706,29 +722,35 @@ class GameSessionController extends ChangeNotifier {
       }
     }
 
-    // Check hit on POI entity
-    final entity = entityNear(point, radius: 44);
-    if (entity != null) {
-      final node = nodeForEntity(entity);
-      if (node == null) return false;
-      _lineDraft = LineDraft(
-        colorIndex: nextLineColorIndex,
-        startNodeId: node,
-        startEntityId: entity,
-        points: <Offset>[city.nodes[node]!.point],
-        reachProgress: 0.0,
-      );
-      return true;
-    }
-
     return false;
   }
 
-  void updateLineGesture(Offset point) {
+  /// Starts a line draft from a point of interest whose positioned hit-area
+  /// widget (Requirement 44.2) won the gesture. This is the replacement for
+  /// the old "entityNear(point, tiny radius)" probe inside the shared pan
+  /// handler: no coordinate math, the widget already proved the hit.
+  void startLineDraftFromEntity(String entityId) {
+    if (gameOver || rewardPending) return;
+    final node = nodeForEntity(entityId);
+    if (node == null || !city.nodes.containsKey(node)) return;
+    _draggedCourierId = null;
+    _lineDraft = LineDraft(
+      colorIndex: nextLineColorIndex,
+      startNodeId: node,
+      startEntityId: entityId,
+      points: <Offset>[city.nodes[node]!.point],
+      reachProgress: 0.0,
+    );
+    notifyListeners();
+  }
+
+  void updateLineGesture(MapCamera camera, Offset screenPoint) {
     if (_draggedCourierId != null) return;
     final draft = _lineDraft;
     if (draft == null) return;
-    final target = entityNear(point, radius: 44);
+    final point = camera.screenToWorld(screenPoint);
+    final target =
+        entityNear(point, radius: camera.worldRadiusFor(TouchTargets.targetSnapRadius));
 
     if (draft.editingLineId == null) {
       if (target != null && target != draft.startEntityId) {
@@ -767,7 +789,7 @@ class GameSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool endLineGesture(Offset point) {
+  bool endLineGesture(MapCamera camera, Offset screenPoint) {
     final draggedCourier = _draggedCourierId;
     if (draggedCourier != null) {
       _draggedCourierId = null;
@@ -778,7 +800,9 @@ class GameSessionController extends ChangeNotifier {
           break;
         }
       }
-      final line = _lineGeometry.lineNear(point, radius: 36);
+      final world = camera.screenToWorld(screenPoint);
+      final line =
+          _lineGeometry.lineNear(world, radius: camera.worldRadiusFor(TouchTargets.courierHitRadius));
       if (courier != null && line != null) {
         courier.lineId = line.id;
         courier.state = CourierState.reassigning;
@@ -791,7 +815,7 @@ class GameSessionController extends ChangeNotifier {
 
     final draft = _lineDraft;
     if (draft == null) return false;
-    updateLineGesture(point);
+    updateLineGesture(camera, screenPoint);
     final current = _lineDraft;
     _lineDraft = null;
     if (current == null) return false;
@@ -943,8 +967,19 @@ class GameSessionController extends ChangeNotifier {
     return result;
   }
 
-  void handleMapTap(Offset point) {
-    final entity = entityNear(point, radius: 44);
+  /// Tap on the map outside every POI hit area (handled by the pan/zoom
+  /// layer). Selects/deselects/builds tap-tap routes like before, but the
+  /// hit test is done with a screen-sized radius via [camera].
+  void handleMapTap(MapCamera camera, Offset screenPoint) {
+    final world = camera.screenToWorld(screenPoint);
+    _handleEntityTap(entityNear(world, radius: camera.worldRadiusFor(TouchTargets.poiHitRadius)));
+  }
+
+  /// Tap inside a POI hit-area widget: the entity is known without any
+  /// distance probing (the widget already won the hit test).
+  void handlePoiTap(String entityId) => _handleEntityTap(entityId);
+
+  void _handleEntityTap(String? entity) {
     if (entity == null) {
       selectedEntityId = null;
       notifyListeners();
@@ -974,7 +1009,11 @@ class GameSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  String? entityNear(Offset point, {double radius = 44}) {
+  /// Nearest active entity to [point] in WORLD space within [radius] world
+  /// units. Callers that hold a [MapCamera] must convert screen-sized radii
+  /// with `camera.worldRadiusFor(...)` — there is intentionally no default
+  /// radius, so nobody can silently reintroduce a zoom-dependent tolerance.
+  String? entityNear(Offset point, {required double radius}) {
     String? result;
     var best = radius;
     for (final restaurant in session.restaurants) {
@@ -1020,8 +1059,8 @@ class GameSessionController extends ChangeNotifier {
 
   void createManualLine(List<Offset> points) {
     if (points.length < 2) return;
-    final first = entityNear(points.first);
-    final last = entityNear(points.last);
+    final first = entityNear(points.first, radius: TouchTargets.poiHitRadius);
+    final last = entityNear(points.last, radius: TouchTargets.poiHitRadius);
     if (first != null && last != null && first != last) createLine(first, last);
   }
 
