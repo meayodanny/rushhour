@@ -9,8 +9,14 @@ class AdService extends ChangeNotifier {
   RewardedAd? _rewarded;
   int _completedGames = 0;
 
-  String get _bannerId => Platform.isAndroid ? 'ca-app-pub-3940256099942544/6300978111' : 'ca-app-pub-3940256099942544/2934735716';
+  // test "ca-app-pub-3940256099942544/9214589741"
+  // prod "ca-app-pub-5621949462134833/7437495052"
+  String get _bannerId => Platform.isAndroid ? 'ca-app-pub-3940256099942544/9214589741' : 'ca-app-pub-3940256099942544/2934735716';
+  // test "ca-app-pub-3940256099942544/1033173712"
+  // prod "ca-app-pub-5621949462134833/9568089512"
   String get _interstitialId => Platform.isAndroid ? 'ca-app-pub-3940256099942544/1033173712' : 'ca-app-pub-3940256099942544/4411468910';
+  // test "ca-app-pub-3940256099942544/5224354917"
+  // prod "ca-app-pub-5621949462134833/5410097515"
   String get _rewardedId => Platform.isAndroid ? 'ca-app-pub-3940256099942544/5224354917' : 'ca-app-pub-3940256099942544/1712485313';
 
   Future<void> initialize() async {

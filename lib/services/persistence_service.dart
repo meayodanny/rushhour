@@ -22,10 +22,15 @@ class PersistenceService {
   bool tutorialSeen(String key) => settings.get('tutorial_$key', defaultValue: false) == true;
   Future<void> markTutorialSeen(String key) => settings.put('tutorial_$key', true);
   Future<void> resetTutorial() async {
-    for (final key in settings.keys.where((Object key) => key.toString().startsWith('tutorial_')).toList()) {
-      await settings.delete(key);
-    }
+  final tutorialKeys = settings.keys
+      .whereType<String>()
+      .where((String key) => key.startsWith('tutorial_'))
+      .toList();
+
+  for (final key in tutorialKeys) {
+    await settings.delete(key);
   }
+}
   String get language => settings.get('language', defaultValue: 'system')! as String;
   Future<void> setLanguage(String value) => settings.put('language', value);
   bool get audioEnabled => settings.get('audio', defaultValue: true) == true;

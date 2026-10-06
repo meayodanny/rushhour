@@ -10,7 +10,7 @@ class StaticMapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawColor(Palette.paper);
+    canvas.drawColor(Palette.paper, BlendMode.clear);
     final river = Path();
     if (city.river.isNotEmpty) {
       river.moveTo(city.river.first.dx, city.river.first.dy);
