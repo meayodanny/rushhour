@@ -4,10 +4,10 @@ import '../../core/palette.dart';
 import '../../game/game_controller.dart';
 import '../../l10n/app_strings.dart';
 import '../../models/entities.dart';
+import 'flow_controls.dart';
 
 class RewardOverlay extends StatelessWidget {
   const RewardOverlay({required this.game, super.key});
-
   final GameSessionController game;
 
   @override
@@ -17,45 +17,50 @@ class RewardOverlay extends StatelessWidget {
     final rewards = game.rewards;
     return Positioned.fill(
       child: ColoredBox(
-        color: Palette.ink.withValues(alpha: .72),
+        color: Palette.ink.withValues(alpha: .82),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(22),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(strings.reward, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 24, letterSpacing: 1)),
-                const SizedBox(height: 6),
-                Text(strings.choose, style: const TextStyle(color: Colors.white70)),
-                const SizedBox(height: 20),
+                Text(strings.reward, style: const TextStyle(color: Palette.paper, fontWeight: FontWeight.w700, fontSize: 23, letterSpacing: 1.3)),
+                const SizedBox(height: 7),
+                Text(strings.choose, style: TextStyle(color: Palette.paper.withValues(alpha: .68), fontSize: 12)),
+                const SizedBox(height: 21),
                 Row(
-                  children: rewards.map((RewardType reward) => Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: AspectRatio(
-                        aspectRatio: .72,
-                        child: Material(
-                          color: Palette.paper,
-                          borderRadius: BorderRadius.circular(20),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () => game.chooseReward(reward),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(_icon(reward), size: 38, color: Palette.ink),
-                                  const SizedBox(height: 14),
-                                  Text(_label(strings, reward), textAlign: TextAlign.center, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
-                                ],
-                              ),
+                  children: rewards.map((RewardType reward) {
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(4),
+                        child: AspectRatio(
+                          aspectRatio: .68,
+                          child: FlowPressable(
+                            onPressed: () => game.chooseReward(reward),
+                            height: null,
+                            radius: 22,
+                            padding: const EdgeInsets.all(10),
+                            background: Palette.paper,
+                            foreground: Palette.ink,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  width: 52,
+                                  height: 52,
+                                  alignment: Alignment.center,
+                                  decoration: const BoxDecoration(color: Palette.panel, shape: BoxShape.circle),
+                                  child: FlowGlyph(_glyph(reward), size: 29),
+                                ),
+                                const SizedBox(height: 15),
+                                Text(_label(strings, reward), textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                              ],
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  )).toList(),
+                    );
+                  }).toList(),
                 ),
               ],
             ),
@@ -65,21 +70,21 @@ class RewardOverlay extends StatelessWidget {
     );
   }
 
-  IconData _icon(RewardType reward) => switch (reward) {
-    RewardType.line => Icons.timeline_rounded,
-    RewardType.walker => Icons.directions_walk_rounded,
-    RewardType.bike => Icons.pedal_bike_rounded,
-    RewardType.car => Icons.directions_car_filled_rounded,
-    RewardType.ferry => Icons.directions_boat_filled_rounded,
-    RewardType.house => Icons.home_rounded,
-  };
+  FlowGlyphType _glyph(RewardType reward) => switch (reward) {
+        RewardType.line => FlowGlyphType.route,
+        RewardType.walker => FlowGlyphType.walk,
+        RewardType.bike => FlowGlyphType.bike,
+        RewardType.car => FlowGlyphType.car,
+        RewardType.ferry => FlowGlyphType.ferry,
+        RewardType.house => FlowGlyphType.house,
+      };
 
   String _label(AppStrings strings, RewardType reward) => switch (reward) {
-    RewardType.line => strings.line,
-    RewardType.walker => strings.walker,
-    RewardType.bike => strings.bike,
-    RewardType.car => strings.car,
-    RewardType.ferry => strings.ferry,
-    RewardType.house => strings.house,
-  };
+        RewardType.line => strings.line,
+        RewardType.walker => strings.walker,
+        RewardType.bike => strings.bike,
+        RewardType.car => strings.car,
+        RewardType.ferry => strings.ferry,
+        RewardType.house => strings.house,
+      };
 }

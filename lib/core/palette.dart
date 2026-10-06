@@ -10,4 +10,8 @@ abstract final class Palette {
   static const Color grass = Color(0xffdce8d4);
   static const Color warning = Color(0xffffbd4a);
   static const Color danger = Color(0xffe64b4b);
+  static const Color blue = Color(0xff118ab2);
+  static const Color coral = Color(0xffef476f);
+  static const Color panel = Color(0xffeeeadd);
+  static const Color veil = Color(0xb3283238);
 }

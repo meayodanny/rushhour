@@ -1,1 +1,14 @@
-{"@@locale":"en","gameTitle":"FLOWLINE","score":"DELIVERIES","gameOver":"THE NETWORK STOPPED","restart":"Restart","hint":"Connect matching shapes: restaurant → customer"}
+{
+  "@@locale": "en",
+  "gameTitle": "FLOWLINE",
+  "tagline": "A CITY IN MOTION",
+  "play": "Play",
+  "settings": "Settings",
+  "tutorial": "Tutorial",
+  "selectCity": "CHOOSE A CITY",
+  "start": "Start",
+  "score": "DELIVERIES",
+  "gameOver": "THE NETWORK STOPPED",
+  "restart": "Again",
+  "menu": "Menu"
+}

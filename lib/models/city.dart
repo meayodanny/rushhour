@@ -144,8 +144,33 @@ class CityData {
   }
 
   static Future<CityData> load(String cityId) async {
-    final source = await rootBundle.loadString('assets/cities/$cityId/map.json');
-    return CityData.fromJson(jsonDecode(source) as Map<String, Object?>);
+    final path = 'assets/cities/$cityId/map.json';
+    final source = await rootBundle.loadString(path);
+    final data = CityData.fromJson(jsonDecode(source) as Map<String, Object?>);
+    if (data.nodes.isEmpty || data.edges.isEmpty) {
+      throw FormatException('City map $path has no drawable road graph.');
+    }
+    for (final edge in data.edges) {
+      if (!data.nodes.containsKey(edge.from) || !data.nodes.containsKey(edge.to) || edge.points.length < 2) {
+        throw FormatException('City map $path contains invalid edge ${edge.id}.');
+      }
+    }
+    return data;
+  }
+
+  Rect get contentBounds {
+    if (nodes.isEmpty) return Rect.zero;
+    var left = double.infinity;
+    var top = double.infinity;
+    var right = double.negativeInfinity;
+    var bottom = double.negativeInfinity;
+    for (final node in nodes.values) {
+      left = math.min(left, node.point.dx);
+      top = math.min(top, node.point.dy);
+      right = math.max(right, node.point.dx);
+      bottom = math.max(bottom, node.point.dy);
+    }
+    return Rect.fromLTRB(left, top, right, bottom);
   }
 
   String nearestNode(Offset point, {double maxDistance = double.infinity}) {

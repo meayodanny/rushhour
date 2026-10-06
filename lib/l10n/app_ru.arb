@@ -1,1 +1,14 @@
-{"@@locale":"ru","gameTitle":"FLOWLINE","score":"ДОСТАВКИ","gameOver":"СЕТЬ ОСТАНОВИЛАСЬ","restart":"Начать заново","hint":"Соедините одинаковые фигуры: ресторан → заказчик"}
+{
+  "@@locale": "ru",
+  "gameTitle": "FLOWLINE",
+  "tagline": "ГОРОД В ДВИЖЕНИИ",
+  "play": "Играть",
+  "settings": "Настройки",
+  "tutorial": "Обучение",
+  "selectCity": "ВЫБЕРИТЕ ГОРОД",
+  "start": "Начать",
+  "score": "ДОСТАВКИ",
+  "gameOver": "СЕТЬ ОСТАНОВИЛАСЬ",
+  "restart": "Ещё раз",
+  "menu": "В меню"
+}

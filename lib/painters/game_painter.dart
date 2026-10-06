@@ -59,6 +59,16 @@ class GamePainter extends CustomPainter {
 
   void _drawCustomer(Canvas canvas, Customer customer) {
     final p = game.city.nodes[customer.nodeId]!.point;
+    final appearance = Curves.easeOutBack.transform(game.customerAppearance(customer));
+    final opacity = Curves.easeIn.transform(game.customerAppearance(customer));
+    canvas.save();
+    canvas.translate(p.dx, p.dy);
+    canvas.scale(appearance);
+    canvas.translate(-p.dx, -p.dy);
+    canvas.saveLayer(
+      Rect.fromCircle(center: p, radius: 90),
+      Paint()..color = Colors.white.withValues(alpha: opacity),
+    );
     final selected = game.selectedEntityId == customer.id;
     if (customer.demandSuspended) {
       canvas.drawCircle(p, 29 + math.sin(game.animation * 5) * 3, Paint()..color = Palette.warning.withValues(alpha: .65)..style = PaintingStyle.stroke..strokeWidth = 5);
@@ -79,6 +89,8 @@ class GamePainter extends CustomPainter {
         index++;
       }
     }
+    canvas.restore();
+    canvas.restore();
   }
 
   void _drawCourier(Canvas canvas, Courier courier) {
