@@ -27,20 +27,20 @@ jobs:
       - name: Analyze
         run: |
           mkdir -p qa_logs
-          flutter analyze --no-fatal-infos 2>&1 | tee qa_logs/analyze.log
+          flutter analyze --no-fatal-infos 2>&1 | tee qa_logs/analyze.txt
 
       - name: Test (regenerating QA goldens)
         if: always()
         run: |
-          flutter test --update-goldens --reporter expanded 2>&1 | tee qa_logs/test.log
+          flutter test --update-goldens --reporter expanded 2>&1 | tee qa_logs/test.txt
 
       - name: Assemble evidence GIF
         if: always()
         run: |
           set +e
-          python3 -m pip install --user pillow 2>&1 | tee -a qa_logs/gif.log
-          python3 tools/make_evidence_gif.py 2>&1 | tee -a qa_logs/gif.log
-          echo "gif_exit=$?" | tee -a qa_logs/gif.log
+          python3 -m pip install --user pillow 2>&1 | tee -a qa_logs/gif.txt
+          python3 tools/make_evidence_gif.py 2>&1 | tee -a qa_logs/gif.txt
+          echo "gif_exit=$?" | tee -a qa_logs/gif.txt
 
       - name: Commit & push QA evidence and logs
         if: always()
@@ -48,10 +48,14 @@ jobs:
           {
             echo "=== workspace listing ==="
             ls -la
-            echo "=== test/goldens ==="
-            ls -la test/goldens 2>&1 || true
-            echo "=== docs ==="
-            find docs -type f 2>&1 || true
+            echo "=== all png files ==="
+            find . -name '*.png' -not -path './.git/*' -not -path './build/*' | head -50
+            echo "=== test dir ==="
+            ls -la test test/goldens 2>&1 || true
+            echo "=== test log tail ==="
+            tail -40 qa_logs/test.txt 2>&1 || true
+            echo "=== gitignore check ==="
+            git check-ignore -v test/goldens/hitbox_map.png qa_logs/test.txt 2>&1 || true
           } > qa_logs/workspace.txt 2>&1
           git config user.name "arena-agent"
           git config user.email "arena-agent@users.noreply.github.com"
