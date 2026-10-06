@@ -4,12 +4,13 @@ import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import '../core/game_config.dart';
+import '../core/geo_projection.dart';
 
 enum RoadType { street, bridge, restrictedCar, ferry }
 enum RoadLevel { major, minor }
 enum BuildingType { residential, office, park, other }
 
-class GeoBounds {
+class GeoBounds implements GeoSpan {
   const GeoBounds({
     required this.minLat,
     required this.maxLat,
@@ -17,9 +18,13 @@ class GeoBounds {
     required this.maxLng,
   });
 
+  @override
   final double minLat;
+  @override
   final double maxLat;
+  @override
   final double minLng;
+  @override
   final double maxLng;
 
   bool containsLat(double lat, double lng) =>
@@ -225,6 +230,7 @@ class CityData {
     required this.ferryPoints,
     required this.availableCuisines,
     required this.holidays,
+    required this.projection,
     this.buildings = const <CityBuilding>[],
   });
 
@@ -244,29 +250,30 @@ class CityData {
   final List<Holiday> holidays;
   final List<CityBuilding> buildings;
 
+  /// Requirement 43: the one and only lat/lng -> world transform for this
+  /// city. Rendering, snapping/hit-testing and pathfinding all read it from
+  /// here, so they can never drift apart.
+  final GeoProjection projection;
+
+  /// Projects a geographic coordinate with this city's projection.
+  Offset project(double lat, double lng) => projection.project(lat, lng);
+
+  /// Inverse of [project]; handy for debugging a snapped world point.
+  ({double lat, double lng}) unproject(Offset point) => projection.unproject(point);
+
   List<Offset> get river => riverSegments.isNotEmpty ? riverSegments.first : const <Offset>[];
 
+  /// Deprecated shim kept only so no caller can silently re-invent the
+  /// formula: it forwards to [GeoProjection], which is the single source of
+  /// truth (Requirement 43).
   static Offset projectCoordinate(
     double lat,
     double lng,
     GeoBounds bounds,
     Size worldSize, {
     double padding = 48.0,
-  }) {
-    final latSpan = math.max(1e-7, bounds.maxLat - bounds.minLat);
-    final lngSpan = math.max(1e-7, bounds.maxLng - bounds.minLng);
-
-    final normX = (lng - bounds.minLng) / lngSpan;
-    final normY = (bounds.maxLat - lat) / latSpan;
-
-    final effectiveW = worldSize.width - 2 * padding;
-    final effectiveH = worldSize.height - 2 * padding;
-
-    return Offset(
-      padding + normX * effectiveW,
-      padding + normY * effectiveH,
-    );
-  }
+  }) =>
+      GeoProjection.fromBounds(bounds, worldSize, padding: padding).project(lat, lng);
 
   factory CityData.fromJson(Map<String, Object?> json, {Size worldSize = GameConfig.worldSize}) {
     final roads = json['roads']! as Map<String, Object?>;
@@ -299,8 +306,8 @@ class CityData {
             maxLng: maxLng + lngPad,
           );
 
-    Offset project(double lat, double lng) =>
-        projectCoordinate(lat, lng, boundingBox, worldSize);
+    final projection = GeoProjection.fromBounds(boundingBox, worldSize);
+    Offset project(double lat, double lng) => projection.project(lat, lng);
 
     final nodes = <String, RoadNode>{};
     for (final raw in rawNodes) {
@@ -373,6 +380,7 @@ class CityData {
           unlockedByDefault: (map['unlockedByDefault'] as bool?) ?? false,
         );
       }).toList(),
+      projection: projection,
       availableCuisines: (json['availableCuisines']! as List<Object?>).cast<String>(),
       holidays: ((json['holidays'] as List<Object?>?) ?? const <Object?>[]).map((Object? raw) {
         final map = raw! as Map<String, Object?>;
@@ -421,16 +429,7 @@ class CityData {
     return Rect.fromLTRB(left, top, right, bottom);
   }
 
-  Rect projectBounds(GeoBounds bounds) {
-    final pTopLeft = projectCoordinate(bounds.maxLat, bounds.minLng, boundingBox, GameConfig.worldSize);
-    final pBottomRight = projectCoordinate(bounds.minLat, bounds.maxLng, boundingBox, GameConfig.worldSize);
-    return Rect.fromLTRB(
-      math.min(pTopLeft.dx, pBottomRight.dx),
-      math.min(pTopLeft.dy, pBottomRight.dy),
-      math.max(pTopLeft.dx, pBottomRight.dx),
-      math.max(pTopLeft.dy, pBottomRight.dy),
-    );
-  }
+  Rect projectBounds(GeoBounds bounds) => projection.projectSpan(bounds);
 
   String nearestNode(Offset point, {double maxDistance = double.infinity}) {
     var best = nodes.values.first;
