@@ -82,19 +82,27 @@ class MainMenuScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Align(
-                            alignment: Alignment.bottomRight,
-                            child: FlowPressable(
-                              semanticLabel: AppStrings.of(context).language,
-                              onPressed: onCycleLanguage,
-                              height: 54,
-                              radius: 18,
-                              background: Palette.paper.withValues(alpha: .94),
-                              foreground: Palette.ink,
-                              padding: const EdgeInsets.symmetric(horizontal: 15),
-                              child: Text(
-                                AppStrings.of(context).locale.languageCode == 'ru' ? '🇷🇺' : '🇬🇧',
-                                style: const TextStyle(fontSize: 24, decoration: TextDecoration.none),
+                          Positioned(
+                            right: 2,
+                            bottom: 0,
+                            child: Semantics(
+                              button: true,
+                              label: AppStrings.of(context).language,
+                              child: GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: onCycleLanguage,
+                                // The 56px invisible target is intentional;
+                                // only the flag itself is painted.
+                                child: SizedBox(
+                                  width: 56,
+                                  height: 56,
+                                  child: Center(
+                                    child: Text(
+                                      localeCode == 'ru' ? '🇷🇺' : '🇬🇧',
+                                      style: const TextStyle(fontSize: 24, decoration: TextDecoration.none),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ),

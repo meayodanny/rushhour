@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../core/game_config.dart';
 import '../core/palette.dart';
 import '../game/game_controller.dart';
 import '../models/entities.dart';
@@ -19,19 +20,38 @@ class OverlayPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (manualPoints.length > 1) {
-      final path = Path()..moveTo(manualPoints.first.dx, manualPoints.first.dy);
-      for (final point in manualPoints.skip(1)) {
-        path.lineTo(point.dx, point.dy);
-      }
+    final draft = game.lineDraft;
+    if (draft != null && draft.points.length > 1) {
+      final path = Path()..moveTo(draft.points.first.dx, draft.points.first.dy);
+      for (final point in draft.points.skip(1)) path.lineTo(point.dx, point.dy);
+      // Drafts are always graph-snapped and intentionally translucent until
+      // the release lands on a valid POI.
       canvas.drawPath(
         path,
         Paint()
-          ..color = Palette.ink.withValues(alpha: .45)
+          ..color = Palette.paper.withValues(alpha: .72)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 8
-          ..strokeCap = StrokeCap.round,
+          ..strokeWidth = 17
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round,
       );
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = GameConfig.lineColors[draft.colorIndex].withValues(alpha: .5)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 9
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round,
+      );
+    }
+
+    // Kept for backwards compatibility with saved/tutorial overlays; normal
+    // gameplay now uses LineDraft rather than a freehand path.
+    if (manualPoints.length > 1 && draft == null) {
+      final path = Path()..moveTo(manualPoints.first.dx, manualPoints.first.dy);
+      for (final point in manualPoints.skip(1)) path.lineTo(point.dx, point.dy);
+      canvas.drawPath(path, Paint()..color = Palette.ink.withValues(alpha: .2)..style = PaintingStyle.stroke..strokeWidth = 8..strokeCap = StrokeCap.round);
     }
 
     for (final courier in game.session.couriers.where((Courier c) => c.state == CourierState.waitingBlocked)) {

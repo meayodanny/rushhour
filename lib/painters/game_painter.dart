@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../core/game_config.dart';
 import '../core/palette.dart';
 import '../game/game_controller.dart';
+import '../game/line_geometry.dart';
 import '../models/entities.dart';
 
 class GamePainter extends CustomPainter {
@@ -21,40 +22,48 @@ class GamePainter extends CustomPainter {
     if (game.session.weather == WeatherType.rain) _drawRain(canvas, size);
   }
 
-  List<Offset> _routePoints(DeliveryLine line) {
-    final result = <Offset>[];
-    var current = game.nodeForEntity(line.stopIds.first);
-    for (final id in line.edgeIds) {
-      final edge = game.city.edgeById(id); if (edge == null) continue;
-      final forward = edge.from == current;
-      final points = forward ? edge.points : edge.points.reversed;
-      if (result.isEmpty) { result.addAll(points); } else { result.addAll(points.skip(1)); }
-      current = forward ? edge.to : edge.from;
-    }
-    return result;
-  }
+  LineGeometry get _geometry => LineGeometry(
+        game.city,
+        game.session.lines,
+        nodeForEntity: game.nodeForEntity,
+      );
+
+  List<Offset> _routePoints(DeliveryLine line) =>
+      _geometry.offsetRoutePointsFor(line, game.nodeForEntity);
 
   void _drawLine(Canvas canvas, DeliveryLine line) {
     final points = _routePoints(line); if (points.length < 2) return;
     final path = Path()..moveTo(points.first.dx, points.first.dy);
     for (final p in points.skip(1)) { path.lineTo(p.dx, p.dy); }
-    canvas.drawPath(path, Paint()..color = Palette.paper.withValues(alpha: .85)..style = PaintingStyle.stroke..strokeWidth = 15..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round);
-    canvas.drawPath(path, Paint()..color = GameConfig.lineColors[line.colorIndex]..style = PaintingStyle.stroke..strokeWidth = 8..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round);
+    // The pale under-stroke separates a line from the road while the colour
+    // track remains wide enough to be recognizable at a phone-sized zoom.
+    canvas.drawPath(path, Paint()..color = Palette.paper.withValues(alpha: .94)..style = PaintingStyle.stroke..strokeWidth = 17..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round);
+    canvas.drawPath(path, Paint()..color = GameConfig.lineColors[line.colorIndex]..style = PaintingStyle.stroke..strokeWidth = 9..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round);
   }
 
   void _drawRestaurant(Canvas canvas, Restaurant restaurant) {
     final p = game.city.nodes[restaurant.nodeId]!.point;
+    final progress = game.restaurantAppearance(restaurant);
+    final scale = Curves.elasticOut.transform(progress.clamp(0.0, 1.0).toDouble());
+    final opacity = Curves.easeIn.transform(progress.clamp(0.0, 1.0).toDouble());
+    canvas.save();
+    canvas.translate(p.dx, p.dy);
+    canvas.scale(scale);
+    canvas.translate(-p.dx, -p.dy);
     final selected = game.selectedEntityId == restaurant.id;
-    canvas.drawCircle(p, selected ? 27 : 23, Paint()..color = Palette.paper);
-    canvas.drawCircle(p, 20, Paint()..color = Palette.ink);
-    _shape(canvas, restaurant.cuisine, p, 12, Palette.paper);
+    canvas.drawCircle(p, selected ? 27 : 23, Paint()..color = Palette.paper.withValues(alpha: opacity));
+    canvas.drawCircle(p, 20, Paint()..color = Palette.ink.withValues(alpha: opacity));
+    _shape(canvas, restaurant.cuisine, p, 12, Palette.paper.withValues(alpha: opacity));
     for (var i = 0; i < restaurant.dishes.length; i++) {
       final dish = restaurant.dishes[i];
-      final angle = -math.pi / 2 + i * math.pi / 3;
+      final dishScale = Curves.elasticOut.transform(dish.appearance.clamp(0.0, 1.0).toDouble());
       final pulse = 1 + math.sin(game.animation * (2 + dish.coolingStage) * 2) * .08 * dish.coolingStage;
+      final angle = -math.pi / 2 + i * math.pi / 3;
       final offset = Offset(math.cos(angle), math.sin(angle)) * 32;
-      _shape(canvas, dish.cuisine, p + offset, 7 * pulse, Palette.ink.withValues(alpha: 1 - dish.coolingStage * .14));
+      _shape(canvas, dish.cuisine, p + offset, 7 * pulse * dishScale,
+          Palette.ink.withValues(alpha: opacity * (1 - dish.coolingStage * .14)));
     }
+    canvas.restore();
   }
 
   void _drawCustomer(Canvas canvas, Customer customer) {
@@ -75,7 +84,7 @@ class GamePainter extends CustomPainter {
     }
     if (customer.overloadRemaining != null && !customer.demandSuspended) {
       final max = game.session.difficulty == Difficulty.realism ? GameConfig.realismOverloadSeconds : GameConfig.normalOverloadSeconds;
-      final fraction = (customer.overloadRemaining! / max).clamp(0.0, 1.0);
+      final fraction = (customer.overloadRemaining! / max).clamp(0.0, 1.0).toDouble();
       final color = Color.lerp(Palette.danger, Palette.warning, fraction)!;
       canvas.drawArc(Rect.fromCircle(center: p, radius: 31 + math.sin(game.animation * 8) * 2), -math.pi / 2, math.pi * 2 * fraction, false, Paint()..color = color..style = PaintingStyle.stroke..strokeWidth = 7..strokeCap = StrokeCap.round);
     }
@@ -85,7 +94,10 @@ class GamePainter extends CustomPainter {
     for (final entry in customer.demand.entries) {
       for (var i = 0; i < entry.value; i++) {
         final col = index % 4; final row = index ~/ 4;
-        _shape(canvas, entry.key, p + Offset((col - 1.5) * 11, 29 + row * 12), 5, Palette.ink);
+        final demandProgress = game.demandAppearance(customer, entry.key, i);
+        final demandScale = Curves.elasticOut.transform(demandProgress.clamp(0.0, 1.0).toDouble());
+        _shape(canvas, entry.key, p + Offset((col - 1.5) * 11, 29 + row * 12), 5 * demandScale,
+            Palette.ink.withValues(alpha: opacity * demandProgress.clamp(0.0, 1.0).toDouble()));
         index++;
       }
     }
@@ -99,14 +111,16 @@ class GamePainter extends CustomPainter {
     final p = _pointOnPolyline(points, courier.progress);
     final radius = switch (courier.type) { CourierType.walk => 6.0, CourierType.bike => 9.0, CourierType.car => 12.0 };
     final pulse = courier.state == CourierState.waitingBlocked ? 1 + math.sin(game.animation * 8) * .25 : 1.0;
-    canvas.drawCircle(p, (radius + 4) * pulse, Paint()..color = Palette.paper);
+    // The pale halo doubles as a visually calm affordance while giving the
+    // touch target roughly twice the tiny courier marker.
+    canvas.drawCircle(p, (radius + 8) * pulse, Paint()..color = Palette.paper);
     canvas.drawCircle(p, radius * pulse, Paint()..color = GameConfig.lineColors[line.colorIndex]);
     if (courier.cargo.isNotEmpty) canvas.drawCircle(p.translate(radius, -radius), 4, Paint()..color = Palette.ink);
   }
 
   Offset _pointOnPolyline(List<Offset> points, double progress) {
     var length = 0.0; for (var i = 1; i < points.length; i++) { length += (points[i] - points[i - 1]).distance; }
-    var target = progress.clamp(0, 1) * length;
+    var target = progress.clamp(0, 1).toDouble() * length;
     for (var i = 1; i < points.length; i++) { final d = (points[i] - points[i - 1]).distance; if (target <= d) return Offset.lerp(points[i - 1], points[i], target / math.max(1, d))!; target -= d; }
     return points.last;
   }

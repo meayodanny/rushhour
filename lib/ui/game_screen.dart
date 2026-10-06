@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,15 +44,24 @@ class _GameScreenState extends ConsumerState<GameScreen>
   final GlobalKey _mapKey = GlobalKey();
   final GlobalKey _clockKey = GlobalKey();
   final GlobalKey _timePanelKey = GlobalKey();
-  final List<Offset> _manual = <Offset>[];
 
   late final AnimationController _timeAnimation;
   late final AnimationController _hintAnimation;
+  late final AnimationController _cameraAnimation;
 
   GameSessionController? _game;
   Size? _viewportSize;
   bool _timeOpen = false;
   bool _settingsOpen = false;
+  bool _cameraGesture = false;
+  Offset _gestureAnchor = Offset.zero;
+  Offset _lastGestureScene = Offset.zero;
+  double _gestureStartScale = 1;
+  Offset _cameraReturnStart = Offset.zero;
+  Offset _cameraReturnEnd = Offset.zero;
+  double _cameraReturnScaleStart = 1;
+  double _cameraReturnScaleEnd = 1;
+  bool _mapMoved = false;
 
   @override
   void initState() {
@@ -63,8 +73,14 @@ class _GameScreenState extends ConsumerState<GameScreen>
     );
     _hintAnimation = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 6200),
+      // The route should be readable at a glance, not flash by at the start
+      // of a session.
+      duration: const Duration(milliseconds: 12000),
     )..addStatusListener(_onHintStatus);
+    _cameraAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 420),
+    )..addListener(_applyCameraReturn);
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -83,6 +99,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
     _transform.dispose();
     _timeAnimation.dispose();
     _hintAnimation.dispose();
+    _cameraAnimation.dispose();
     super.dispose();
   }
 
@@ -205,39 +222,32 @@ class _GameScreenState extends ConsumerState<GameScreen>
               List<Object?> rejected,
             ) => ClipRect(
               key: _mapKey,
-              child: InteractiveViewer(
-                transformationController: _transform,
-                constrained: false,
-                minScale: .25,
-                maxScale: 2.5,
-                boundaryMargin: const EdgeInsets.all(280),
-                panEnabled: _manual.isEmpty,
-                onInteractionStart: (_) => _closeTimePanel(),
-                child: SizedBox(
-                  width: GameConfig.worldSize.width,
-                  height: GameConfig.worldSize.height,
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTapUp: (TapUpDetails details) => game.handleMapTap(details.localPosition),
-                    onLongPressStart: (LongPressStartDetails details) {
-                      setState(() {
-                        _manual
-                          ..clear()
-                          ..add(details.localPosition);
-                      });
-                    },
-                    onLongPressMoveUpdate: (LongPressMoveUpdateDetails details) {
-                      setState(() {
-                        if (_manual.isEmpty || (_manual.last - details.localPosition).distance > 14) {
-                          _manual.add(details.localPosition);
-                        }
-                      });
-                    },
-                    onLongPressEnd: (LongPressEndDetails details) {
-                      game.createManualLine(List<Offset>.of(_manual));
-                      setState(_manual.clear);
-                    },
-                    child: Stack(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapUp: (TapUpDetails details) {
+                  if (!_mapMoved) game.handleMapTap(_scenePoint(details.localPosition));
+                },
+                onScaleStart: _onMapScaleStart,
+                onScaleUpdate: _onMapScaleUpdate,
+                onScaleEnd: _onMapScaleEnd,
+                child: SizedBox.expand(
+                  child: ValueListenableBuilder<Matrix4>(
+                    valueListenable: _transform,
+                    builder: (BuildContext context, Matrix4 matrix, Widget? child) => Transform(
+                      alignment: Alignment.topLeft,
+                      transform: matrix,
+                      child: child,
+                    ),
+                    child: OverflowBox(
+                      alignment: Alignment.topLeft,
+                      minWidth: GameConfig.worldSize.width,
+                      maxWidth: GameConfig.worldSize.width,
+                      minHeight: GameConfig.worldSize.height,
+                      maxHeight: GameConfig.worldSize.height,
+                      child: SizedBox(
+                        width: GameConfig.worldSize.width,
+                        height: GameConfig.worldSize.height,
+                        child: Stack(
                       fit: StackFit.expand,
                       children: <Widget>[
                         RepaintBoundary(
@@ -251,7 +261,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                           size: GameConfig.worldSize,
                           painter: OverlayPainter(
                             game,
-                            List<Offset>.of(_manual),
+                            const <Offset>[],
                             hintAnimation: _hintAnimation,
                           ),
                         ),
@@ -261,20 +271,151 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
               ),
             ),
-          );
+          ),
+        ),
+      ),
         },
       );
+
+  Offset _scenePoint(Offset viewportPoint) => _transform.toScene(viewportPoint);
+
+  void _onMapScaleStart(ScaleStartDetails details) {
+    _closeTimePanel();
+    _mapMoved = false;
+    final game = _game ?? ref.read(gameControllerProvider);
+    final scene = _scenePoint(details.focalPoint);
+    _lastGestureScene = scene;
+    _cameraAnimation.stop();
+    if (game.beginLineGesture(scene)) {
+      _cameraGesture = false;
+      return;
+    }
+    _cameraGesture = true;
+    _gestureAnchor = scene;
+    _gestureStartScale = _transform.value.getMaxScaleOnAxis();
+    _cameraAnimation.stop();
+  }
+
+  void _onMapScaleUpdate(ScaleUpdateDetails details) {
+    _mapMoved = _mapMoved || details.scale != 1 || details.focalPointDelta.distance > .5;
+    final game = _game ?? ref.read(gameControllerProvider);
+    if (!_cameraGesture) {
+      _lastGestureScene = _scenePoint(details.focalPoint);
+      game.updateLineGesture(_lastGestureScene);
+      return;
+    }
+    final viewport = _viewportSize;
+    if (viewport == null) return;
+    final scale = _softScale(_gestureStartScale * details.scale, viewport);
+    final focal = details.focalPoint;
+    final rawTranslation = Offset(
+      focal.dx - _gestureAnchor.dx * scale,
+      focal.dy - _gestureAnchor.dy * scale,
+    );
+    final translation = _softTranslation(rawTranslation, scale, viewport);
+    _transform.value = _matrix(scale, translation);
+  }
+
+  void _onMapScaleEnd(ScaleEndDetails details) {
+    final game = _game ?? ref.read(gameControllerProvider);
+    if (!_cameraGesture) {
+      game.endLineGesture(_lastGestureScene);
+    } else {
+      _animateCameraBack();
+    }
+    _cameraGesture = false;
+  }
+
+  Matrix4 _matrix(double scale, Offset translation) => Matrix4.identity()
+    ..translate(translation.dx, translation.dy)
+    ..scale(scale);
+
+  Rect _mapBounds() => (_game ?? ref.read(gameControllerProvider)).city.contentBounds.inflate(58);
+
+  double _minZoom(Size viewport) {
+    final bounds = _mapBounds();
+    return math.max(viewport.width / bounds.width, viewport.height / bounds.height) * .96;
+  }
+
+  double _maxZoom(Size viewport) => math.max(2.4, _minZoom(viewport) * 3.2);
+
+  double _softScale(double value, Size viewport) {
+    final min = _minZoom(viewport);
+    final max = _maxZoom(viewport);
+    if (value < min) return min - (min - value) * .22;
+    if (value > max) return max + (value - max) * .22;
+    return value;
+  }
+
+  Offset _softTranslation(Offset value, double scale, Size viewport) {
+    final hard = _hardLimits(scale, viewport);
+    double soften(double coordinate, double min, double max) {
+      if (min > max) return (min + max) / 2;
+      if (coordinate < min) return min - (min - coordinate) * .22;
+      if (coordinate > max) return max + (coordinate - max) * .22;
+      return coordinate;
+    }
+    return Offset(soften(value.dx, hard.left, hard.right), soften(value.dy, hard.top, hard.bottom));
+  }
+
+  Rect _hardLimits(double scale, Size viewport) {
+    final bounds = _mapBounds();
+    const padding = 22.0;
+    final minX = viewport.width - padding - bounds.right * scale;
+    final maxX = padding - bounds.left * scale;
+    final minY = viewport.height - padding - bounds.bottom * scale;
+    final maxY = padding - bounds.top * scale;
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
+  }
+
+  void _animateCameraBack() {
+    final viewport = _viewportSize;
+    if (viewport == null) return;
+    final currentScale = _transform.value.getMaxScaleOnAxis();
+    final min = _minZoom(viewport);
+    final max = _maxZoom(viewport);
+    final targetScale = currentScale.clamp(min, max).toDouble();
+    final targetTranslation = _clampedTranslation(targetScale, viewport);
+    _cameraReturnScaleStart = currentScale;
+    _cameraReturnScaleEnd = targetScale;
+    _cameraReturnStart = Offset(_transform.value.storage[12], _transform.value.storage[13]);
+    _cameraReturnEnd = targetTranslation;
+    if ((_cameraReturnScaleStart - _cameraReturnScaleEnd).abs() < .0001 &&
+        (_cameraReturnStart - _cameraReturnEnd).distance < .1) {
+      return;
+    }
+    _cameraAnimation.forward(from: 0);
+  }
+
+  Offset _clampedTranslation(double scale, Size viewport) {
+    final hard = _hardLimits(scale, viewport);
+    final current = Offset(_transform.value.storage[12], _transform.value.storage[13]);
+    final x = hard.left <= hard.right ? current.dx.clamp(hard.left, hard.right).toDouble() : (hard.left + hard.right) / 2;
+    final y = hard.top <= hard.bottom ? current.dy.clamp(hard.top, hard.bottom).toDouble() : (hard.top + hard.bottom) / 2;
+    return Offset(x, y);
+  }
+
+  void _applyCameraReturn() {
+    if (!mounted) return;
+    final eased = Curves.easeOutCubic.transform(_cameraAnimation.value);
+    final scale = lerpDouble(_cameraReturnScaleStart, _cameraReturnScaleEnd, eased)!;
+    final translation = Offset(
+      lerpDouble(_cameraReturnStart.dx, _cameraReturnEnd.dx, eased)!,
+      lerpDouble(_cameraReturnStart.dy, _cameraReturnEnd.dy, eased)!,
+    );
+    _transform.value = _matrix(scale, translation);
+  }
 
   void _fitToViewport(GameSessionController game) {
     final viewport = _viewportSize;
     if (viewport == null || viewport.isEmpty || game.city.nodes.isEmpty) return;
-    final bounds = game.city.contentBounds.inflate(65);
-    final scale = math.min(viewport.width / bounds.width, viewport.height / bounds.height).clamp(.25, 2.5);
-    final matrix = Matrix4.identity()
-      ..translate(viewport.width / 2, viewport.height / 2)
-      ..scale(scale)
-      ..translate(-bounds.center.dx, -bounds.center.dy);
-    _transform.value = matrix;
+    final bounds = _mapBounds();
+    final scale = _minZoom(viewport).clamp(.25, _maxZoom(viewport)).toDouble();
+    final translation = Offset(
+      viewport.width / 2 - bounds.center.dx * scale,
+      viewport.height / 2 - bounds.center.dy * scale,
+    );
+    _transform.value = _matrix(scale, translation);
   }
 
   void _toggleTimePanel() {

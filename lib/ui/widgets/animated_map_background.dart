@@ -82,6 +82,18 @@ class MenuMapPainter extends CustomPainter {
     canvas.scale(scale);
     canvas.translate(-bounds.center.dx, -bounds.center.dy);
 
+    for (final building in city.buildings) {
+      if (building.footprint.length < 3) continue;
+      final path = _path(building.footprint)..close();
+      final color = switch (building.type) {
+        BuildingType.residential => const Color(0xffeadfd0),
+        BuildingType.office => const Color(0xffd8e1e2),
+        BuildingType.park => Palette.grass,
+        BuildingType.other => const Color(0xffe7e2d5),
+      };
+      canvas.drawPath(path, Paint()..color = color);
+    }
+
     if (city.river.length > 1) {
       final river = _path(city.river);
       canvas.drawPath(

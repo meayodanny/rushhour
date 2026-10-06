@@ -19,10 +19,14 @@ extension CourierBalance on CourierType {
 }
 
 class Dish {
-  Dish({required this.id, required this.cuisine, this.age = 0});
+  Dish({required this.id, required this.cuisine, this.age = 0, this.appearance = 1});
   final String id;
   final Cuisine cuisine;
   double age;
+  double appearance;
+
+  // New dishes use the same fade + pulse treatment as newly spawned map
+  // points. Loaded dishes are restored as fully visible.
   int get coolingStage => (age / GameConfig.dishLifetime * 5).floor().clamp(0, 5);
   Map<String, Object?> toJson() => <String, Object?>{'id': id, 'cuisine': cuisine.name, 'age': age};
   factory Dish.fromJson(Map<String, Object?> j) => Dish(id: j['id']! as String, cuisine: Cuisine.values.byName(j['cuisine']! as String), age: (j['age']! as num).toDouble());

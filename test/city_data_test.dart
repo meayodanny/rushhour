@@ -11,6 +11,8 @@ void main() {
     expect(city.edges, isNotEmpty);
     expect(city.restaurantPois, isNotEmpty);
     expect(city.customerPois, isNotEmpty);
+    expect(city.buildings, isNotEmpty);
+    expect(city.buildings.every((CityBuilding building) => building.footprint.length >= 3), isTrue);
     expect(city.contentBounds.width, greaterThan(0));
     expect(city.contentBounds.height, greaterThan(0));
     expect(

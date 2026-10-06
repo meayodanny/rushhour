@@ -6,6 +6,26 @@ import 'package:flutter/services.dart';
 
 enum RoadType { street, bridge, restrictedCar, ferry }
 enum RoadLevel { major, minor }
+enum BuildingType { residential, office, park, other }
+
+class CityBuilding {
+  const CityBuilding({required this.id, required this.type, required this.footprint});
+  final String id;
+  final BuildingType type;
+  final List<Offset> footprint;
+
+  factory CityBuilding.fromJson(Map<String, Object?> json) {
+    final raw = json['footprint'] as List<Object?>? ?? const <Object?>[];
+    return CityBuilding(
+      id: json['id']! as String,
+      type: BuildingType.values.byName((json['type'] as String?) ?? 'other'),
+      footprint: raw.map((Object? point) {
+        final pair = point! as List<Object?>;
+        return Offset((pair[0]! as num).toDouble(), (pair[1]! as num).toDouble());
+      }).toList(),
+    );
+  }
+}
 
 class RoadNode {
   const RoadNode({required this.id, required this.point});
@@ -93,6 +113,7 @@ class CityData {
     required this.nodes, required this.edges, required this.river,
     required this.restaurantPois, required this.customerPois,
     required this.ferryPoints, required this.availableCuisines, required this.holidays,
+    this.buildings = const <CityBuilding>[],
   });
   final String cityId;
   final String displayName;
@@ -105,6 +126,7 @@ class CityData {
   final List<FerryPoint> ferryPoints;
   final List<String> availableCuisines;
   final List<Holiday> holidays;
+  final List<CityBuilding> buildings;
 
   factory CityData.fromJson(Map<String, Object?> json) {
     final roads = json['roads']! as Map<String, Object?>;
@@ -125,6 +147,10 @@ class CityData {
       attribution: (json['attribution'] as String?) ?? '© OpenStreetMap contributors',
       nodes: nodes,
       edges: (roads['edges']! as List<Object?>).map((Object? e) => RoadEdge.fromJson(e! as Map<String, Object?>, nodes)).toList(),
+      buildings: ((json['buildings'] as List<Object?>?) ?? const <Object?>[])
+          .map((Object? raw) => CityBuilding.fromJson(raw! as Map<String, Object?>))
+          .where((CityBuilding building) => building.footprint.length >= 3)
+          .toList(),
       river: (json['river']! as Map<String, Object?>)['polyline'] is List<Object?>
         ? ((json['river']! as Map<String, Object?>)['polyline']! as List<Object?>).map((Object? p) {
             final pair = p! as List<Object?>; return Offset((pair[0]! as num).toDouble(), (pair[1]! as num).toDouble());
@@ -153,6 +179,11 @@ class CityData {
     for (final edge in data.edges) {
       if (!data.nodes.containsKey(edge.from) || !data.nodes.containsKey(edge.to) || edge.points.length < 2) {
         throw FormatException('City map $path contains invalid edge ${edge.id}.');
+      }
+    }
+    for (final building in data.buildings) {
+      if (building.footprint.length < 3) {
+        throw FormatException('City map $path contains invalid building ${building.id}.');
       }
     }
     return data;

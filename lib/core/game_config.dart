@@ -1,7 +1,11 @@
 import 'dart:ui';
 
 abstract final class GameConfig {
-  static const Size worldSize = Size(900, 1400);
+  // MVP is intentionally a compact district; the graph no longer reserves a
+  // large empty world around the playable neighbourhood.
+  static const Size worldSize = Size(860, 1320);
+  static const int startingLines = 2;
+  static const int startingWalkCouriers = 2;
   static const int baseDemandLimit = 8;
   static const int upgradedDemandLimit = 12;
   static const int maxDishes = 6;
