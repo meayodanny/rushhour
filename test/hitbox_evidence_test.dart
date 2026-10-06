@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:rushhour/ui/game_screen.dart';
@@ -91,9 +90,8 @@ void main() {
     var frame = 0;
     Offset position = touchDown;
     const steps = 10;
-    final total = customerCentre - touchDown;
+    final delta = (customerCentre - touchDown) * (1.0 / steps);
     for (var i = 0; i < steps; i++) {
-      final delta = total / steps;
       position += delta;
       await gesture.moveTo(position);
       // Advance the draft draw-in animation so the line is fully visible.

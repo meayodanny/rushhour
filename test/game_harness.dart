@@ -3,7 +3,6 @@
 library;
 
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,6 +68,7 @@ class FakePersistenceService extends PersistenceService {
   Future<void> saveRecord(
     String cityId,
     Difficulty difficulty,
+    int score,
     double survival,
     int networkSize,
   ) async {}
@@ -164,7 +164,7 @@ Future<GameHarness> pumpGameScreen(
   final audio = SilentAudioService();
   final ads = StubAdService();
 
-  final container = ProviderContainer(overrides: <Override>[
+  final container = ProviderContainer(overrides: [
     persistenceProvider.overrideWithValue(persistence),
     cityProvider.overrideWithValue(city),
     audioServiceProvider.overrideWithValue(audio),

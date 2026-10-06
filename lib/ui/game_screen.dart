@@ -7,10 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../core/game_config.dart';
+import '../core/geo_projection.dart';
 import '../core/palette.dart';
+import '../core/touch_targets.dart';
 import '../game/game_controller.dart';
 import '../models/entities.dart';
 import '../painters/game_painter.dart';
+import '../painters/hitbox_debug_painter.dart';
 import '../painters/overlay_painter.dart';
 import '../painters/static_map_painter.dart';
 import 'widgets/fleet_bar.dart';
@@ -519,7 +522,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   /// Requirement 44.2: each point of interest is its own positioned
   /// interactive widget, laid over the painted map. Flutter's own hit
   /// testing resolves "POI vs pan/zoom" — no manual distance checks.
-  Widget _buildPoiHitArea(PoiHitRect hit) {
+  Widget _buildPoiHitArea(GameSessionController game, PoiHitRect hit) {
     return Positioned(
       key: ValueKey<String>('poi-hit-${hit.entityId}'),
       left: hit.rect.left,
@@ -543,6 +546,10 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   MapCamera _camera() => MapCamera(_transform.value);
 
+  /// The live controller (never null while the screen is mounted).
+  GameSessionController get _activeGame =>
+      (_game ?? ref.read(gameControllerProvider))!;
+
   /// Converts a global pointer position into the map viewport's local
   /// coordinates — the space the camera matrix maps from.
   Offset _mapLocalFromGlobal(Offset globalPoint) {
@@ -562,19 +569,19 @@ class _GameScreenState extends ConsumerState<GameScreen>
     if (!_lineGestureActive) {
       setState(() => _lineGestureActive = true);
     }
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     game.startLineDraftFromEntity(entityId);
   }
 
   void _onPoiPanUpdate(Offset globalPosition) {
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     final screenPoint = _mapLocalFromGlobal(globalPosition);
     _lastGestureScreen = screenPoint;
     game.updateLineGesture(_camera(), screenPoint);
   }
 
   void _onPoiPanEnd() {
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     if (_lineGestureActive) {
       setState(() => _lineGestureActive = false);
     }
@@ -585,7 +592,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
     if (_lineGestureActive) {
       setState(() => _lineGestureActive = false);
     }
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     game.cancelLineGesture();
   }
 
@@ -597,7 +604,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   void _onMapScaleStart(ScaleStartDetails details) {
     _closeTimePanel();
     _mapMoved = false;
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     final camera = _camera();
     // THE bug of patches #2/#3, fixed: the recognizer used to feed the GLOBAL
     // focal point into a matrix that expects map-local coordinates. Every
@@ -624,7 +631,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   void _onMapScaleUpdate(ScaleUpdateDetails details) {
     _mapMoved = _mapMoved || details.scale != 1 || details.focalPointDelta.distance > .5;
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     if (!_cameraGesture) {
       _lastGestureScreen = details.localFocalPoint;
       game.updateLineGesture(_camera(), details.localFocalPoint);
@@ -643,7 +650,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 
   void _onMapScaleEnd(ScaleEndDetails details) {
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     if (!_cameraGesture) {
       game.endLineGesture(_camera(), _lastGestureScreen);
     } else {
@@ -661,8 +668,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   // Requirement 40.2: Camera bounds clamped to active reveal bounds
   Rect _mapBounds() {
-    final game = _game ?? ref.read(gameControllerProvider);
-    final activeGeo = game!.activeRevealBounds;
+    final game = _activeGame;
+    final activeGeo = game.activeRevealBounds;
     final rect = game.city.projectBounds(activeGeo);
     return rect.inflate(45);
   }

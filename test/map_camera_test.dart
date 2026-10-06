@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,7 +31,7 @@ void main() {
 
     test('a world circle of worldRadiusFor(px) is a screen circle of px radius', () {
       final camera = MapCamera(Matrix4.identity()
-        ..translate(-10, 10)
+        ..translate(-10.0, 10.0)
         ..scale(0.35));
       const worldRadius = 100.0;
       final centre = projection.project(51.5, -0.005);
@@ -51,7 +49,7 @@ void main() {
     test('uniform scale keeps screen radii zoom-independent', () {
       for (final scale in <double>[0.25, 0.35, 1.0, 2.4, 3.2]) {
         final camera = MapCamera(Matrix4.identity()
-          ..translate(5, 5)
+          ..translate(5.0, 5.0)
           ..scale(scale));
         const screenPx = 24.0; // TouchTargets.poiHitRadius
         final worldRadius = camera.worldRadiusFor(screenPx);

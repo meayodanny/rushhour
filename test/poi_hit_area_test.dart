@@ -74,10 +74,10 @@ void main() {
     expect(game.lineDraft!.startEntityId, 'r001');
 
     // Drag towards the customer icon in small visible steps.
-    final total = customerCentre - (touchDown + const Offset(24, 18));
     const steps = 8;
+    final step = (customerCentre - (touchDown + const Offset(24, 18))) * (1.0 / steps);
     for (var i = 0; i < steps; i++) {
-      await gesture.moveBy(total / steps);
+      await gesture.moveBy(step);
       if (game.lineDraft != null) game.lineDraft!.reachProgress = 1.0;
       await tester.pump(const Duration(milliseconds: 40));
     }
@@ -163,7 +163,7 @@ void main() {
 Future<void> gestureDrag(WidgetTester tester, TestGesture gesture, Offset delta) async {
   const steps = 4;
   for (var i = 0; i < steps; i++) {
-    await gesture.moveBy(delta / steps);
+    await gesture.moveBy(delta * (1.0 / steps));
     await tester.pump(const Duration(milliseconds: 30));
   }
 }

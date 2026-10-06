@@ -27,11 +27,13 @@ jobs:
       - name: Analyze
         run: |
           mkdir -p qa_logs
-          flutter analyze --no-fatal-infos 2>&1 | tee qa_logs/analyze.txt
+          set -o pipefail
+          flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee qa_logs/analyze.txt
 
       - name: Test (regenerating QA goldens)
         if: always()
         run: |
+          set -o pipefail
           flutter test --update-goldens --reporter expanded 2>&1 | tee qa_logs/test.txt
 
       - name: Assemble evidence GIF
