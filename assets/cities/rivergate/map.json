@@ -1,2059 +1,2324 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "cityId": "rivergate",
   "displayName": "Rivergate",
   "attribution": "© OpenStreetMap contributors",
   "boundingBox": {
-    "minLat": 0,
-    "minLng": 0,
-    "maxLat": 1,
-    "maxLng": 1
+    "minLat": 51.49812,
+    "maxLat": 51.51648,
+    "minLng": -0.133852,
+    "maxLng": -0.105448
   },
+  "startViewport": {
+    "minLat": 51.5,
+    "maxLat": 51.505,
+    "minLng": -0.128,
+    "maxLng": -0.116
+  },
+  "revealStages": [
+    {
+      "stageIndex": 1,
+      "bounds": {
+        "minLat": 51.4985,
+        "maxLat": 51.5065,
+        "minLng": -0.133,
+        "maxLng": -0.107
+      },
+      "unlockAfterLevel": 2
+    },
+    {
+      "stageIndex": 2,
+      "bounds": {
+        "minLat": 51.49812,
+        "maxLat": 51.51648,
+        "minLng": -0.133852,
+        "maxLng": -0.105448
+      },
+      "unlockAfterLevel": 4
+    }
+  ],
   "roads": {
     "nodes": [
       {
-        "id": "n0_0",
-        "x": 80,
-        "y": 90
+        "id": "s_sw1",
+        "lat": 51.499,
+        "lng": -0.1325
       },
       {
-        "id": "n0_1",
-        "x": 210,
-        "y": 90
+        "id": "s_sw2",
+        "lat": 51.4992,
+        "lng": -0.1265
       },
       {
-        "id": "n0_2",
-        "x": 340,
-        "y": 90
+        "id": "s_sw3",
+        "lat": 51.4988,
+        "lng": -0.1205
       },
       {
-        "id": "n0_3",
-        "x": 560,
-        "y": 90
+        "id": "s_se1",
+        "lat": 51.4993,
+        "lng": -0.1145
       },
       {
-        "id": "n0_4",
-        "x": 690,
-        "y": 90
+        "id": "s_se2",
+        "lat": 51.4991,
+        "lng": -0.1085
       },
       {
-        "id": "n0_5",
-        "x": 820,
-        "y": 90
+        "id": "s_mid_w",
+        "lat": 51.5015,
+        "lng": -0.131
       },
       {
-        "id": "n1_0",
-        "x": 80,
-        "y": 240
+        "id": "s_mid_c1",
+        "lat": 51.5018,
+        "lng": -0.125
       },
       {
-        "id": "n1_1",
-        "x": 210,
-        "y": 240
+        "id": "s_mid_c2",
+        "lat": 51.5012,
+        "lng": -0.119
       },
       {
-        "id": "n1_2",
-        "x": 340,
-        "y": 240
+        "id": "s_mid_e1",
+        "lat": 51.5019,
+        "lng": -0.113
       },
       {
-        "id": "n1_3",
-        "x": 560,
-        "y": 240
+        "id": "s_mid_e2",
+        "lat": 51.5016,
+        "lng": -0.1075
       },
       {
-        "id": "n1_4",
-        "x": 690,
-        "y": 240
+        "id": "s_diag1",
+        "lat": 51.5005,
+        "lng": -0.128
       },
       {
-        "id": "n1_5",
-        "x": 820,
-        "y": 240
+        "id": "s_diag2",
+        "lat": 51.5008,
+        "lng": -0.116
       },
       {
-        "id": "n2_0",
-        "x": 80,
-        "y": 390
+        "id": "s_diag3",
+        "lat": 51.5028,
+        "lng": -0.1225
       },
       {
-        "id": "n2_1",
-        "x": 210,
-        "y": 390
+        "id": "s_bank_1",
+        "lat": 51.5038,
+        "lng": -0.1315
       },
       {
-        "id": "n2_2",
-        "x": 340,
-        "y": 390
+        "id": "s_bank_2",
+        "lat": 51.5042,
+        "lng": -0.126
       },
       {
-        "id": "n2_3",
-        "x": 560,
-        "y": 390
+        "id": "s_bank_bridge_w",
+        "lat": 51.5045,
+        "lng": -0.1215
       },
       {
-        "id": "n2_4",
-        "x": 690,
-        "y": 390
+        "id": "s_bank_3",
+        "lat": 51.5049,
+        "lng": -0.117
       },
       {
-        "id": "n2_5",
-        "x": 820,
-        "y": 390
+        "id": "s_bank_ferry",
+        "lat": 51.5052,
+        "lng": -0.1125
       },
       {
-        "id": "n3_0",
-        "x": 80,
-        "y": 540
+        "id": "s_bank_bridge_e",
+        "lat": 51.5056,
+        "lng": -0.1078
       },
       {
-        "id": "n3_1",
-        "x": 210,
-        "y": 540
+        "id": "n_bank_1",
+        "lat": 51.5085,
+        "lng": -0.131
       },
       {
-        "id": "n3_2",
-        "x": 340,
-        "y": 540
+        "id": "n_bank_2",
+        "lat": 51.5088,
+        "lng": -0.1255
       },
       {
-        "id": "n3_3",
-        "x": 560,
-        "y": 540
+        "id": "n_bank_bridge_w",
+        "lat": 51.5092,
+        "lng": -0.121
       },
       {
-        "id": "n3_4",
-        "x": 690,
-        "y": 540
+        "id": "n_bank_3",
+        "lat": 51.5096,
+        "lng": -0.1165
       },
       {
-        "id": "n3_5",
-        "x": 820,
-        "y": 540
+        "id": "n_bank_ferry",
+        "lat": 51.51,
+        "lng": -0.112
       },
       {
-        "id": "n4_0",
-        "x": 80,
-        "y": 690
+        "id": "n_bank_bridge_e",
+        "lat": 51.5104,
+        "lng": -0.1072
       },
       {
-        "id": "n4_1",
-        "x": 210,
-        "y": 690
+        "id": "n_mid_w",
+        "lat": 51.5118,
+        "lng": -0.1315
       },
       {
-        "id": "n4_2",
-        "x": 340,
-        "y": 690
+        "id": "n_mid_c1",
+        "lat": 51.5122,
+        "lng": -0.125
       },
       {
-        "id": "n4_3",
-        "x": 560,
-        "y": 690
+        "id": "n_mid_c2",
+        "lat": 51.5116,
+        "lng": -0.1185
       },
       {
-        "id": "n4_4",
-        "x": 690,
-        "y": 690
+        "id": "n_mid_e1",
+        "lat": 51.5125,
+        "lng": -0.1125
       },
       {
-        "id": "n4_5",
-        "x": 820,
-        "y": 690
+        "id": "n_mid_e2",
+        "lat": 51.5121,
+        "lng": -0.1068
       },
       {
-        "id": "n5_0",
-        "x": 80,
-        "y": 840
+        "id": "n_diag1",
+        "lat": 51.5108,
+        "lng": -0.1285
       },
       {
-        "id": "n5_1",
-        "x": 210,
-        "y": 840
+        "id": "n_diag2",
+        "lat": 51.5112,
+        "lng": -0.1155
       },
       {
-        "id": "n5_2",
-        "x": 340,
-        "y": 840
+        "id": "n_diag3",
+        "lat": 51.5135,
+        "lng": -0.122
       },
       {
-        "id": "n5_3",
-        "x": 560,
-        "y": 840
+        "id": "n_top_w1",
+        "lat": 51.5152,
+        "lng": -0.1328
       },
       {
-        "id": "n5_4",
-        "x": 690,
-        "y": 840
+        "id": "n_top_w2",
+        "lat": 51.5155,
+        "lng": -0.1262
       },
       {
-        "id": "n5_5",
-        "x": 820,
-        "y": 840
+        "id": "n_top_c",
+        "lat": 51.5158,
+        "lng": -0.12
       },
       {
-        "id": "n6_0",
-        "x": 80,
-        "y": 990
+        "id": "n_top_e1",
+        "lat": 51.5154,
+        "lng": -0.1135
       },
       {
-        "id": "n6_1",
-        "x": 210,
-        "y": 990
+        "id": "n_top_e2",
+        "lat": 51.5151,
+        "lng": -0.1065
       },
       {
-        "id": "n6_2",
-        "x": 340,
-        "y": 990
+        "id": "s_sub1",
+        "lat": 51.5002,
+        "lng": -0.1228
       },
       {
-        "id": "n6_3",
-        "x": 560,
-        "y": 990
+        "id": "s_sub2",
+        "lat": 51.5025,
+        "lng": -0.1285
       },
       {
-        "id": "n6_4",
-        "x": 690,
-        "y": 990
+        "id": "s_sub3",
+        "lat": 51.5032,
+        "lng": -0.1142
       },
       {
-        "id": "n6_5",
-        "x": 820,
-        "y": 990
+        "id": "s_sub4",
+        "lat": 51.4998,
+        "lng": -0.1105
       },
       {
-        "id": "n7_0",
-        "x": 80,
-        "y": 1140
+        "id": "s_sub5",
+        "lat": 51.5028,
+        "lng": -0.1092
       },
       {
-        "id": "n7_1",
-        "x": 210,
-        "y": 1140
+        "id": "n_sub1",
+        "lat": 51.5138,
+        "lng": -0.1292
       },
       {
-        "id": "n7_2",
-        "x": 340,
-        "y": 1140
+        "id": "n_sub2",
+        "lat": 51.5102,
+        "lng": -0.1232
       },
       {
-        "id": "n7_3",
-        "x": 560,
-        "y": 1140
+        "id": "n_sub3",
+        "lat": 51.5132,
+        "lng": -0.1158
       },
       {
-        "id": "n7_4",
-        "x": 690,
-        "y": 1140
+        "id": "n_sub4",
+        "lat": 51.5142,
+        "lng": -0.1098
       },
       {
-        "id": "n7_5",
-        "x": 820,
-        "y": 1140
+        "id": "n_sub5",
+        "lat": 51.5106,
+        "lng": -0.1088
       },
       {
-        "id": "n8_0",
-        "x": 80,
-        "y": 1290
+        "id": "bridge_w_mid",
+        "lat": 51.50685,
+        "lng": -0.12125
       },
       {
-        "id": "n8_1",
-        "x": 210,
-        "y": 1290
-      },
-      {
-        "id": "n8_2",
-        "x": 340,
-        "y": 1290
-      },
-      {
-        "id": "n8_3",
-        "x": 560,
-        "y": 1290
-      },
-      {
-        "id": "n8_4",
-        "x": 690,
-        "y": 1290
-      },
-      {
-        "id": "n8_5",
-        "x": 820,
-        "y": 1290
+        "id": "bridge_e_mid",
+        "lat": 51.508,
+        "lng": -0.1075
       }
     ],
     "edges": [
       {
-        "id": "e0",
-        "from": "n0_0",
-        "to": "n0_1",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
         "id": "e1",
-        "from": "n0_1",
-        "to": "n0_2",
+        "from": "s_sw1",
+        "to": "s_sw2",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.499,
+            -0.1325
+          ],
+          [
+            51.4992,
+            -0.1265
+          ]
+        ]
       },
       {
         "id": "e2",
-        "from": "n0_3",
-        "to": "n0_4",
+        "from": "s_sw2",
+        "to": "s_sw3",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.4992,
+            -0.1265
+          ],
+          [
+            51.4988,
+            -0.1205
+          ]
+        ]
       },
       {
         "id": "e3",
-        "from": "n0_4",
-        "to": "n0_5",
+        "from": "s_sw3",
+        "to": "s_se1",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.4988,
+            -0.1205
+          ],
+          [
+            51.4993,
+            -0.1145
+          ]
+        ]
       },
       {
         "id": "e4",
-        "from": "n1_0",
-        "to": "n1_1",
+        "from": "s_se1",
+        "to": "s_se2",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.4993,
+            -0.1145
+          ],
+          [
+            51.4991,
+            -0.1085
+          ]
+        ]
       },
       {
         "id": "e5",
-        "from": "n1_1",
-        "to": "n1_2",
+        "from": "s_sw1",
+        "to": "s_mid_w",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.499,
+            -0.1325
+          ],
+          [
+            51.5015,
+            -0.131
+          ]
+        ]
       },
       {
         "id": "e6",
-        "from": "n1_3",
-        "to": "n1_4",
+        "from": "s_sw2",
+        "to": "s_diag1",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.4992,
+            -0.1265
+          ],
+          [
+            51.5005,
+            -0.128
+          ]
+        ]
       },
       {
         "id": "e7",
-        "from": "n1_4",
-        "to": "n1_5",
+        "from": "s_diag1",
+        "to": "s_mid_c1",
         "type": "street",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5005,
+            -0.128
+          ],
+          [
+            51.5018,
+            -0.125
+          ]
+        ]
       },
       {
         "id": "e8",
-        "from": "n2_0",
-        "to": "n2_1",
+        "from": "s_sw3",
+        "to": "s_sub1",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.4988,
+            -0.1205
+          ],
+          [
+            51.5002,
+            -0.1228
+          ]
+        ]
       },
       {
         "id": "e9",
-        "from": "n2_1",
-        "to": "n2_2",
+        "from": "s_sub1",
+        "to": "s_mid_c2",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5002,
+            -0.1228
+          ],
+          [
+            51.5012,
+            -0.119
+          ]
+        ]
       },
       {
         "id": "e10",
-        "from": "n2_2",
-        "to": "n2_3",
-        "type": "bridge",
-        "roadLevel": "major",
+        "from": "s_se1",
+        "to": "s_diag2",
+        "type": "street",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.4993,
+            -0.1145
+          ],
+          [
+            51.5008,
+            -0.116
+          ]
+        ]
       },
       {
         "id": "e11",
-        "from": "n2_3",
-        "to": "n2_4",
+        "from": "s_diag2",
+        "to": "s_mid_e1",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5008,
+            -0.116
+          ],
+          [
+            51.5019,
+            -0.113
+          ]
+        ]
       },
       {
         "id": "e12",
-        "from": "n2_4",
-        "to": "n2_5",
+        "from": "s_se2",
+        "to": "s_sub4",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.4991,
+            -0.1085
+          ],
+          [
+            51.4998,
+            -0.1105
+          ]
+        ]
       },
       {
         "id": "e13",
-        "from": "n3_0",
-        "to": "n3_1",
+        "from": "s_sub4",
+        "to": "s_mid_e2",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.4998,
+            -0.1105
+          ],
+          [
+            51.5016,
+            -0.1075
+          ]
+        ]
       },
       {
         "id": "e14",
-        "from": "n3_1",
-        "to": "n3_2",
+        "from": "s_mid_w",
+        "to": "s_mid_c1",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5015,
+            -0.131
+          ],
+          [
+            51.5018,
+            -0.125
+          ]
+        ]
       },
       {
         "id": "e15",
-        "from": "n3_3",
-        "to": "n3_4",
+        "from": "s_mid_c1",
+        "to": "s_mid_c2",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5018,
+            -0.125
+          ],
+          [
+            51.5012,
+            -0.119
+          ]
+        ]
       },
       {
         "id": "e16",
-        "from": "n3_4",
-        "to": "n3_5",
+        "from": "s_mid_c2",
+        "to": "s_mid_e1",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5012,
+            -0.119
+          ],
+          [
+            51.5019,
+            -0.113
+          ]
+        ]
       },
       {
         "id": "e17",
-        "from": "n4_0",
-        "to": "n4_1",
+        "from": "s_mid_e1",
+        "to": "s_mid_e2",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5019,
+            -0.113
+          ],
+          [
+            51.5016,
+            -0.1075
+          ]
+        ]
       },
       {
         "id": "e18",
-        "from": "n4_1",
-        "to": "n4_2",
+        "from": "s_mid_w",
+        "to": "s_sub2",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5015,
+            -0.131
+          ],
+          [
+            51.5025,
+            -0.1285
+          ]
+        ]
       },
       {
         "id": "e19",
-        "from": "n4_3",
-        "to": "n4_4",
+        "from": "s_sub2",
+        "to": "s_bank_1",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5025,
+            -0.1285
+          ],
+          [
+            51.5038,
+            -0.1315
+          ]
+        ]
       },
       {
         "id": "e20",
-        "from": "n4_4",
-        "to": "n4_5",
+        "from": "s_mid_c1",
+        "to": "s_bank_2",
+        "type": "street",
+        "roadLevel": "minor",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5018,
+            -0.125
+          ],
+          [
+            51.5042,
+            -0.126
+          ]
+        ]
+      },
+      {
+        "id": "e21",
+        "from": "s_mid_c2",
+        "to": "s_diag3",
         "type": "street",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e21",
-        "from": "n5_0",
-        "to": "n5_1",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5012,
+            -0.119
+          ],
+          [
+            51.5028,
+            -0.1225
+          ]
+        ]
       },
       {
         "id": "e22",
-        "from": "n5_1",
-        "to": "n5_2",
+        "from": "s_diag3",
+        "to": "s_bank_bridge_w",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5028,
+            -0.1225
+          ],
+          [
+            51.5045,
+            -0.1215
+          ]
+        ]
       },
       {
         "id": "e23",
-        "from": "n5_3",
-        "to": "n5_4",
+        "from": "s_mid_e1",
+        "to": "s_sub3",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5019,
+            -0.113
+          ],
+          [
+            51.5032,
+            -0.1142
+          ]
+        ]
       },
       {
         "id": "e24",
-        "from": "n5_4",
-        "to": "n5_5",
+        "from": "s_sub3",
+        "to": "s_bank_ferry",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5032,
+            -0.1142
+          ],
+          [
+            51.5052,
+            -0.1125
+          ]
+        ]
       },
       {
         "id": "e25",
-        "from": "n6_0",
-        "to": "n6_1",
+        "from": "s_mid_e2",
+        "to": "s_sub5",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5016,
+            -0.1075
+          ],
+          [
+            51.5028,
+            -0.1092
+          ]
+        ]
       },
       {
         "id": "e26",
-        "from": "n6_1",
-        "to": "n6_2",
+        "from": "s_sub5",
+        "to": "s_bank_bridge_e",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5028,
+            -0.1092
+          ],
+          [
+            51.5056,
+            -0.1078
+          ]
+        ]
       },
       {
         "id": "e27",
-        "from": "n6_2",
-        "to": "n6_3",
+        "from": "s_bank_1",
+        "to": "s_bank_2",
+        "type": "street",
+        "roadLevel": "minor",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5038,
+            -0.1315
+          ],
+          [
+            51.5042,
+            -0.126
+          ]
+        ]
+      },
+      {
+        "id": "e28",
+        "from": "s_bank_2",
+        "to": "s_bank_bridge_w",
+        "type": "street",
+        "roadLevel": "major",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5042,
+            -0.126
+          ],
+          [
+            51.5045,
+            -0.1215
+          ]
+        ]
+      },
+      {
+        "id": "e29",
+        "from": "s_bank_bridge_w",
+        "to": "s_bank_3",
+        "type": "street",
+        "roadLevel": "major",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5045,
+            -0.1215
+          ],
+          [
+            51.5049,
+            -0.117
+          ]
+        ]
+      },
+      {
+        "id": "e30",
+        "from": "s_bank_3",
+        "to": "s_bank_ferry",
+        "type": "street",
+        "roadLevel": "minor",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5049,
+            -0.117
+          ],
+          [
+            51.5052,
+            -0.1125
+          ]
+        ]
+      },
+      {
+        "id": "e31",
+        "from": "s_bank_ferry",
+        "to": "s_bank_bridge_e",
+        "type": "street",
+        "roadLevel": "minor",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5052,
+            -0.1125
+          ],
+          [
+            51.5056,
+            -0.1078
+          ]
+        ]
+      },
+      {
+        "id": "e32",
+        "from": "s_diag1",
+        "to": "s_sub1",
+        "type": "street",
+        "roadLevel": "minor",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5005,
+            -0.128
+          ],
+          [
+            51.5002,
+            -0.1228
+          ]
+        ]
+      },
+      {
+        "id": "e33",
+        "from": "s_sub1",
+        "to": "s_diag2",
+        "type": "street",
+        "roadLevel": "minor",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5002,
+            -0.1228
+          ],
+          [
+            51.5008,
+            -0.116
+          ]
+        ]
+      },
+      {
+        "id": "e34",
+        "from": "s_sub2",
+        "to": "s_diag3",
+        "type": "street",
+        "roadLevel": "minor",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5025,
+            -0.1285
+          ],
+          [
+            51.5028,
+            -0.1225
+          ]
+        ]
+      },
+      {
+        "id": "e35",
+        "from": "s_diag3",
+        "to": "s_sub3",
+        "type": "street",
+        "roadLevel": "minor",
+        "allowCar": true,
+        "allowBike": true,
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5028,
+            -0.1225
+          ],
+          [
+            51.5032,
+            -0.1142
+          ]
+        ]
+      },
+      {
+        "id": "e36",
+        "from": "s_bank_bridge_w",
+        "to": "bridge_w_mid",
         "type": "bridge",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e28",
-        "from": "n6_3",
-        "to": "n6_4",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e29",
-        "from": "n6_4",
-        "to": "n6_5",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e30",
-        "from": "n7_0",
-        "to": "n7_1",
-        "type": "street",
-        "roadLevel": "major",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e31",
-        "from": "n7_1",
-        "to": "n7_2",
-        "type": "street",
-        "roadLevel": "major",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e32",
-        "from": "n7_3",
-        "to": "n7_4",
-        "type": "street",
-        "roadLevel": "major",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e33",
-        "from": "n7_4",
-        "to": "n7_5",
-        "type": "street",
-        "roadLevel": "major",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e34",
-        "from": "n8_0",
-        "to": "n8_1",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e35",
-        "from": "n8_1",
-        "to": "n8_2",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e36",
-        "from": "n8_3",
-        "to": "n8_4",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5045,
+            -0.1215
+          ],
+          [
+            51.50685,
+            -0.12125
+          ]
+        ]
       },
       {
         "id": "e37",
-        "from": "n8_4",
-        "to": "n8_5",
-        "type": "street",
-        "roadLevel": "minor",
+        "from": "bridge_w_mid",
+        "to": "n_bank_bridge_w",
+        "type": "bridge",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.50685,
+            -0.12125
+          ],
+          [
+            51.5092,
+            -0.121
+          ]
+        ]
       },
       {
         "id": "e38",
-        "from": "n0_0",
-        "to": "n1_0",
-        "type": "street",
-        "roadLevel": "minor",
+        "from": "s_bank_bridge_e",
+        "to": "bridge_e_mid",
+        "type": "bridge",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5056,
+            -0.1078
+          ],
+          [
+            51.508,
+            -0.1075
+          ]
+        ]
       },
       {
         "id": "e39",
-        "from": "n1_0",
-        "to": "n2_0",
-        "type": "street",
-        "roadLevel": "minor",
+        "from": "bridge_e_mid",
+        "to": "n_bank_bridge_e",
+        "type": "bridge",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.508,
+            -0.1075
+          ],
+          [
+            51.5104,
+            -0.1072
+          ]
+        ]
       },
       {
         "id": "e40",
-        "from": "n2_0",
-        "to": "n3_0",
+        "from": "n_bank_1",
+        "to": "n_bank_2",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5085,
+            -0.131
+          ],
+          [
+            51.5088,
+            -0.1255
+          ]
+        ]
       },
       {
         "id": "e41",
-        "from": "n3_0",
-        "to": "n4_0",
+        "from": "n_bank_2",
+        "to": "n_bank_bridge_w",
         "type": "street",
-        "roadLevel": "minor",
-        "allowCar": false,
+        "roadLevel": "major",
+        "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5088,
+            -0.1255
+          ],
+          [
+            51.5092,
+            -0.121
+          ]
+        ]
       },
       {
         "id": "e42",
-        "from": "n4_0",
-        "to": "n5_0",
+        "from": "n_bank_bridge_w",
+        "to": "n_bank_3",
         "type": "street",
-        "roadLevel": "minor",
-        "allowCar": false,
+        "roadLevel": "major",
+        "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5092,
+            -0.121
+          ],
+          [
+            51.5096,
+            -0.1165
+          ]
+        ]
       },
       {
         "id": "e43",
-        "from": "n5_0",
-        "to": "n6_0",
+        "from": "n_bank_3",
+        "to": "n_bank_ferry",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5096,
+            -0.1165
+          ],
+          [
+            51.51,
+            -0.112
+          ]
+        ]
       },
       {
         "id": "e44",
-        "from": "n6_0",
-        "to": "n7_0",
+        "from": "n_bank_ferry",
+        "to": "n_bank_bridge_e",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.51,
+            -0.112
+          ],
+          [
+            51.5104,
+            -0.1072
+          ]
+        ]
       },
       {
         "id": "e45",
-        "from": "n7_0",
-        "to": "n8_0",
+        "from": "n_bank_1",
+        "to": "n_mid_w",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5085,
+            -0.131
+          ],
+          [
+            51.5118,
+            -0.1315
+          ]
+        ]
       },
       {
         "id": "e46",
-        "from": "n0_1",
-        "to": "n1_1",
+        "from": "n_bank_2",
+        "to": "n_sub2",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5088,
+            -0.1255
+          ],
+          [
+            51.5102,
+            -0.1232
+          ]
+        ]
       },
       {
         "id": "e47",
-        "from": "n1_1",
-        "to": "n2_1",
+        "from": "n_sub2",
+        "to": "n_mid_c1",
         "type": "street",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5102,
+            -0.1232
+          ],
+          [
+            51.5122,
+            -0.125
+          ]
+        ]
       },
       {
         "id": "e48",
-        "from": "n2_1",
-        "to": "n3_1",
+        "from": "n_bank_bridge_w",
+        "to": "n_diag1",
         "type": "street",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5092,
+            -0.121
+          ],
+          [
+            51.5108,
+            -0.1285
+          ]
+        ]
       },
       {
         "id": "e49",
-        "from": "n3_1",
-        "to": "n4_1",
+        "from": "n_diag1",
+        "to": "n_mid_c1",
         "type": "street",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5108,
+            -0.1285
+          ],
+          [
+            51.5122,
+            -0.125
+          ]
+        ]
       },
       {
         "id": "e50",
-        "from": "n4_1",
-        "to": "n5_1",
+        "from": "n_bank_3",
+        "to": "n_mid_c2",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5096,
+            -0.1165
+          ],
+          [
+            51.5116,
+            -0.1185
+          ]
+        ]
       },
       {
         "id": "e51",
-        "from": "n5_1",
-        "to": "n6_1",
+        "from": "n_bank_ferry",
+        "to": "n_diag2",
         "type": "street",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.51,
+            -0.112
+          ],
+          [
+            51.5112,
+            -0.1155
+          ]
+        ]
       },
       {
         "id": "e52",
-        "from": "n6_1",
-        "to": "n7_1",
+        "from": "n_diag2",
+        "to": "n_mid_e1",
         "type": "street",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5112,
+            -0.1155
+          ],
+          [
+            51.5125,
+            -0.1125
+          ]
+        ]
       },
       {
         "id": "e53",
-        "from": "n7_1",
-        "to": "n8_1",
+        "from": "n_bank_bridge_e",
+        "to": "n_sub5",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5104,
+            -0.1072
+          ],
+          [
+            51.5106,
+            -0.1088
+          ]
+        ]
       },
       {
         "id": "e54",
-        "from": "n0_2",
-        "to": "n1_2",
+        "from": "n_sub5",
+        "to": "n_mid_e2",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5106,
+            -0.1088
+          ],
+          [
+            51.5121,
+            -0.1068
+          ]
+        ]
       },
       {
         "id": "e55",
-        "from": "n1_2",
-        "to": "n2_2",
+        "from": "n_mid_w",
+        "to": "n_mid_c1",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5118,
+            -0.1315
+          ],
+          [
+            51.5122,
+            -0.125
+          ]
+        ]
       },
       {
         "id": "e56",
-        "from": "n2_2",
-        "to": "n3_2",
+        "from": "n_mid_c1",
+        "to": "n_mid_c2",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5122,
+            -0.125
+          ],
+          [
+            51.5116,
+            -0.1185
+          ]
+        ]
       },
       {
         "id": "e57",
-        "from": "n3_2",
-        "to": "n4_2",
+        "from": "n_mid_c2",
+        "to": "n_mid_e1",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5116,
+            -0.1185
+          ],
+          [
+            51.5125,
+            -0.1125
+          ]
+        ]
       },
       {
         "id": "e58",
-        "from": "n4_2",
-        "to": "n5_2",
+        "from": "n_mid_e1",
+        "to": "n_mid_e2",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5125,
+            -0.1125
+          ],
+          [
+            51.5121,
+            -0.1068
+          ]
+        ]
       },
       {
         "id": "e59",
-        "from": "n5_2",
-        "to": "n6_2",
+        "from": "n_mid_w",
+        "to": "n_sub1",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5118,
+            -0.1315
+          ],
+          [
+            51.5138,
+            -0.1292
+          ]
+        ]
       },
       {
         "id": "e60",
-        "from": "n6_2",
-        "to": "n7_2",
+        "from": "n_sub1",
+        "to": "n_top_w1",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5138,
+            -0.1292
+          ],
+          [
+            51.5152,
+            -0.1328
+          ]
+        ]
       },
       {
         "id": "e61",
-        "from": "n7_2",
-        "to": "n8_2",
+        "from": "n_mid_c1",
+        "to": "n_diag3",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5122,
+            -0.125
+          ],
+          [
+            51.5135,
+            -0.122
+          ]
+        ]
       },
       {
         "id": "e62",
-        "from": "n0_3",
-        "to": "n1_3",
+        "from": "n_diag3",
+        "to": "n_top_w2",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5135,
+            -0.122
+          ],
+          [
+            51.5155,
+            -0.1262
+          ]
+        ]
       },
       {
         "id": "e63",
-        "from": "n1_3",
-        "to": "n2_3",
+        "from": "n_mid_c2",
+        "to": "n_top_c",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5116,
+            -0.1185
+          ],
+          [
+            51.5158,
+            -0.12
+          ]
+        ]
       },
       {
         "id": "e64",
-        "from": "n2_3",
-        "to": "n3_3",
+        "from": "n_mid_e1",
+        "to": "n_sub3",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5125,
+            -0.1125
+          ],
+          [
+            51.5132,
+            -0.1158
+          ]
+        ]
       },
       {
         "id": "e65",
-        "from": "n3_3",
-        "to": "n4_3",
+        "from": "n_sub3",
+        "to": "n_top_e1",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5132,
+            -0.1158
+          ],
+          [
+            51.5154,
+            -0.1135
+          ]
+        ]
       },
       {
         "id": "e66",
-        "from": "n4_3",
-        "to": "n5_3",
+        "from": "n_mid_e2",
+        "to": "n_sub4",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5121,
+            -0.1068
+          ],
+          [
+            51.5142,
+            -0.1098
+          ]
+        ]
       },
       {
         "id": "e67",
-        "from": "n5_3",
-        "to": "n6_3",
+        "from": "n_sub4",
+        "to": "n_top_e2",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5142,
+            -0.1098
+          ],
+          [
+            51.5151,
+            -0.1065
+          ]
+        ]
       },
       {
         "id": "e68",
-        "from": "n6_3",
-        "to": "n7_3",
+        "from": "n_top_w1",
+        "to": "n_top_w2",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5152,
+            -0.1328
+          ],
+          [
+            51.5155,
+            -0.1262
+          ]
+        ]
       },
       {
         "id": "e69",
-        "from": "n7_3",
-        "to": "n8_3",
+        "from": "n_top_w2",
+        "to": "n_top_c",
         "type": "street",
-        "roadLevel": "minor",
+        "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5155,
+            -0.1262
+          ],
+          [
+            51.5158,
+            -0.12
+          ]
+        ]
       },
       {
         "id": "e70",
-        "from": "n0_4",
-        "to": "n1_4",
+        "from": "n_top_c",
+        "to": "n_top_e1",
         "type": "street",
         "roadLevel": "major",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5158,
+            -0.12
+          ],
+          [
+            51.5154,
+            -0.1135
+          ]
+        ]
       },
       {
         "id": "e71",
-        "from": "n1_4",
-        "to": "n2_4",
+        "from": "n_top_e1",
+        "to": "n_top_e2",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5154,
+            -0.1135
+          ],
+          [
+            51.5151,
+            -0.1065
+          ]
+        ]
       },
       {
         "id": "e72",
-        "from": "n2_4",
-        "to": "n3_4",
+        "from": "n_diag1",
+        "to": "n_mid_w",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5108,
+            -0.1285
+          ],
+          [
+            51.5118,
+            -0.1315
+          ]
+        ]
       },
       {
         "id": "e73",
-        "from": "n3_4",
-        "to": "n4_4",
+        "from": "n_diag2",
+        "to": "n_mid_c2",
         "type": "street",
-        "roadLevel": "major",
+        "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5112,
+            -0.1155
+          ],
+          [
+            51.5116,
+            -0.1185
+          ]
+        ]
       },
       {
         "id": "e74",
-        "from": "n4_4",
-        "to": "n5_4",
-        "type": "street",
-        "roadLevel": "major",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e75",
-        "from": "n5_4",
-        "to": "n6_4",
-        "type": "street",
-        "roadLevel": "major",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e76",
-        "from": "n6_4",
-        "to": "n7_4",
-        "type": "street",
-        "roadLevel": "major",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e77",
-        "from": "n7_4",
-        "to": "n8_4",
-        "type": "street",
-        "roadLevel": "major",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e78",
-        "from": "n0_5",
-        "to": "n1_5",
+        "from": "n_diag3",
+        "to": "n_sub3",
         "type": "street",
         "roadLevel": "minor",
         "allowCar": true,
         "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e79",
-        "from": "n1_5",
-        "to": "n2_5",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e80",
-        "from": "n2_5",
-        "to": "n3_5",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e81",
-        "from": "n3_5",
-        "to": "n4_5",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e82",
-        "from": "n4_5",
-        "to": "n5_5",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e83",
-        "from": "n5_5",
-        "to": "n6_5",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e84",
-        "from": "n6_5",
-        "to": "n7_5",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "e85",
-        "from": "n7_5",
-        "to": "n8_5",
-        "type": "street",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
-      },
-      {
-        "id": "ferry_f1",
-        "from": "n4_2",
-        "to": "n4_3",
-        "type": "ferry",
-        "roadLevel": "minor",
-        "allowCar": true,
-        "allowBike": true,
-        "allowWalk": true
+        "allowWalk": true,
+        "polyline": [
+          [
+            51.5135,
+            -0.122
+          ],
+          [
+            51.5132,
+            -0.1158
+          ]
+        ]
       }
     ]
   },
   "river": {
-    "polyline": [
+    "segments": [
       [
-        455,
-        -40
+        [
+          51.5055,
+          -0.1345
+        ],
+        [
+          51.506,
+          -0.129
+        ],
+        [
+          51.5066,
+          -0.1235
+        ],
+        [
+          51.5072,
+          -0.118
+        ],
+        [
+          51.5078,
+          -0.1125
+        ],
+        [
+          51.5085,
+          -0.1065
+        ],
+        [
+          51.5092,
+          -0.104
+        ]
       ],
       [
-        440,
-        180
-      ],
-      [
-        470,
-        360
-      ],
-      [
-        445,
-        560
-      ],
-      [
-        462,
-        760
-      ],
-      [
-        438,
-        950
-      ],
-      [
-        466,
-        1160
-      ],
-      [
-        450,
-        1450
+        [
+          51.5066,
+          -0.1235
+        ],
+        [
+          51.5058,
+          -0.125
+        ],
+        [
+          51.505,
+          -0.1258
+        ]
       ]
     ]
   },
   "ferryPoints": [
     {
-      "id": "f1",
-      "nodeA": "n4_2",
-      "nodeB": "n4_3",
+      "id": "fp_rivergate",
+      "nodeA": "s_bank_ferry",
+      "nodeB": "n_bank_ferry",
       "unlockedByDefault": false
     }
   ],
   "poiPool": {
     "restaurants": [
       {
-        "id": "r0",
-        "nodeId": "n0_1"
+        "id": "r_pizza_central",
+        "nodeId": "s_mid_c1",
+        "kind": "restaurant"
       },
       {
-        "id": "r1",
-        "nodeId": "n2_4"
+        "id": "r_burger_south",
+        "nodeId": "s_se1",
+        "kind": "restaurant"
       },
       {
-        "id": "r2",
-        "nodeId": "n4_0"
+        "id": "r_asian_north",
+        "nodeId": "n_mid_c1",
+        "kind": "restaurant"
       },
       {
-        "id": "r3",
-        "nodeId": "n6_5"
+        "id": "r_dessert_river",
+        "nodeId": "s_bank_2",
+        "kind": "restaurant"
       },
       {
-        "id": "r4",
-        "nodeId": "n8_2"
-      },
-      {
-        "id": "r5",
-        "nodeId": "n1_5"
-      },
-      {
-        "id": "r6",
-        "nodeId": "n7_0"
+        "id": "r_healthy_north",
+        "nodeId": "n_top_c",
+        "kind": "restaurant"
       }
     ],
     "customers": [
       {
-        "id": "c0",
-        "nodeId": "n1_2"
+        "id": "c_south_square",
+        "nodeId": "s_mid_c2",
+        "kind": "customer"
       },
       {
-        "id": "c1",
-        "nodeId": "n3_4"
+        "id": "c_south_west",
+        "nodeId": "s_sw2",
+        "kind": "customer"
       },
       {
-        "id": "c2",
-        "nodeId": "n5_1"
+        "id": "c_bridge_south",
+        "nodeId": "s_bank_bridge_w",
+        "kind": "customer"
       },
       {
-        "id": "c3",
-        "nodeId": "n7_3"
+        "id": "c_south_east",
+        "nodeId": "s_mid_e1",
+        "kind": "customer"
       },
       {
-        "id": "c4",
-        "nodeId": "n8_5"
+        "id": "c_south_promenade",
+        "nodeId": "s_bank_3",
+        "kind": "customer"
       },
       {
-        "id": "c5",
-        "nodeId": "n0_4"
+        "id": "c_bridge_north",
+        "nodeId": "n_bank_bridge_w",
+        "kind": "customer"
       },
       {
-        "id": "c6",
-        "nodeId": "n4_5"
+        "id": "c_north_center",
+        "nodeId": "n_mid_c2",
+        "kind": "customer"
       },
       {
-        "id": "c7",
-        "nodeId": "n6_2"
+        "id": "c_north_west",
+        "nodeId": "n_top_w2",
+        "kind": "customer"
+      },
+      {
+        "id": "c_north_east",
+        "nodeId": "n_top_e1",
+        "kind": "customer"
+      },
+      {
+        "id": "c_ferry_north",
+        "nodeId": "n_bank_ferry",
+        "kind": "customer"
+      },
+      {
+        "id": "c_north_park",
+        "nodeId": "n_sub3",
+        "kind": "customer"
+      },
+      {
+        "id": "c_east_dock",
+        "nodeId": "s_bank_bridge_e",
+        "kind": "customer"
       }
     ]
   },
   "availableCuisines": [
     "pizza",
-    "asian",
     "burger",
+    "asian",
     "dessert",
     "healthy"
   ],
   "holidays": [
     {
-      "day": 3,
-      "durationDays": 1,
-      "orderMultiplier": 1.5,
-      "label": "Lantern Day"
-    },
-    {
       "day": 7,
       "durationDays": 2,
-      "orderMultiplier": 1.35,
+      "orderMultiplier": 1.4,
       "label": "River Festival"
+    },
+    {
+      "day": 14,
+      "durationDays": 2,
+      "orderMultiplier": 1.6,
+      "label": "City Marathon"
     }
   ],
   "buildings": [
     {
-      "id": "b1",
+      "id": "b_res_1",
       "type": "residential",
       "footprint": [
         [
-          96,
-          106
+          51.5008,
+          -0.1245
         ],
         [
-          194,
-          106
+          51.5015,
+          -0.1245
         ],
         [
-          194,
-          224
+          51.5015,
+          -0.1232
         ],
         [
-          96,
-          224
+          51.5012,
+          -0.1232
+        ],
+        [
+          51.5012,
+          -0.1238
+        ],
+        [
+          51.5008,
+          -0.1238
         ]
       ]
     },
     {
-      "id": "b2",
+      "id": "b_res_2",
+      "type": "residential",
+      "footprint": [
+        [
+          51.5004,
+          -0.127
+        ],
+        [
+          51.5012,
+          -0.127
+        ],
+        [
+          51.5012,
+          -0.1255
+        ],
+        [
+          51.5004,
+          -0.1255
+        ]
+      ]
+    },
+    {
+      "id": "b_off_south_1",
       "type": "office",
       "footprint": [
         [
-          225,
-          110
+          51.5022,
+          -0.124
         ],
         [
-          326,
-          110
+          51.5032,
+          -0.124
         ],
         [
-          326,
-          174
+          51.5032,
+          -0.122
         ],
         [
-          225,
-          174
+          51.5022,
+          -0.122
         ]
       ]
     },
     {
-      "id": "b3",
+      "id": "b_park_south",
+      "type": "park",
+      "footprint": [
+        [
+          51.4996,
+          -0.1195
+        ],
+        [
+          51.5008,
+          -0.1195
+        ],
+        [
+          51.501,
+          -0.117
+        ],
+        [
+          51.4998,
+          -0.1165
+        ],
+        [
+          51.4994,
+          -0.118
+        ]
+      ]
+    },
+    {
+      "id": "b_res_3",
       "type": "residential",
       "footprint": [
         [
-          225,
-          184
+          51.5022,
+          -0.118
         ],
         [
-          300,
-          184
+          51.503,
+          -0.118
         ],
         [
-          300,
-          225
+          51.503,
+          -0.115
         ],
         [
-          225,
-          225
+          51.5025,
+          -0.115
+        ],
+        [
+          51.5025,
+          -0.1165
+        ],
+        [
+          51.5022,
+          -0.1165
         ]
       ]
     },
     {
-      "id": "b4",
+      "id": "b_res_4",
+      "type": "residential",
+      "footprint": [
+        [
+          51.5002,
+          -0.1135
+        ],
+        [
+          51.5012,
+          -0.1135
+        ],
+        [
+          51.5012,
+          -0.111
+        ],
+        [
+          51.5002,
+          -0.111
+        ]
+      ]
+    },
+    {
+      "id": "b_off_south_2",
       "type": "office",
       "footprint": [
         [
-          575,
-          106
+          51.5035,
+          -0.1115
         ],
         [
-          675,
-          106
+          51.5045,
+          -0.1115
         ],
         [
-          675,
-          224
+          51.5045,
+          -0.109
         ],
         [
-          575,
-          224
+          51.5035,
+          -0.109
         ]
       ]
     },
     {
-      "id": "b5",
-      "type": "park",
-      "footprint": [
-        [
-          705,
-          112
-        ],
-        [
-          804,
-          112
-        ],
-        [
-          804,
-          220
-        ],
-        [
-          705,
-          220
-        ]
-      ]
-    },
-    {
-      "id": "b6",
-      "type": "park",
-      "footprint": [
-        [
-          96,
-          256
-        ],
-        [
-          194,
-          256
-        ],
-        [
-          194,
-          374
-        ],
-        [
-          96,
-          374
-        ]
-      ]
-    },
-    {
-      "id": "b7",
+      "id": "b_res_5",
       "type": "residential",
       "footprint": [
         [
-          225,
-          256
+          51.502,
+          -0.1305
         ],
         [
-          326,
-          256
+          51.5032,
+          -0.1305
         ],
         [
-          326,
-          320
+          51.5032,
+          -0.1285
         ],
         [
-          225,
-          320
+          51.502,
+          -0.1285
         ]
       ]
     },
     {
-      "id": "b8",
+      "id": "b_other_market",
       "type": "other",
       "footprint": [
         [
-          226,
-          330
+          51.4998,
+          -0.131
         ],
         [
-          300,
-          330
+          51.5006,
+          -0.131
         ],
         [
-          300,
-          374
+          51.5006,
+          -0.129
         ],
         [
-          226,
-          374
+          51.4998,
+          -0.129
         ]
       ]
     },
     {
-      "id": "b9",
+      "id": "b_off_north_1",
       "type": "office",
       "footprint": [
         [
-          575,
-          256
+          51.51,
+          -0.1245
         ],
         [
-          675,
-          256
+          51.5112,
+          -0.1245
         ],
         [
-          675,
-          374
+          51.5112,
+          -0.1225
         ],
         [
-          575,
-          374
+          51.51,
+          -0.1225
         ]
       ]
     },
     {
-      "id": "b10",
-      "type": "residential",
-      "footprint": [
-        [
-          705,
-          256
-        ],
-        [
-          804,
-          256
-        ],
-        [
-          804,
-          374
-        ],
-        [
-          705,
-          374
-        ]
-      ]
-    },
-    {
-      "id": "b11",
-      "type": "residential",
-      "footprint": [
-        [
-          96,
-          406
-        ],
-        [
-          194,
-          406
-        ],
-        [
-          194,
-          524
-        ],
-        [
-          96,
-          524
-        ]
-      ]
-    },
-    {
-      "id": "b12",
+      "id": "b_off_north_2",
       "type": "office",
       "footprint": [
         [
-          225,
-          406
+          51.5102,
+          -0.1195
         ],
         [
-          326,
-          406
+          51.511,
+          -0.1195
         ],
         [
-          326,
-          470
+          51.511,
+          -0.117
         ],
         [
-          225,
-          470
+          51.5102,
+          -0.117
         ]
       ]
     },
     {
-      "id": "b13",
+      "id": "b_park_north",
       "type": "park",
       "footprint": [
         [
-          226,
-          480
+          51.5125,
+          -0.128
         ],
         [
-          320,
-          480
+          51.5145,
+          -0.128
         ],
         [
-          320,
-          524
+          51.5145,
+          -0.124
         ],
         [
-          226,
-          524
+          51.5125,
+          -0.124
         ]
       ]
     },
     {
-      "id": "b14",
+      "id": "b_res_north_1",
       "type": "residential",
       "footprint": [
         [
-          575,
-          406
+          51.5128,
+          -0.1215
         ],
         [
-          675,
-          406
+          51.5145,
+          -0.1215
         ],
         [
-          675,
-          524
+          51.5145,
+          -0.119
         ],
         [
-          575,
-          524
+          51.5135,
+          -0.119
+        ],
+        [
+          51.5135,
+          -0.1205
+        ],
+        [
+          51.5128,
+          -0.1205
         ]
       ]
     },
     {
-      "id": "b15",
+      "id": "b_res_north_2",
+      "type": "residential",
+      "footprint": [
+        [
+          51.5125,
+          -0.115
+        ],
+        [
+          51.514,
+          -0.115
+        ],
+        [
+          51.514,
+          -0.112
+        ],
+        [
+          51.5125,
+          -0.112
+        ]
+      ]
+    },
+    {
+      "id": "b_off_north_3",
       "type": "office",
       "footprint": [
         [
-          705,
-          406
+          51.513,
+          -0.109
         ],
         [
-          804,
-          406
+          51.5145,
+          -0.109
         ],
         [
-          804,
-          524
+          51.5145,
+          -0.107
         ],
         [
-          705,
-          524
+          51.513,
+          -0.107
         ]
       ]
     },
     {
-      "id": "b16",
-      "type": "park",
-      "footprint": [
-        [
-          96,
-          556
-        ],
-        [
-          194,
-          556
-        ],
-        [
-          194,
-          674
-        ],
-        [
-          96,
-          674
-        ]
-      ]
-    },
-    {
-      "id": "b17",
-      "type": "residential",
-      "footprint": [
-        [
-          225,
-          556
-        ],
-        [
-          326,
-          556
-        ],
-        [
-          326,
-          674
-        ],
-        [
-          225,
-          674
-        ]
-      ]
-    },
-    {
-      "id": "b18",
-      "type": "office",
-      "footprint": [
-        [
-          575,
-          556
-        ],
-        [
-          675,
-          556
-        ],
-        [
-          675,
-          674
-        ],
-        [
-          575,
-          674
-        ]
-      ]
-    },
-    {
-      "id": "b19",
-      "type": "residential",
-      "footprint": [
-        [
-          705,
-          556
-        ],
-        [
-          804,
-          556
-        ],
-        [
-          804,
-          674
-        ],
-        [
-          705,
-          674
-        ]
-      ]
-    },
-    {
-      "id": "b20",
+      "id": "b_other_museum",
       "type": "other",
       "footprint": [
         [
-          96,
-          706
+          51.5098,
+          -0.1145
         ],
         [
-          194,
-          706
+          51.5108,
+          -0.1145
         ],
         [
-          194,
-          824
+          51.5108,
+          -0.1125
         ],
         [
-          96,
-          824
-        ]
-      ]
-    },
-    {
-      "id": "b21",
-      "type": "office",
-      "footprint": [
-        [
-          225,
-          706
-        ],
-        [
-          326,
-          706
-        ],
-        [
-          326,
-          824
-        ],
-        [
-          225,
-          824
-        ]
-      ]
-    },
-    {
-      "id": "b22",
-      "type": "park",
-      "footprint": [
-        [
-          575,
-          706
-        ],
-        [
-          675,
-          706
-        ],
-        [
-          675,
-          824
-        ],
-        [
-          575,
-          824
-        ]
-      ]
-    },
-    {
-      "id": "b23",
-      "type": "residential",
-      "footprint": [
-        [
-          705,
-          706
-        ],
-        [
-          804,
-          706
-        ],
-        [
-          804,
-          824
-        ],
-        [
-          705,
-          824
-        ]
-      ]
-    },
-    {
-      "id": "b24",
-      "type": "residential",
-      "footprint": [
-        [
-          96,
-          856
-        ],
-        [
-          194,
-          856
-        ],
-        [
-          194,
-          974
-        ],
-        [
-          96,
-          974
-        ]
-      ]
-    },
-    {
-      "id": "b25",
-      "type": "office",
-      "footprint": [
-        [
-          225,
-          856
-        ],
-        [
-          326,
-          856
-        ],
-        [
-          326,
-          974
-        ],
-        [
-          225,
-          974
-        ]
-      ]
-    },
-    {
-      "id": "b26",
-      "type": "park",
-      "footprint": [
-        [
-          575,
-          856
-        ],
-        [
-          675,
-          856
-        ],
-        [
-          675,
-          974
-        ],
-        [
-          575,
-          974
-        ]
-      ]
-    },
-    {
-      "id": "b27",
-      "type": "residential",
-      "footprint": [
-        [
-          705,
-          856
-        ],
-        [
-          804,
-          856
-        ],
-        [
-          804,
-          974
-        ],
-        [
-          705,
-          974
-        ]
-      ]
-    },
-    {
-      "id": "b28",
-      "type": "other",
-      "footprint": [
-        [
-          96,
-          1006
-        ],
-        [
-          194,
-          1006
-        ],
-        [
-          194,
-          1124
-        ],
-        [
-          96,
-          1124
-        ]
-      ]
-    },
-    {
-      "id": "b29",
-      "type": "residential",
-      "footprint": [
-        [
-          225,
-          1006
-        ],
-        [
-          326,
-          1006
-        ],
-        [
-          326,
-          1124
-        ],
-        [
-          225,
-          1124
-        ]
-      ]
-    },
-    {
-      "id": "b30",
-      "type": "office",
-      "footprint": [
-        [
-          575,
-          1006
-        ],
-        [
-          675,
-          1006
-        ],
-        [
-          675,
-          1124
-        ],
-        [
-          575,
-          1124
-        ]
-      ]
-    },
-    {
-      "id": "b31",
-      "type": "park",
-      "footprint": [
-        [
-          705,
-          1006
-        ],
-        [
-          804,
-          1006
-        ],
-        [
-          804,
-          1124
-        ],
-        [
-          705,
-          1124
-        ]
-      ]
-    },
-    {
-      "id": "b32",
-      "type": "residential",
-      "footprint": [
-        [
-          96,
-          1156
-        ],
-        [
-          194,
-          1156
-        ],
-        [
-          194,
-          1274
-        ],
-        [
-          96,
-          1274
-        ]
-      ]
-    },
-    {
-      "id": "b33",
-      "type": "office",
-      "footprint": [
-        [
-          225,
-          1156
-        ],
-        [
-          326,
-          1156
-        ],
-        [
-          326,
-          1274
-        ],
-        [
-          225,
-          1274
-        ]
-      ]
-    },
-    {
-      "id": "b34",
-      "type": "residential",
-      "footprint": [
-        [
-          575,
-          1156
-        ],
-        [
-          675,
-          1156
-        ],
-        [
-          675,
-          1274
-        ],
-        [
-          575,
-          1274
-        ]
-      ]
-    },
-    {
-      "id": "b35",
-      "type": "park",
-      "footprint": [
-        [
-          705,
-          1156
-        ],
-        [
-          804,
-          1156
-        ],
-        [
-          804,
-          1274
-        ],
-        [
-          705,
-          1274
+          51.5098,
+          -0.1125
         ]
       ]
     }

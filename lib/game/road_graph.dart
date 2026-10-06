@@ -33,33 +33,79 @@ class RoadGraph {
       _adjacency.putIfAbsent(edge.to, () => <RoadEdge>[]).add(edge);
     }
   }
+
   final CityData city;
   final Map<String, List<RoadEdge>> _adjacency = <String, List<RoadEdge>>{};
 
-  PathResult? findPath(String start, String goal, {CourierType? mode, Set<String> blocked = const <String>{}, bool allowFerry = false}) {
+  List<RoadEdge> _ferryEdges() {
+    final list = <RoadEdge>[];
+    for (final fp in city.ferryPoints) {
+      if (city.nodes.containsKey(fp.nodeA) && city.nodes.containsKey(fp.nodeB)) {
+        list.add(RoadEdge(
+          id: fp.id,
+          from: fp.nodeA,
+          to: fp.nodeB,
+          points: <Offset>[city.nodes[fp.nodeA]!.point, city.nodes[fp.nodeB]!.point],
+          type: RoadType.ferry,
+          level: RoadLevel.minor,
+          allowCar: true,
+          allowBike: true,
+          allowWalk: true,
+        ));
+      }
+    }
+    return list;
+  }
+
+  PathResult? findPath(
+    String start,
+    String goal, {
+    CourierType? mode,
+    Set<String> blocked = const <String>{},
+    bool allowFerry = false,
+  }) {
     if (start == goal) return const PathResult(<String>[], 0);
+    if (!city.nodes.containsKey(start) || !city.nodes.containsKey(goal)) return null;
+
     final distances = <String, double>{start: 0};
     final previousNode = <String, String>{};
     final previousEdge = <String, String>{};
-    final queue = HeapPriorityQueue<_Step>((_Step a, _Step b) => a.distance.compareTo(b.distance))..add(_Step(start, 0));
+    final queue = HeapPriorityQueue<_Step>((_Step a, _Step b) => a.distance.compareTo(b.distance))
+      ..add(_Step(start, 0));
+
+    // Dynamic adjacency list with ferries included only if allowFerry is true
+    final extraEdges = allowFerry ? _ferryEdges() : const <RoadEdge>[];
+
     while (queue.isNotEmpty) {
       final current = queue.removeFirst();
       if (current.distance != distances[current.node]) continue;
       if (current.node == goal) break;
-      for (final edge in _adjacency[current.node] ?? const <RoadEdge>[]) {
+
+      final nodeEdges = <RoadEdge>[
+        ...(_adjacency[current.node] ?? const <RoadEdge>[]),
+        ...extraEdges.where((RoadEdge e) => e.from == current.node || e.to == current.node),
+      ];
+
+      for (final edge in nodeEdges) {
         if (blocked.contains(edge.id) || !_allowed(edge, mode, allowFerry)) continue;
         final next = edge.from == current.node ? edge.to : edge.from;
         final candidate = current.distance + edge.length;
         if (candidate < (distances[next] ?? double.infinity)) {
-          distances[next] = candidate; previousNode[next] = current.node; previousEdge[next] = edge.id;
+          distances[next] = candidate;
+          previousNode[next] = current.node;
+          previousEdge[next] = edge.id;
           queue.add(_Step(next, candidate));
         }
       }
     }
+
     if (!distances.containsKey(goal)) return null;
     final edges = <String>[];
     var cursor = goal;
-    while (cursor != start) { edges.add(previousEdge[cursor]!); cursor = previousNode[cursor]!; }
+    while (cursor != start) {
+      edges.add(previousEdge[cursor]!);
+      cursor = previousNode[cursor]!;
+    }
     return PathResult(edges.reversed.toList(), distances[goal]!);
   }
 

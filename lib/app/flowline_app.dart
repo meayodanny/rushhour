@@ -3,16 +3,67 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 
 import '../core/flowline_theme.dart';
 import '../game/game_controller.dart';
 import '../l10n/app_strings.dart';
 import '../models/entities.dart';
+import '../services/persistence_service.dart';
 import '../ui/city_selection_screen.dart';
 import '../ui/game_screen.dart';
 import '../ui/main_menu_screen.dart';
 import '../ui/routes.dart';
 import '../ui/settings_screen.dart';
+
+class LocaleNotifier extends StateNotifier<Locale> {
+  LocaleNotifier(this._persistence) : super(_initialLocale(_persistence));
+  final PersistenceService _persistence;
+
+  static Locale _initialLocale(PersistenceService persistence) {
+    final stored = persistence.language;
+    final system = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    final code = stored == 'system' ? (<String>{'ru', 'en'}.contains(system) ? system : 'en') : stored;
+    return Locale(code);
+  }
+
+  Future<void> cycleLanguage() async {
+    final next = state.languageCode == 'ru' ? 'en' : 'ru';
+    state = Locale(next);
+    await _persistence.setLanguage(next);
+  }
+
+  Future<void> setLanguage(String code) async {
+    state = Locale(code);
+    await _persistence.setLanguage(code);
+  }
+}
+
+final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((Ref ref) {
+  final persistence = ref.watch(persistenceProvider);
+  return LocaleNotifier(persistence);
+});
+
+class ThemeModeNotifier extends StateNotifier<ThemeMode> {
+  ThemeModeNotifier(this._persistence) : super(_persistence.themeMode);
+  final PersistenceService _persistence;
+
+  Future<void> toggleTheme() async {
+    final next = state == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    state = next;
+    await _persistence.setThemeMode(next);
+  }
+
+  Future<void> setTheme(ThemeMode mode) async {
+    state = mode;
+    await _persistence.setThemeMode(mode);
+  }
+}
+
+final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((Ref ref) {
+  final persistence = ref.watch(persistenceProvider);
+  return ThemeModeNotifier(persistence);
+});
 
 class FlowlineApp extends ConsumerStatefulWidget {
   const FlowlineApp({super.key});
@@ -22,32 +73,18 @@ class FlowlineApp extends ConsumerStatefulWidget {
 }
 
 class _FlowlineAppState extends ConsumerState<FlowlineApp> {
-  late Locale _locale;
   late bool _firstLaunch;
 
   @override
   void initState() {
     super.initState();
-    final persistence = ref.read(persistenceProvider);
-    final stored = persistence.language;
-    final system = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
-    final code = stored == 'system' ? (<String>{'ru', 'en'}.contains(system) ? system : 'en') : stored;
-    _locale = Locale(code);
-    _firstLaunch = persistence.isFirstLaunch;
-  }
-
-  Future<void> _cycleLanguage() async {
-    final next = _locale.languageCode == 'ru' ? 'en' : 'ru';
-    setState(() => _locale = Locale(next));
-    await ref.read(persistenceProvider).setLanguage(next);
+    _firstLaunch = ref.read(persistenceProvider).isFirstLaunch;
   }
 
   Widget _menu(BuildContext context) {
     final city = ref.read(cityProvider);
     return MainMenuScreen(
       city: city,
-      localeCode: _locale.languageCode,
-      onCycleLanguage: () => unawaited(_cycleLanguage()),
       onPlay: () {
         Navigator.of(context).push<void>(buildSharedMapRoute<void>(
           page: CitySelectionScreen(
@@ -60,8 +97,6 @@ class _FlowlineAppState extends ConsumerState<FlowlineApp> {
         Navigator.of(context).push<void>(buildPanelRoute<void>(
           page: SettingsScreen(
             city: city,
-            localeCode: _locale.languageCode,
-            onCycleLanguage: () => unawaited(_cycleLanguage()),
           ),
         ));
       },
@@ -99,27 +134,34 @@ class _FlowlineAppState extends ConsumerState<FlowlineApp> {
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'Flowline',
-        debugShowCheckedModeBanner: false,
-        locale: _locale,
-        supportedLocales: const <Locale>[Locale('en'), Locale('ru')],
-        localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
-          AppStringsDelegate(),
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: FlowlineTheme.data,
-        home: Builder(
-          builder: (BuildContext context) => _firstLaunch
-              ? GameScreen(
-                  difficulty: Difficulty.normal,
-                  tutorial: true,
-                  startNew: true,
-                  onReturnToMenu: () => _returnToMenu(context, tutorial: true),
-                )
-              : _menu(context),
-        ),
-      );
+  Widget build(BuildContext context) {
+    final locale = ref.watch(localeProvider);
+    final themeMode = ref.watch(themeModeProvider);
+
+    return MaterialApp(
+      title: 'Flowline',
+      debugShowCheckedModeBanner: false,
+      locale: locale,
+      supportedLocales: const <Locale>[Locale('en'), Locale('ru')],
+      localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+        AppStringsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: FlowlineTheme.light,
+      darkTheme: FlowlineTheme.dark,
+      themeMode: themeMode,
+      home: Builder(
+        builder: (BuildContext context) => _firstLaunch
+            ? GameScreen(
+                difficulty: Difficulty.normal,
+                tutorial: true,
+                startNew: true,
+                onReturnToMenu: () => _returnToMenu(context, tutorial: true),
+              )
+            : _menu(context),
+      ),
+    );
+  }
 }

@@ -14,19 +14,32 @@ class RewardOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!game.rewardPending) return const SizedBox.shrink();
     final strings = AppStrings.of(context);
+    final palette = Palette.of(context);
     final rewards = game.rewards;
+
     return Positioned.fill(
       child: ColoredBox(
-        color: Palette.ink.withValues(alpha: .82),
+        color: palette.veil.withValues(alpha: .82),
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(22),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(strings.reward, style: const TextStyle(color: Palette.paper, fontWeight: FontWeight.w700, fontSize: 23, letterSpacing: 1.3)),
+                Text(
+                  strings.reward,
+                  style: TextStyle(
+                    color: palette.paper,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 23,
+                    letterSpacing: 1.3,
+                  ),
+                ),
                 const SizedBox(height: 7),
-                Text(strings.choose, style: TextStyle(color: Palette.paper.withValues(alpha: .68), fontSize: 12)),
+                Text(
+                  strings.choose,
+                  style: TextStyle(color: palette.paper.withValues(alpha: .68), fontSize: 12),
+                ),
                 const SizedBox(height: 21),
                 Row(
                   children: rewards.map((RewardType reward) {
@@ -40,8 +53,8 @@ class RewardOverlay extends StatelessWidget {
                             height: null,
                             radius: 22,
                             padding: const EdgeInsets.all(10),
-                            background: Palette.paper,
-                            foreground: Palette.ink,
+                            background: palette.paper,
+                            foreground: palette.ink,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -49,11 +62,15 @@ class RewardOverlay extends StatelessWidget {
                                   width: 52,
                                   height: 52,
                                   alignment: Alignment.center,
-                                  decoration: const BoxDecoration(color: Palette.panel, shape: BoxShape.circle),
-                                  child: FlowGlyph(_glyph(reward), size: 29),
+                                  decoration: BoxDecoration(color: palette.panel, shape: BoxShape.circle),
+                                  child: FlowGlyph(_glyph(reward), size: 29, color: palette.ink),
                                 ),
                                 const SizedBox(height: 15),
-                                Text(_label(strings, reward), textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                Text(
+                                  _label(strings, reward),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: palette.ink),
+                                ),
                               ],
                             ),
                           ),

@@ -17,6 +17,10 @@ class AppStrings {
   String get back => ru ? 'Назад' : 'Back';
   String get sound => ru ? 'Звук' : 'Sound';
   String get soundCaption => ru ? 'Короткие сигналы города' : 'Short signals from the city';
+  String get theme => ru ? 'Тема' : 'Theme';
+  String get themeCaption => ru ? 'Оформление карты' : 'Map color style';
+  String get darkTheme => ru ? 'Тёмная' : 'Dark';
+  String get lightTheme => ru ? 'Светлая' : 'Light';
   String get language => ru ? 'Язык' : 'Language';
   String get fit => ru ? 'Вписать карту' : 'Fit map';
   String get difficulty => ru ? 'РЕЖИМ' : 'MODE';

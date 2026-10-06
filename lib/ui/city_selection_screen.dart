@@ -22,7 +22,9 @@ class _CitySelectionScreenState extends State<CitySelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final palette = Palette.of(context);
     final routeAnimation = ModalRoute.of(context)?.animation ?? kAlwaysCompleteAnimation;
+
     return AnimatedBuilder(
       animation: routeAnimation,
       builder: (BuildContext context, Widget? child) {
@@ -37,7 +39,7 @@ class _CitySelectionScreenState extends State<CitySelectionScreen> {
                 city: widget.city,
                 cameraZoom: 1 + camera * .18,
                 cameraOffset: Offset(-26 * camera, 34 * camera),
-                dim: .34 + camera * .16,
+                dim: palette.isDark ? .65 : (.34 + camera * .16),
               ),
             ),
             SafeArea(
@@ -60,16 +62,16 @@ class _CitySelectionScreenState extends State<CitySelectionScreen> {
                                 height: 52,
                                 radius: 17,
                                 padding: EdgeInsets.zero,
-                                background: Palette.paper,
-                                foreground: Palette.ink,
+                                background: palette.paper,
+                                foreground: palette.ink,
                                 child: const FlowGlyph(FlowGlyphType.back),
                               ),
                             ),
                             const Spacer(),
                             Text(
                               strings.selectCity,
-                              style: const TextStyle(
-                                color: Palette.paper,
+                              style: TextStyle(
+                                color: palette.paper,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 2.1,
@@ -82,7 +84,7 @@ class _CitySelectionScreenState extends State<CitySelectionScreen> {
                         Container(
                           padding: const EdgeInsets.fromLTRB(23, 25, 23, 23),
                           decoration: BoxDecoration(
-                            color: Palette.paper.withValues(alpha: .96),
+                            color: palette.paper.withValues(alpha: .96),
                             borderRadius: BorderRadius.circular(28),
                           ),
                           child: Column(
@@ -94,106 +96,98 @@ class _CitySelectionScreenState extends State<CitySelectionScreen> {
                                   Container(
                                     width: 48,
                                     height: 48,
-                                    decoration: const BoxDecoration(color: Palette.water, shape: BoxShape.circle),
+                                    decoration: BoxDecoration(color: palette.water, shape: BoxShape.circle),
                                     alignment: Alignment.center,
-                                    child: const FlowGlyph(FlowGlyphType.route, color: Palette.ink),
+                                    child: FlowGlyph(FlowGlyphType.route, color: palette.ink),
                                   ),
                                   const SizedBox(width: 15),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Text(strings.city.toUpperCase(), style: const TextStyle(fontSize: 25, height: 1, fontWeight: FontWeight.w700, letterSpacing: .5)),
+                                        Text(
+                                          strings.city.toUpperCase(),
+                                          style: TextStyle(
+                                            fontSize: 25,
+                                            height: 1,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: .5,
+                                            color: palette.ink,
+                                          ),
+                                        ),
                                         const SizedBox(height: 7),
-                                        Text(strings.cityCaption, style: const TextStyle(fontSize: 9, color: Palette.muted, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
+                                        Text(
+                                          strings.cityCaption,
+                                          style: TextStyle(
+                                            fontSize: 9,
+                                            color: palette.muted,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 1.1,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 27),
-                              Text(strings.difficulty, style: const TextStyle(fontSize: 10, color: Palette.muted, fontWeight: FontWeight.w700, letterSpacing: 1.7)),
+                              Text(
+                                strings.difficulty,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: palette.muted,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.7,
+                                ),
+                              ),
                               const SizedBox(height: 11),
                               Wrap(
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: Difficulty.values.map((Difficulty difficulty) {
-                                  final selected = _difficulty == difficulty;
-                                  return _ModeChip(
-                                    label: _difficultyLabel(strings, difficulty),
-                                    selected: selected,
+                                  final active = _difficulty == difficulty;
+                                  return FlowPressable(
                                     onPressed: () => setState(() => _difficulty = difficulty),
+                                    height: 40,
+                                    radius: 14,
+                                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                                    background: active ? palette.ink : palette.panel,
+                                    foreground: active ? palette.paper : palette.ink,
+                                    child: Text(
+                                      switch (difficulty) {
+                                        Difficulty.normal => strings.normal,
+                                        Difficulty.realism => strings.realism,
+                                        Difficulty.infinite => strings.infinite,
+                                        Difficulty.sandbox => strings.sandbox,
+                                      },
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                                    ),
                                   );
                                 }).toList(),
                               ),
-                              const SizedBox(height: 25),
+                              const SizedBox(height: 24),
                               FlowPressable(
                                 onPressed: () => widget.onStart(_difficulty),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text(strings.start.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 1.5)),
-                                    const SizedBox(width: 12),
-                                    const FlowGlyph(FlowGlyphType.play, size: 18, color: Palette.paper),
-                                  ],
+                                height: 58,
+                                background: palette.blue,
+                                foreground: palette.paper,
+                                child: Text(
+                                  strings.start.toUpperCase(),
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1.6),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          widget.city.attribution,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Palette.paper.withValues(alpha: .66), fontSize: 9, decoration: TextDecoration.none),
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
     );
   }
-
-  String _difficultyLabel(AppStrings strings, Difficulty difficulty) => switch (difficulty) {
-        Difficulty.normal => strings.normal,
-        Difficulty.realism => strings.realism,
-        Difficulty.infinite => strings.infinite,
-        Difficulty.sandbox => strings.sandbox,
-      };
-}
-
-class _ModeChip extends StatelessWidget {
-  const _ModeChip({required this.label, required this.selected, required this.onPressed});
-  final String label;
-  final bool selected;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onPressed,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-          decoration: BoxDecoration(
-            color: selected ? Palette.ink : Palette.panel,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: selected ? Palette.paper : Palette.ink,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: .35,
-            ),
-          ),
-        ),
-      );
 }

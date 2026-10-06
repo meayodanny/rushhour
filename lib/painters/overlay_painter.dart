@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../core/game_config.dart';
 import '../core/palette.dart';
 import '../game/game_controller.dart';
+import '../game/line_geometry.dart';
 import '../models/entities.dart';
 
 class OverlayPainter extends CustomPainter {
@@ -12,24 +13,33 @@ class OverlayPainter extends CustomPainter {
     this.game,
     this.manualPoints, {
     required this.hintAnimation,
+    this.palette = FlowlinePalette.light,
   }) : super(repaint: Listenable.merge(<Listenable>[game, hintAnimation]));
 
   final GameSessionController game;
   final List<Offset> manualPoints;
   final Animation<double> hintAnimation;
+  final FlowlinePalette palette;
 
   @override
   void paint(Canvas canvas, Size size) {
     final draft = game.lineDraft;
     if (draft != null && draft.points.length > 1) {
-      final path = Path()..moveTo(draft.points.first.dx, draft.points.first.dy);
-      for (final point in draft.points.skip(1)) path.lineTo(point.dx, point.dy);
-      // Drafts are always graph-snapped and intentionally translucent until
-      // the release lands on a valid POI.
+      final activePoints = List<Offset>.of(draft.points);
+      // Requirement 25: Extension animation (reachProgress 0.0 -> 1.0) for newly added segment
+      if (draft.reachProgress < 1.0 && activePoints.length >= 2) {
+        final lastIdx = activePoints.length - 1;
+        final pPrev = activePoints[lastIdx - 1];
+        final pTarget = activePoints[lastIdx];
+        activePoints[lastIdx] = Offset.lerp(pPrev, pTarget, draft.reachProgress)!;
+      }
+
+      final path = LineGeometry.buildSmoothPath(activePoints, cornerRadius: 16);
+
       canvas.drawPath(
         path,
         Paint()
-          ..color = Palette.paper.withValues(alpha: .72)
+          ..color = palette.paper.withValues(alpha: .72)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 17
           ..strokeCap = StrokeCap.round
@@ -46,12 +56,16 @@ class OverlayPainter extends CustomPainter {
       );
     }
 
-    // Kept for backwards compatibility with saved/tutorial overlays; normal
-    // gameplay now uses LineDraft rather than a freehand path.
     if (manualPoints.length > 1 && draft == null) {
-      final path = Path()..moveTo(manualPoints.first.dx, manualPoints.first.dy);
-      for (final point in manualPoints.skip(1)) path.lineTo(point.dx, point.dy);
-      canvas.drawPath(path, Paint()..color = Palette.ink.withValues(alpha: .2)..style = PaintingStyle.stroke..strokeWidth = 8..strokeCap = StrokeCap.round);
+      final path = LineGeometry.buildSmoothPath(manualPoints, cornerRadius: 16);
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = palette.ink.withValues(alpha: .2)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 8
+          ..strokeCap = StrokeCap.round,
+      );
     }
 
     for (final courier in game.session.couriers.where((Courier c) => c.state == CourierState.waitingBlocked)) {
@@ -77,7 +91,7 @@ class OverlayPainter extends CustomPainter {
       if (alternate == null) continue;
       for (final id in alternate.edgeIds) {
         final alt = game.city.edgeById(id);
-        if (alt != null) _dashPolyline(canvas, alt.points, color: Palette.danger.withValues(alpha: .55));
+        if (alt != null) _dashPolyline(canvas, alt.points, color: palette.danger.withValues(alpha: .55));
       }
     }
 
@@ -87,10 +101,7 @@ class OverlayPainter extends CustomPainter {
   void _drawGestureRoute(Canvas canvas) {
     final points = game.tutorialRoutePoints;
     if (points.length < 2) return;
-    final completePath = Path()..moveTo(points.first.dx, points.first.dy);
-    for (final point in points.skip(1)) {
-      completePath.lineTo(point.dx, point.dy);
-    }
+    final completePath = LineGeometry.buildSmoothPath(points, cornerRadius: 16);
 
     final timeline = hintAnimation.value;
     final rawDraw = (timeline / .24).clamp(0.0, 1.0);
@@ -98,37 +109,26 @@ class OverlayPainter extends CustomPainter {
     final fadeIn = (timeline / .06).clamp(0.0, 1.0);
     final fadeOut = timeline < .74 ? 1.0 : (1 - (timeline - .74) / .26).clamp(0.0, 1.0);
     final opacity = fadeIn * fadeOut;
+    if (opacity <= 0.001) return;
 
-    final visible = Path();
-    for (final metric in completePath.computeMetrics()) {
-      visible.addPath(metric.extractPath(0, metric.length * drawProgress), Offset.zero);
-    }
-    _dashPath(
-      canvas,
-      visible,
+    final metrics = completePath.computeMetrics().toList();
+    if (metrics.isEmpty) return;
+    final metric = metrics.first;
+    final animatedPath = metric.extractPath(0, metric.length * drawProgress);
+
+    canvas.drawPath(
+      animatedPath,
       Paint()
-        ..color = Palette.blue.withValues(alpha: .72 * opacity)
+        ..color = palette.blue.withValues(alpha: .75 * opacity)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 8
+        ..strokeWidth = 6
         ..strokeCap = StrokeCap.round,
     );
 
-    final metrics = completePath.computeMetrics().toList();
-    final metric = metrics.isEmpty ? null : metrics.first;
-    final tangent = metric == null
-        ? null
-        : metric.getTangentForOffset((metric.length * drawProgress - .1).clamp(0.0, metric.length));
-    if (tangent != null && drawProgress > .03) {
-      canvas.drawCircle(tangent.position, 11, Paint()..color = Palette.paper.withValues(alpha: opacity));
-      canvas.drawCircle(tangent.position, 6, Paint()..color = Palette.blue.withValues(alpha: opacity));
-    }
-  }
-
-  void _dashPath(Canvas canvas, Path path, Paint paint) {
-    for (final metric in path.computeMetrics()) {
-      for (var distance = 0.0; distance < metric.length; distance += 24) {
-        canvas.drawPath(metric.extractPath(distance, math.min(distance + 13, metric.length)), paint);
-      }
+    final tangent = metric.getTangentForOffset(metric.length * drawProgress);
+    if (tangent != null) {
+      canvas.drawCircle(tangent.position, 10, Paint()..color = palette.paper.withValues(alpha: opacity));
+      canvas.drawCircle(tangent.position, 6, Paint()..color = palette.blue.withValues(alpha: opacity));
     }
   }
 
@@ -138,18 +138,24 @@ class OverlayPainter extends CustomPainter {
     for (final p in points.skip(1)) {
       path.lineTo(p.dx, p.dy);
     }
-    _dashPath(
-      canvas,
-      path,
-      Paint()
-        ..color = color
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 5
-        ..strokeCap = StrokeCap.round,
-    );
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+
+    final metrics = path.computeMetrics().toList();
+    for (final m in metrics) {
+      var d = 0.0;
+      while (d < m.length) {
+        final end = math.min(d + 10, m.length);
+        canvas.drawPath(m.extractPath(d, end), paint);
+        d += 18;
+      }
+    }
   }
 
   @override
   bool shouldRepaint(covariant OverlayPainter oldDelegate) =>
-      oldDelegate.game != game || oldDelegate.manualPoints != manualPoints || oldDelegate.hintAnimation != hintAnimation;
+      oldDelegate.palette != palette || true;
 }

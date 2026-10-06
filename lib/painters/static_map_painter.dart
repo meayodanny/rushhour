@@ -4,63 +4,64 @@ import 'package:flutter/material.dart';
 import '../core/palette.dart';
 import '../models/city.dart';
 
-/// Enable with `--dart-define=FLOWLINE_DEBUG_ROADS=true`. In this mode every
-/// edge and graph node is overdrawn, with no viewport culling, so malformed or
-/// incorrectly projected geometry is immediately visible.
 const bool debugDrawWholeRoadGraph = bool.fromEnvironment(
   'FLOWLINE_DEBUG_ROADS',
   defaultValue: false,
 );
 
 class StaticMapPainter extends CustomPainter {
-  const StaticMapPainter(this.city, {this.debugAllRoads = debugDrawWholeRoadGraph});
+  const StaticMapPainter(
+    this.city, {
+    this.palette = FlowlinePalette.light,
+    this.activeBoundsRect,
+    this.debugAllRoads = debugDrawWholeRoadGraph,
+  });
+
   final CityData city;
+  final FlowlinePalette palette;
+  final Rect? activeBoundsRect;
   final bool debugAllRoads;
 
   @override
   void paint(Canvas canvas, Size size) {
-    // BlendMode.clear used here previously. CustomPaint siblings can share a
-    // canvas, so that operation could erase composited content on some GPUs.
-    // Painting an opaque map base is deterministic on all Flutter backends.
-    canvas.drawRect(Offset.zero & size, Paint()..color = Palette.paper);
+    canvas.drawRect(Offset.zero & size, Paint()..color = palette.paper);
 
-    // Decorative city fabric is deliberately painted first. Buildings never
-    // participate in hit testing and roads/POIs remain the dominant layer.
+    // Decorative building fabric
     _drawBuildings(canvas);
 
-    final river = Path();
-    if (city.river.isNotEmpty) {
-      river.moveTo(city.river.first.dx, city.river.first.dy);
-      for (final p in city.river.skip(1)) {
-        river.lineTo(p.dx, p.dy);
+    // Requirement 39.1: Draw all river segments separately
+    final riverPaint = Paint()
+      ..color = palette.water
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 96
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final riverGleamPaint = Paint()
+      ..color = palette.isDark ? const Color(0x22ffffff) : const Color(0x66ffffff)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+
+    for (final segment in city.riverSegments) {
+      if (segment.length < 2) continue;
+      final riverPath = Path()..moveTo(segment.first.dx, segment.first.dy);
+      for (final p in segment.skip(1)) {
+        riverPath.lineTo(p.dx, p.dy);
       }
-      canvas.drawPath(
-        river,
-        Paint()
-          ..color = Palette.water
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 110
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round,
-      );
-      canvas.drawPath(
-        river,
-        Paint()
-          ..color = const Color(0x88ffffff)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2,
-      );
+      canvas.drawPath(riverPath, riverPaint);
+      canvas.drawPath(riverPath, riverGleamPaint);
     }
 
-    // This painter intentionally draws the complete graph. The map viewport
-    // clips only after geometry has been projected into world coordinates,
-    // avoiding accidental data-space culling.
+    // Roads
     for (final edge in city.edges.where((RoadEdge e) => e.type != RoadType.bridge && e.type != RoadType.ferry)) {
       _drawRoad(canvas, edge);
     }
     for (final edge in city.edges.where((RoadEdge e) => e.type == RoadType.bridge)) {
       _drawRoad(canvas, edge, bridge: true);
     }
+
+    // Ferries
     for (final ferry in city.ferryPoints) {
       final a = city.nodes[ferry.nodeA]?.point;
       final b = city.nodes[ferry.nodeB]?.point;
@@ -69,9 +70,27 @@ class StaticMapPainter extends CustomPainter {
         a,
         b,
         Paint()
-          ..color = Palette.muted.withValues(alpha: .5)
+          ..color = palette.muted.withValues(alpha: .5)
           ..strokeWidth = 3
           ..strokeCap = StrokeCap.round,
+      );
+    }
+
+    // Requirement 40.4: Dimmed rendering / Fog of War for unopened map regions
+    if (activeBoundsRect != null) {
+      final mapRect = city.contentBounds.inflate(50);
+      final activeRRect = RRect.fromRectAndRadius(activeBoundsRect!.inflate(12), const Radius.circular(24));
+
+      final fogPath = Path()
+        ..addRect(mapRect)
+        ..addRRect(activeRRect)
+        ..fillType = PathFillType.evenOdd;
+
+      canvas.drawPath(
+        fogPath,
+        Paint()
+          ..color = palette.fogOfWar
+          ..style = PaintingStyle.fill,
       );
     }
 
@@ -96,29 +115,31 @@ class StaticMapPainter extends CustomPainter {
       final path = Path()..moveTo(building.footprint.first.dx, building.footprint.first.dy);
       for (final point in building.footprint.skip(1)) path.lineTo(point.dx, point.dy);
       path.close();
+
       final fill = switch (building.type) {
-        BuildingType.residential => const Color(0xffeadfd0),
-        BuildingType.office => const Color(0xffd8e1e2),
-        BuildingType.park => Palette.grass,
-        BuildingType.other => const Color(0xffe7e2d5),
+        BuildingType.residential => palette.buildingResidential,
+        BuildingType.office => palette.buildingOffice,
+        BuildingType.park => palette.buildingPark,
+        BuildingType.other => palette.buildingOther,
       };
+
       canvas.drawPath(path, Paint()..color = fill);
-      canvas.drawPath(path, Paint()..color = Palette.ink.withValues(alpha: .10)..style = PaintingStyle.stroke..strokeWidth = 2);
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = palette.ink.withValues(alpha: palette.isDark ? .20 : .10)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5,
+      );
+
       if (building.type == BuildingType.park) {
         final bounds = path.getBounds();
-        final dots = Paint()..color = const Color(0x6680a96b)..strokeWidth = 2;
+        final dotColor = palette.isDark ? const Color(0x4480a96b) : const Color(0x6680a96b);
+        final dots = Paint()..color = dotColor..strokeWidth = 2;
         for (var x = bounds.left + 8; x < bounds.right; x += 15) {
           for (var y = bounds.top + 8; y < bounds.bottom; y += 15) {
             if (path.contains(Offset(x, y))) canvas.drawCircle(Offset(x, y), 2.2, dots);
           }
-        }
-      } else {
-        // Minimal facade marks make rectangles read as blocks without turning
-        // the background into another interactive visual layer.
-        final bounds = path.getBounds().deflate(7);
-        final facade = Paint()..color = Palette.paper.withValues(alpha: .32)..strokeWidth = 2;
-        for (var x = bounds.left; x < bounds.right; x += 13) {
-          canvas.drawLine(Offset(x, bounds.top), Offset(x, bounds.bottom), facade);
         }
       }
     }
@@ -139,16 +160,16 @@ class StaticMapPainter extends CustomPainter {
       canvas.drawPath(
         path,
         Paint()
-          ..color = Palette.ink.withValues(alpha: .16)
+          ..color = palette.ink.withValues(alpha: palette.isDark ? .35 : .16)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = width + 9
+          ..strokeWidth = width + 8
           ..strokeCap = StrokeCap.round,
       );
     }
     canvas.drawPath(
       path,
       Paint()
-        ..color = edge.level == RoadLevel.major ? Palette.majorRoad : Palette.road
+        ..color = edge.level == RoadLevel.major ? palette.majorRoad : palette.road
         ..style = PaintingStyle.stroke
         ..strokeWidth = width
         ..strokeCap = StrokeCap.round
@@ -157,7 +178,7 @@ class StaticMapPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = Palette.paper.withValues(alpha: .7)
+        ..color = palette.paper.withValues(alpha: palette.isDark ? .12 : .6)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1
         ..strokeCap = StrokeCap.round,
@@ -166,5 +187,8 @@ class StaticMapPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant StaticMapPainter oldDelegate) =>
-      oldDelegate.city != city || oldDelegate.debugAllRoads != debugAllRoads;
+      oldDelegate.city != city ||
+      oldDelegate.palette != palette ||
+      oldDelegate.activeBoundsRect != activeBoundsRect ||
+      oldDelegate.debugAllRoads != debugAllRoads;
 }

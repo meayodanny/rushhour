@@ -48,6 +48,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   late final AnimationController _timeAnimation;
   late final AnimationController _hintAnimation;
   late final AnimationController _cameraAnimation;
+  late final AnimationController _gameOverAnimation;
 
   GameSessionController? _game;
   Size? _viewportSize;
@@ -62,6 +63,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
   double _cameraReturnScaleStart = 1;
   double _cameraReturnScaleEnd = 1;
   bool _mapMoved = false;
+  bool _gameOverTriggered = false;
 
   @override
   void initState() {
@@ -73,20 +75,26 @@ class _GameScreenState extends ConsumerState<GameScreen>
     );
     _hintAnimation = AnimationController(
       vsync: this,
-      // The route should be readable at a glance, not flash by at the start
-      // of a session.
       duration: const Duration(milliseconds: 12000),
     )..addStatusListener(_onHintStatus);
+
     _cameraAnimation = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 420),
+      duration: const Duration(milliseconds: 450),
     )..addListener(_applyCameraReturn);
+
+    // Requirement 37: Cinematic defeat animation
+    _gameOverAnimation = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    );
+
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final game = ref.read(gameControllerProvider);
       _game = game;
-      game.addListener(_syncHintAnimation);
+      game.addListener(_onGameUpdate);
       if (widget.startNew) game.startSession(widget.difficulty, tutorial: widget.tutorial);
       _syncHintAnimation();
     });
@@ -95,22 +103,102 @@ class _GameScreenState extends ConsumerState<GameScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _game?.removeListener(_syncHintAnimation);
+    _game?.removeListener(_onGameUpdate);
     _transform.dispose();
     _timeAnimation.dispose();
     _hintAnimation.dispose();
     _cameraAnimation.dispose();
+    _gameOverAnimation.dispose();
     super.dispose();
   }
 
+  // Requirement 27: Lifecycle pause & resume handling
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    final game = _game;
+    if (game == null) return;
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached ||
-        state == AppLifecycleState.inactive) {
-      final game = _game;
-      if (game != null) unawaited(game.save());
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      game.onAppPaused();
+    } else if (state == AppLifecycleState.resumed) {
+      game.onAppResumed();
     }
+  }
+
+  void _onGameUpdate() {
+    final game = _game;
+    if (game == null || !mounted) return;
+    _syncHintAnimation();
+
+    // Requirement 37: Trigger defeat cinematic
+    if (game.gameOver && !_gameOverTriggered) {
+      _gameOverTriggered = true;
+      _triggerGameOverCinematic(game);
+    } else if (!game.gameOver && _gameOverTriggered) {
+      _gameOverTriggered = false;
+      _gameOverAnimation.reset();
+    }
+
+    // Requirement 40.2: Trigger cinematic camera expansion on reveal stage
+    if (game.newlyRevealedStage) {
+      game.newlyRevealedStage = false;
+      _animateRevealExpansion(game);
+    }
+  }
+
+  void _triggerGameOverCinematic(GameSessionController game) {
+    final viewport = _viewportSize;
+    if (viewport == null) return;
+
+    Offset targetCenter;
+    if (game.failedCustomerId != null) {
+      final cust = game.customerById(game.failedCustomerId);
+      final node = cust != null ? game.city.nodes[cust.nodeId] : null;
+      targetCenter = node?.point ?? game.city.contentBounds.center;
+    } else {
+      targetCenter = game.city.contentBounds.center;
+    }
+
+    final currentScale = _transform.value.getMaxScaleOnAxis();
+    final targetScale = math.min(2.4, _maxZoom(viewport));
+
+    _cameraReturnScaleStart = currentScale;
+    _cameraReturnScaleEnd = targetScale;
+    _cameraReturnStart = Offset(_transform.value.storage[12], _transform.value.storage[13]);
+    _cameraReturnEnd = Offset(
+      viewport.width / 2 - targetCenter.dx * targetScale,
+      viewport.height / 2 - targetCenter.dy * targetScale,
+    );
+
+    _cameraAnimation.duration = const Duration(milliseconds: 1100);
+    _cameraAnimation.forward(from: 0).then((_) {
+      _cameraAnimation.duration = const Duration(milliseconds: 450);
+    });
+    _gameOverAnimation.forward(from: 0);
+  }
+
+  void _animateRevealExpansion(GameSessionController game) {
+    final viewport = _viewportSize;
+    if (viewport == null) return;
+
+    final bounds = _mapBounds();
+    final currentScale = _transform.value.getMaxScaleOnAxis();
+    final targetScale = _minZoom(viewport).clamp(.25, _maxZoom(viewport)).toDouble();
+
+    _cameraReturnScaleStart = currentScale;
+    _cameraReturnScaleEnd = targetScale;
+    _cameraReturnStart = Offset(_transform.value.storage[12], _transform.value.storage[13]);
+    _cameraReturnEnd = Offset(
+      viewport.width / 2 - bounds.center.dx * targetScale,
+      viewport.height / 2 - bounds.center.dy * targetScale,
+    );
+
+    _cameraAnimation.duration = const Duration(milliseconds: 1200);
+    _cameraAnimation.forward(from: 0).then((_) {
+      _cameraAnimation.duration = const Duration(milliseconds: 450);
+    });
   }
 
   void _syncHintAnimation() {
@@ -130,10 +218,16 @@ class _GameScreenState extends ConsumerState<GameScreen>
   @override
   Widget build(BuildContext context) {
     final game = ref.watch(gameControllerProvider);
+    final palette = Palette.of(context);
+
+    // Requirement 33: Progressive UI reveal flags
+    final showAppBar = game.session.lines.isNotEmpty || game.session.score > 0 || game.session.customers.length >= 2 || !widget.startNew;
+    final showBottomBar = game.session.customers.length >= 2 || game.session.score >= 1 || game.session.lines.length >= 2 || !widget.startNew;
+
     return PopScope(
       canPop: !widget.tutorial,
       child: ColoredBox(
-        color: Palette.paper,
+        color: palette.paper,
         child: SafeArea(
           child: Listener(
             behavior: HitTestBehavior.translucent,
@@ -142,29 +236,51 @@ class _GameScreenState extends ConsumerState<GameScreen>
               children: <Widget>[
                 Column(
                   children: <Widget>[
-                    GameHud(
-                      game: game,
-                      clockKey: _clockKey,
-                      onTimeTap: _toggleTimePanel,
-                      onSettings: () {
-                        _closeTimePanel();
-                        setState(() => _settingsOpen = true);
-                      },
-                      showSettings: !widget.tutorial,
+                    // Requirement 33: AppBar with animated fade + slide
+                    AnimatedSlide(
+                      offset: showAppBar ? Offset.zero : const Offset(0, -1.0),
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeOutCubic,
+                      child: AnimatedOpacity(
+                        opacity: showAppBar ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 350),
+                        child: GameHud(
+                          game: game,
+                          clockKey: _clockKey,
+                          onTimeTap: _toggleTimePanel,
+                          onSettings: () {
+                            _closeTimePanel();
+                            setState(() => _settingsOpen = true);
+                          },
+                          showSettings: !widget.tutorial,
+                        ),
+                      ),
                     ),
-                    Expanded(child: _map(game)),
-                    FleetBar(game: game),
+                    Expanded(child: _map(game, palette)),
+                    // Requirement 33: Bottom FleetBar with animated fade + slide
+                    AnimatedSlide(
+                      offset: showBottomBar ? Offset.zero : const Offset(0, 1.0),
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeOutCubic,
+                      child: AnimatedOpacity(
+                        opacity: showBottomBar ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 350),
+                        child: FleetBar(game: game),
+                      ),
+                    ),
+                    // Requirement 35: BannerAd loaded before inserting AdWidget into tree
                     AnimatedBuilder(
                       animation: game.ads,
                       builder: (BuildContext context, Widget? child) {
                         final banner = game.ads.banner;
-                        return banner == null
-                            ? const SizedBox.shrink()
-                            : SizedBox(
-                                width: banner.size.width.toDouble(),
-                                height: banner.size.height.toDouble(),
-                                child: AdWidget(ad: banner),
-                              );
+                        if (banner != null && game.ads.bannerLoaded) {
+                          return SizedBox(
+                            width: banner.size.width.toDouble(),
+                            height: banner.size.height.toDouble(),
+                            child: AdWidget(ad: banner),
+                          );
+                        }
+                        return const SizedBox.shrink();
                       },
                     ),
                   ],
@@ -188,10 +304,28 @@ class _GameScreenState extends ConsumerState<GameScreen>
                   ),
                 ),
                 RewardOverlay(game: game),
-                GameOverOverlay(
-                  game: game,
-                  onMenu: () => unawaited(widget.onReturnToMenu()),
-                ),
+                // Requirement 37: Animated blur + defeat overlay
+                if (game.gameOver)
+                  Positioned.fill(
+                    child: AnimatedBuilder(
+                      animation: _gameOverAnimation,
+                      builder: (BuildContext context, Widget? child) {
+                        final blur = Curves.easeInQuad.transform(_gameOverAnimation.value) * 12.0;
+                        return BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+                          child: ColoredBox(
+                            color: palette.paper.withValues(alpha: 0.25 * _gameOverAnimation.value),
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: GameOverOverlay(
+                        game: game,
+                        appearAnimation: _gameOverAnimation,
+                        onMenu: () => unawaited(widget.onReturnToMenu()),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -200,7 +334,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
     );
   }
 
-  Widget _map(GameSessionController game) => LayoutBuilder(
+  Widget _map(GameSessionController game, FlowlinePalette palette) => LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           final viewport = Size(constraints.maxWidth, constraints.maxHeight);
           if (_viewportSize != viewport && viewport.width.isFinite && viewport.height.isFinite) {
@@ -209,6 +343,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
               if (mounted) _fitToViewport(game);
             });
           }
+          final activeRect = game.city.projectBounds(game.activeRevealBounds);
+
           return DragTarget<CourierType>(
             onAcceptWithDetails: (DragTargetDetails<CourierType> details) {
               final renderObject = _mapKey.currentContext?.findRenderObject();
@@ -248,32 +384,40 @@ class _GameScreenState extends ConsumerState<GameScreen>
                         width: GameConfig.worldSize.width,
                         height: GameConfig.worldSize.height,
                         child: Stack(
-                      fit: StackFit.expand,
-                      children: <Widget>[
-                        RepaintBoundary(
-                          child: CustomPaint(
-                            size: GameConfig.worldSize,
-                            painter: StaticMapPainter(game.city),
-                          ),
+                          fit: StackFit.expand,
+                          children: <Widget>[
+                            RepaintBoundary(
+                              child: CustomPaint(
+                                size: GameConfig.worldSize,
+                                painter: StaticMapPainter(
+                                  game.city,
+                                  palette: palette,
+                                  activeBoundsRect: activeRect,
+                                ),
+                              ),
+                            ),
+                            CustomPaint(
+                              size: GameConfig.worldSize,
+                              painter: GamePainter(game, palette: palette),
+                            ),
+                            CustomPaint(
+                              size: GameConfig.worldSize,
+                              painter: OverlayPainter(
+                                game,
+                                const <Offset>[],
+                                hintAnimation: _hintAnimation,
+                                palette: palette,
+                              ),
+                            ),
+                          ],
                         ),
-                        CustomPaint(size: GameConfig.worldSize, painter: GamePainter(game)),
-                        CustomPaint(
-                          size: GameConfig.worldSize,
-                          painter: OverlayPainter(
-                            game,
-                            const <Offset>[],
-                            hintAnimation: _hintAnimation,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
+          );
         },
       );
 
@@ -330,7 +474,13 @@ class _GameScreenState extends ConsumerState<GameScreen>
     ..translate(translation.dx, translation.dy)
     ..scale(scale);
 
-  Rect _mapBounds() => (_game ?? ref.read(gameControllerProvider)).city.contentBounds.inflate(58);
+  // Requirement 40.2: Camera bounds clamped to active reveal bounds
+  Rect _mapBounds() {
+    final game = _game ?? ref.read(gameControllerProvider);
+    final activeGeo = game.activeRevealBounds;
+    final rect = game.city.projectBounds(activeGeo);
+    return rect.inflate(45);
+  }
 
   double _minZoom(Size viewport) {
     final bounds = _mapBounds();

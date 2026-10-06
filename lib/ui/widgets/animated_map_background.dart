@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 import '../../core/palette.dart';
 import '../../models/city.dart';
 
-/// Decorative menu map. It uses the real city geometry, while courier motion
-/// is intentionally independent of game state. The absolute clock keeps two
-/// route surfaces in phase during a camera transition.
 class AnimatedMapBackground extends StatefulWidget {
   const AnimatedMapBackground({
     required this.city,
@@ -39,18 +36,22 @@ class _AnimatedMapBackgroundState extends State<AnimatedMapBackground> with Sing
   }
 
   @override
-  Widget build(BuildContext context) => RepaintBoundary(
-        child: CustomPaint(
-          painter: MenuMapPainter(
-            widget.city,
-            clock: _clock,
-            cameraZoom: widget.cameraZoom,
-            cameraOffset: widget.cameraOffset,
-            dim: widget.dim,
-          ),
-          child: const SizedBox.expand(),
+  Widget build(BuildContext context) {
+    final palette = Palette.of(context);
+    return RepaintBoundary(
+      child: CustomPaint(
+        painter: MenuMapPainter(
+          widget.city,
+          clock: _clock,
+          cameraZoom: widget.cameraZoom,
+          cameraOffset: widget.cameraOffset,
+          dim: widget.dim,
+          palette: palette,
         ),
-      );
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
 }
 
 class MenuMapPainter extends CustomPainter {
@@ -60,6 +61,7 @@ class MenuMapPainter extends CustomPainter {
     required this.cameraZoom,
     required this.cameraOffset,
     required this.dim,
+    required this.palette,
   })  : _clock = clock,
         super(repaint: clock);
 
@@ -68,10 +70,11 @@ class MenuMapPainter extends CustomPainter {
   final double cameraZoom;
   final Offset cameraOffset;
   final double dim;
+  final FlowlinePalette palette;
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = Palette.paper);
+    canvas.drawRect(Offset.zero & size, Paint()..color = palette.paper);
     if (city.nodes.isEmpty || city.edges.isEmpty) return;
 
     final bounds = city.contentBounds.inflate(90);
@@ -86,79 +89,64 @@ class MenuMapPainter extends CustomPainter {
       if (building.footprint.length < 3) continue;
       final path = _path(building.footprint)..close();
       final color = switch (building.type) {
-        BuildingType.residential => const Color(0xffeadfd0),
-        BuildingType.office => const Color(0xffd8e1e2),
-        BuildingType.park => Palette.grass,
-        BuildingType.other => const Color(0xffe7e2d5),
+        BuildingType.residential => palette.buildingResidential,
+        BuildingType.office => palette.buildingOffice,
+        BuildingType.park => palette.buildingPark,
+        BuildingType.other => palette.buildingOther,
       };
       canvas.drawPath(path, Paint()..color = color);
     }
 
-    if (city.river.length > 1) {
-      final river = _path(city.river);
-      canvas.drawPath(
-        river,
-        Paint()
-          ..color = Palette.water
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 105
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round,
-      );
+    // Draw all river segments
+    final riverPaint = Paint()
+      ..color = palette.water
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 96
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    for (final seg in city.riverSegments) {
+      if (seg.length > 1) {
+        canvas.drawPath(_path(seg), riverPaint);
+      }
     }
+
     for (final edge in city.edges) {
-      final major = edge.level == RoadLevel.major;
+      final isMajor = edge.level == RoadLevel.major;
+      final width = isMajor ? 12.0 : 7.0;
+      if (edge.type == RoadType.bridge) {
+        canvas.drawPath(
+          _path(edge.points),
+          Paint()
+            ..color = palette.ink.withValues(alpha: palette.isDark ? .35 : .16)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = width + 8
+            ..strokeCap = StrokeCap.round,
+        );
+      }
       canvas.drawPath(
         _path(edge.points),
         Paint()
-          ..color = major ? Palette.majorRoad : Palette.road
+          ..color = isMajor ? palette.majorRoad : palette.road
           ..style = PaintingStyle.stroke
-          ..strokeWidth = major ? 11 : 6
+          ..strokeWidth = width
           ..strokeCap = StrokeCap.round
           ..strokeJoin = StrokeJoin.round,
       );
     }
 
-    final absolutePhase = (DateTime.now().millisecondsSinceEpoch % 12000) / 12000;
-    final edgeCount = city.edges.length;
-    for (var i = 0; i < math.min(7, edgeCount); i++) {
-      final edge = city.edges[(i * 13 + 4) % edgeCount];
-      final loop = (absolutePhase * (1 + i * .08) + i * .17) % 1;
-      final pingPong = loop < .5 ? loop * 2 : (1 - loop) * 2;
-      final p = _pointOn(edge.points, pingPong);
-      final radius = <double>[7, 9, 6][i % 3];
-      canvas.drawCircle(p, radius + 3, Paint()..color = Palette.paper);
-      canvas.drawCircle(p, radius, Paint()..color = <Color>[Palette.coral, Palette.blue, Palette.warning][i % 3]);
-    }
     canvas.restore();
 
-    canvas.drawRect(Offset.zero & size, Paint()..color = Palette.ink.withValues(alpha: dim));
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = palette.ink.withValues(alpha: dim),
+    );
   }
 
   Path _path(List<Offset> points) {
-    final path = Path();
-    if (points.isEmpty) return path;
-    path.moveTo(points.first.dx, points.first.dy);
-    for (final p in points.skip(1)) {
-      path.lineTo(p.dx, p.dy);
-    }
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (final p in points.skip(1)) path.lineTo(p.dx, p.dy);
     return path;
-  }
-
-  Offset _pointOn(List<Offset> points, double progress) {
-    if (points.isEmpty) return Offset.zero;
-    if (points.length == 1) return points.first;
-    var length = 0.0;
-    for (var i = 1; i < points.length; i++) {
-      length += (points[i] - points[i - 1]).distance;
-    }
-    var target = progress * length;
-    for (var i = 1; i < points.length; i++) {
-      final segment = (points[i] - points[i - 1]).distance;
-      if (target <= segment) return Offset.lerp(points[i - 1], points[i], target / math.max(1, segment))!;
-      target -= segment;
-    }
-    return points.last;
   }
 
   @override
@@ -167,5 +155,5 @@ class MenuMapPainter extends CustomPainter {
       oldDelegate.cameraZoom != cameraZoom ||
       oldDelegate.cameraOffset != cameraOffset ||
       oldDelegate.dim != dim ||
-      oldDelegate._clock != _clock;
+      oldDelegate.palette != palette;
 }

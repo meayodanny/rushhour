@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/entities.dart';
@@ -20,8 +20,6 @@ class PersistenceService {
     session = await Hive.openBox<Object?>(_sessionName);
   }
 
-  /// Remains true until the first tutorial run reaches its result screen and
-  /// the player explicitly returns to the menu.
   bool get isFirstLaunch => settings.get('isFirstLaunch', defaultValue: true) == true;
   Future<void> completeFirstLaunch() => settings.put('isFirstLaunch', false);
 
@@ -40,10 +38,17 @@ class PersistenceService {
 
   String get language => settings.get('language', defaultValue: 'system')! as String;
   Future<void> setLanguage(String value) => settings.put('language', value);
+
+  ThemeMode get themeMode =>
+      settings.get('theme', defaultValue: 'light') == 'dark' ? ThemeMode.dark : ThemeMode.light;
+  Future<void> setThemeMode(ThemeMode mode) =>
+      settings.put('theme', mode == ThemeMode.dark ? 'dark' : 'light');
+
   bool get audioEnabled => settings.get('audio', defaultValue: true) == true;
   Future<void> setAudioEnabled(bool value) => settings.put('audio', value);
 
   Future<void> saveSession(GameSnapshot snapshot) => session.put('active', jsonEncode(snapshot.toJson()));
+
   GameSnapshot? loadSession() {
     final value = session.get('active');
     if (value is! String) return null;
