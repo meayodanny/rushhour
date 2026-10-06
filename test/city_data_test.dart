@@ -4,7 +4,7 @@ import 'package:rushhour/models/city.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  test('Rivergate asset produces drawable in-bounds geometry', () async {
+  test('Rivergate asset produces real OSM geometry with projection and reveal stages', () async {
     final city = await CityData.load('rivergate');
 
     expect(city.nodes, isNotEmpty);
@@ -19,5 +19,11 @@ void main() {
       city.edges.every((RoadEdge edge) => edge.points.length >= 2),
       isTrue,
     );
+    // River segments
+    expect(city.riverSegments, isNotEmpty);
+    expect(city.riverSegments.every((List segment) => segment.length >= 2), isTrue);
+    // Start viewport and reveal stages
+    expect(city.startViewport.minLat, lessThan(city.startViewport.maxLat));
+    expect(city.revealStages, isNotEmpty);
   });
 }

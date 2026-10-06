@@ -24,84 +24,92 @@ class GameHud extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final strings = AppStrings.of(context);
+    final palette = Palette.of(context);
+    final dateStr = game.formattedDate(context);
+
     return Container(
-      height: 76,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      color: Palette.paper,
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      color: Colors.transparent,
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          // Requirement 31: Date only on the left
           Semantics(
             button: true,
-            label: '${game.formattedTime}, ${strings.day} ${game.session.day}',
+            label: dateStr,
             child: GestureDetector(
               key: clockKey,
               behavior: HitTestBehavior.opaque,
               onTap: onTimeTap,
               child: Container(
-                width: 92,
-                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 7),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(game.formattedTime, style: const TextStyle(fontSize: 22, height: 1, fontWeight: FontWeight.w700, letterSpacing: -1)),
-                    const SizedBox(height: 5),
-                    Text('${strings.day} ${game.session.day}', style: const TextStyle(fontSize: 9, color: Palette.muted, fontWeight: FontWeight.w700, letterSpacing: .3)),
-                  ],
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  dateStr,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: palette.ink,
+                    letterSpacing: -.3,
+                  ),
                 ),
               ),
             ),
           ),
           const Spacer(),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text('${game.session.score}', style: const TextStyle(fontSize: 29, height: 1, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              Text(strings.score, style: const TextStyle(fontSize: 8, letterSpacing: 1.3, color: Palette.muted, fontWeight: FontWeight.w700)),
-            ],
-          ),
-          const Spacer(),
           if (game.session.houseTokens > 0)
             Container(
-              margin: const EdgeInsets.only(right: 8),
-              width: 42,
-              height: 42,
-              decoration: const BoxDecoration(color: Palette.panel, shape: BoxShape.circle),
+              margin: const EdgeInsets.only(right: 14),
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(color: palette.panel, shape: BoxShape.circle),
               child: Stack(
                 clipBehavior: Clip.none,
                 children: <Widget>[
-                  const Center(child: FlowGlyph(FlowGlyphType.house, size: 21)),
+                  const Center(child: FlowGlyph(FlowGlyphType.house, size: 18)),
                   Positioned(
                     right: -2,
-                    top: -3,
+                    top: -2,
                     child: Container(
-                      width: 18,
-                      height: 18,
+                      width: 16,
+                      height: 16,
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(color: Palette.coral, shape: BoxShape.circle),
-                      child: Text('${game.session.houseTokens}', style: const TextStyle(color: Palette.paper, fontSize: 9, fontWeight: FontWeight.w700)),
+                      decoration: BoxDecoration(color: palette.coral, shape: BoxShape.circle),
+                      child: Text(
+                        '${game.session.houseTokens}',
+                        style: TextStyle(color: palette.paper, fontSize: 8, fontWeight: FontWeight.w700),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
           if (showSettings)
-            SizedBox(
-              width: 48,
-              child: FlowPressable(
-                semanticLabel: strings.settings,
-                onPressed: onSettings,
-                height: 46,
-                radius: 16,
-                padding: EdgeInsets.zero,
-                background: Palette.panel,
-                foreground: Palette.ink,
-                child: const FlowGlyph(FlowGlyphType.sliders, size: 22),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onSettings,
+              child: Container(
+                width: 38,
+                height: 38,
+                margin: const EdgeInsets.only(right: 12),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: palette.panel.withValues(alpha: 0.8),
+                  shape: BoxShape.circle,
+                ),
+                child: FlowGlyph(FlowGlyphType.sliders, size: 18, color: palette.ink),
               ),
-            )
-          else
-            const SizedBox(width: 48),
+            ),
+          // Requirement 31: Delivery score as small semi-transparent text on the right
+          Text(
+            '${game.session.score}',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: palette.ink.withValues(alpha: .55),
+              letterSpacing: .5,
+            ),
+          ),
         ],
       ),
     );

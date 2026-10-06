@@ -1,12 +1,12 @@
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+
 import '../models/city.dart';
 import '../models/entities.dart';
 
-/// Geometry shared by the renderer and hit testing. Keeping the offset
-/// calculation here is important: a courier and the line it belongs to must
-/// always occupy the same visual track.
+/// Geometry shared by the renderer and hit testing.
 class LineGeometry {
   LineGeometry(this.city, this.lines, {this.nodeForEntity});
 
@@ -14,8 +14,6 @@ class LineGeometry {
   final List<DeliveryLine> lines;
   final String? Function(String)? nodeForEntity;
 
-  // World units: at the initial phone fit this is roughly 8–10 physical
-  // pixels, leaving a visible paper gap between 2–3 coloured tracks.
   static const double separation = 22;
   static const double nodeTaper = 34;
 
@@ -39,52 +37,13 @@ class LineGeometry {
     return (trackIndex(line, edgeId) - (shared.length - 1) / 2) * separation;
   }
 
-  /// Returns a route with a separate, gently tapered track for every edge.
-  /// Offsets reach zero close to graph nodes, so lines meet cleanly instead of
-  /// making a sharp dog-leg at a junction.
-  List<Offset> offsetRoutePoints(DeliveryLine line) {
-    final result = <Offset>[];
-    var current = _nodeForEntity(line.stopIds.first);
-    for (final edgeId in line.edgeIds) {
-      final edge = city.edgeById(edgeId);
-      if (edge == null) continue;
-      final forward = edge.from == current;
-      // Compute the normal in canonical from -> to space, then reverse the
-      // shifted points for reverse traversal. Opposite-direction routes thus
-      // still occupy distinct, stable tracks.
-      final canonical = _offsetEdge(edge.points, trackOffset(line, edge.id));
-      final shifted = forward ? canonical : canonical.reversed.toList();
-      if (result.isEmpty) {
-        result.addAll(shifted);
-      } else {
-        // Both adjacent edges taper to their common node. Keeping one copy
-        // prevents a microscopic cap/loop from appearing at that node.
-        result.addAll(shifted.skip(1));
-      }
-      current = forward ? edge.to : edge.from;
-    }
-    return result;
-  }
+  List<Offset> offsetRoutePoints(DeliveryLine line) =>
+      offsetRoutePointsFor(line, (String id) => _nodeForEntity(id));
 
-  List<Offset> routePoints(DeliveryLine line) {
-    final result = <Offset>[];
-    var current = _nodeForEntity(line.stopIds.first);
-    for (final edgeId in line.edgeIds) {
-      final edge = city.edgeById(edgeId);
-      if (edge == null) continue;
-      final forward = edge.from == current;
-      final points = forward ? edge.points : edge.points.reversed.toList();
-      if (result.isEmpty) {
-        result.addAll(points);
-      } else {
-        result.addAll(points.skip(1));
-      }
-      current = forward ? edge.to : edge.from;
-    }
-    return result;
-  }
+  List<Offset> routePoints(DeliveryLine line) =>
+      routePointsFor(line, (String id) => _nodeForEntity(id));
 
-  DeliveryLine? lineNear(Offset point, {double radius = 24}) {
+  DeliveryLine? lineNear(Offset point, {double radius = 32}) {
     DeliveryLine? best;
     var bestDistance = radius;
     for (final line in lines) {
@@ -154,8 +113,6 @@ class LineGeometry {
     return null;
   }
 
-  // Explicit lookup is useful to the controller for active entities while
-  // retaining a small, dependency-free geometry helper for the painter.
   List<Offset> offsetRoutePointsFor(DeliveryLine line, String? Function(String) nodeForEntity) {
     final result = <Offset>[];
     var current = nodeForEntity(line.stopIds.first);
@@ -163,9 +120,6 @@ class LineGeometry {
       final edge = city.edgeById(edgeId);
       if (edge == null) continue;
       final forward = edge.from == current;
-      // Compute the normal in canonical from -> to space, then reverse the
-      // shifted points for reverse traversal. Opposite-direction routes thus
-      // still occupy distinct, stable tracks.
       final canonical = _offsetEdge(edge.points, trackOffset(line, edge.id));
       final shifted = forward ? canonical : canonical.reversed.toList();
       if (result.isEmpty) {
@@ -219,4 +173,44 @@ class LineGeometry {
 
   double _smoothStep(double value) => value * value * (3 - 2 * value);
 
+  /// Builds a smooth Path with rounded corner fillets for aesthetic drawing.
+  static Path buildSmoothPath(List<Offset> points, {double cornerRadius = 14.0}) {
+    final path = Path();
+    if (points.isEmpty) return path;
+    if (points.length == 1) {
+      path.moveTo(points.first.dx, points.first.dy);
+      return path;
+    }
+    if (points.length == 2) {
+      path.moveTo(points.first.dx, points.first.dy);
+      path.lineTo(points.last.dx, points.last.dy);
+      return path;
+    }
+
+    path.moveTo(points.first.dx, points.first.dy);
+    for (var i = 1; i < points.length - 1; i++) {
+      final pPrev = points[i - 1];
+      final pCurr = points[i];
+      final pNext = points[i + 1];
+
+      final v1 = pCurr - pPrev;
+      final v2 = pNext - pCurr;
+      final len1 = v1.distance;
+      final len2 = v2.distance;
+
+      if (len1 < 1e-4 || len2 < 1e-4) {
+        path.lineTo(pCurr.dx, pCurr.dy);
+        continue;
+      }
+
+      final r = math.min(cornerRadius, math.min(len1 * 0.45, len2 * 0.45));
+      final startFillet = pCurr - (v1 / len1) * r;
+      final endFillet = pCurr + (v2 / len2) * r;
+
+      path.lineTo(startFillet.dx, startFillet.dy);
+      path.quadraticBezierTo(pCurr.dx, pCurr.dy, endFillet.dx, endFillet.dy);
+    }
+    path.lineTo(points.last.dx, points.last.dy);
+    return path;
+  }
 }

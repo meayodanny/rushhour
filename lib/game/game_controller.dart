@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -32,6 +33,7 @@ class LineDraft {
     this.editingLineId,
     this.editingEndpoint,
     this.bodyEdgeIndex,
+    this.reachProgress = 1.0,
   });
 
   final int colorIndex;
@@ -42,12 +44,14 @@ class LineDraft {
   final int? bodyEdgeIndex;
   String? targetEntityId;
   List<Offset> points;
+  double reachProgress;
 }
 
 final persistenceProvider = Provider<PersistenceService>((Ref ref) => throw UnimplementedError());
 final adServiceProvider = Provider<AdService>((Ref ref) => throw UnimplementedError());
 final audioServiceProvider = Provider<AudioService>((Ref ref) => throw UnimplementedError());
 final cityProvider = Provider<CityData>((Ref ref) => throw UnimplementedError());
+
 final gameControllerProvider = ChangeNotifierProvider<GameSessionController>((Ref ref) => GameSessionController(
       city: ref.watch(cityProvider),
       persistence: ref.watch(persistenceProvider),
@@ -56,8 +60,12 @@ final gameControllerProvider = ChangeNotifierProvider<GameSessionController>((Re
     ));
 
 class GameSessionController extends ChangeNotifier {
-  GameSessionController({required this.city, required this.persistence, required this.audio, required this.ads})
-      : graph = RoadGraph(city) {
+  GameSessionController({
+    required this.city,
+    required this.persistence,
+    required this.audio,
+    required this.ads,
+  }) : graph = RoadGraph(city) {
     final saved = persistence.loadSession();
     session = saved ?? _newSession(Difficulty.normal);
     for (final customer in session.customers) {
@@ -93,8 +101,9 @@ class GameSessionController extends ChangeNotifier {
   List<RewardType> rewardOptions = const <RewardType>[];
   bool tutorialVisible = false;
   bool isTutorial = false;
+  bool isPausedByLifecycle = false;
   double animation = 0;
-  double _demandTimer = 7;
+  double _demandTimer = 8;
   double _eventTimer = 30;
   double _weatherTimer = 48;
   double _firstCustomerTimer = 3;
@@ -102,11 +111,39 @@ class GameSessionController extends ChangeNotifier {
   double _nextRestaurantTimer = 72;
   int _id = 100;
   String? failedCustomerId;
+  bool newlyRevealedStage = false;
+
+  GeoBounds get activeRevealBounds {
+    if (city.revealStages.isEmpty || session.activeRevealStage == 0) {
+      return city.startViewport;
+    }
+    final stageIdx = (session.activeRevealStage - 1).clamp(0, city.revealStages.length - 1);
+    return city.revealStages[stageIdx].bounds;
+  }
+
+  bool isPointInActiveBounds(Offset point) {
+    final bounds = activeRevealBounds;
+    final r = city.projectBounds(bounds);
+    return r.inflate(20).contains(point);
+  }
+
+  bool isNodeInActiveBounds(String nodeId) {
+    final node = city.nodes[nodeId];
+    if (node == null) return false;
+    return activeRevealBounds.containsLat(node.lat, node.lng);
+  }
 
   GameSnapshot _newSession(Difficulty difficulty) {
     final cuisineNames = city.availableCuisines.isEmpty ? const <String>['pizza'] : city.availableCuisines;
     final cuisines = cuisineNames.map(Cuisine.values.byName).toList();
-    final restaurantPois = List<CityPoi>.of(city.restaurantPois)..shuffle(_random);
+
+    // Select first restaurant from inside startViewport
+    final inBoundsPois = city.restaurantPois.where((CityPoi p) {
+      final n = city.nodes[p.nodeId];
+      return n != null && city.startViewport.containsLat(n.lat, n.lng);
+    }).toList();
+    final pool = inBoundsPois.isNotEmpty ? inBoundsPois : city.restaurantPois;
+    final restaurantPois = List<CityPoi>.of(pool)..shuffle(_random);
     final restaurants = <Restaurant>[];
     if (restaurantPois.isNotEmpty) {
       final poi = restaurantPois.first;
@@ -127,9 +164,7 @@ class GameSessionController extends ChangeNotifier {
       score: 0,
       elapsed: 0,
       day: 1,
-      minute: 8 * 60,
-      // Two line tokens and two concrete Walk couriers are the MVP opening
-      // loadout. Additional vehicle types arrive only through rewards.
+      minute: 0,
       availableLines: sandbox ? 6 : GameConfig.startingLines,
       ferryTokens: 0,
       houseTokens: 0,
@@ -139,11 +174,13 @@ class GameSessionController extends ChangeNotifier {
         CourierType.bike: sandbox ? 8 : 0,
         CourierType.car: sandbox ? 8 : 0,
       },
+      unlockedCourierTypes: sandbox
+          ? const <CourierType>{CourierType.walk, CourierType.bike, CourierType.car}
+          : const <CourierType>{CourierType.walk},
+      activeRevealStage: 0,
     );
   }
 
-  /// Every mode shares the same soft opening: one kitchen now, its first
-  /// matching customer after 2–4 seconds, then normal load growth.
   void startSession(Difficulty difficulty, {required bool tutorial}) {
     isTutorial = tutorial;
     session = _newSession(difficulty);
@@ -153,7 +190,9 @@ class GameSessionController extends ChangeNotifier {
     failedCustomerId = null;
     selectedEntityId = null;
     tutorialVisible = false;
+    newlyRevealedStage = false;
     timeScale = TimeScale.normal;
+    isPausedByLifecycle = false;
     _customerAppearance.clear();
     _restaurantAppearance
       ..clear()
@@ -162,7 +201,7 @@ class GameSessionController extends ChangeNotifier {
     for (final customer in session.customers) _seedDemandAppearance(customer);
     _lineDraft = null;
     _draggedCourierId = null;
-    _firstCustomerTimer = 2 + _random.nextDouble() * 2;
+    _firstCustomerTimer = 2.5 + _random.nextDouble() * 1.5;
     _nextCustomerTimer = 34 + _random.nextDouble() * 12;
     _nextRestaurantTimer = 68 + _random.nextDouble() * 18;
     _demandTimer = 8;
@@ -173,11 +212,27 @@ class GameSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void onAppPaused() {
+    isPausedByLifecycle = true;
+    unawaited(save());
+  }
+
+  void onAppResumed() {
+    isPausedByLifecycle = false;
+    _lastFrame = DateTime.now();
+  }
+
   void _onFrame(Timer _) {
+    if (isPausedByLifecycle) return;
     final now = DateTime.now();
     final realDt = math.min(.1, now.difference(_lastFrame).inMicroseconds / 1000000);
     _lastFrame = now;
     animation += realDt;
+
+    if (_lineDraft != null && _lineDraft!.reachProgress < 1.0) {
+      _lineDraft!.reachProgress = math.min(1.0, _lineDraft!.reachProgress + realDt / 0.12);
+    }
+
     for (final entry in _customerAppearance.entries.toList()) {
       if (entry.value < 1) _customerAppearance[entry.key] = math.min(1, entry.value + realDt / .42);
     }
@@ -192,6 +247,7 @@ class GameSessionController extends ChangeNotifier {
     for (final entry in _demandAppearance.entries.toList()) {
       if (entry.value < 1) _demandAppearance[entry.key] = math.min(1, entry.value + realDt / .42);
     }
+
     final dt = realDt * timeScale.value;
     if (dt > 0 && !gameOver && !rewardPending) _tick(dt);
     notifyListeners();
@@ -199,17 +255,30 @@ class GameSessionController extends ChangeNotifier {
 
   void _tick(double dt) {
     session.elapsed += dt;
-    session.minute += dt * 10;
-    while (session.minute >= 1440) {
-      session.minute -= 1440;
-      session.day++;
-    }
+    // Requirement 24: Unified time scale: 3 real seconds = 1 in-game day
+    session.day = 1 + (session.elapsed / 3.0).floor();
+
     _tickPopulation(dt);
     _tickDemand(dt);
     _tickRestaurants(dt);
     _tickCouriers(dt);
     _tickEvents(dt);
     _tickOverload(dt);
+    _checkMapReveal();
+  }
+
+  void _checkMapReveal() {
+    if (city.revealStages.isEmpty) return;
+    final currentLevel = session.score ~/ GameConfig.deliveriesPerReward;
+    for (var i = 0; i < city.revealStages.length; i++) {
+      final stage = city.revealStages[i];
+      if (currentLevel >= stage.unlockAfterLevel && session.activeRevealStage < stage.stageIndex) {
+        session.activeRevealStage = stage.stageIndex;
+        newlyRevealedStage = true;
+        notifyListeners();
+        break;
+      }
+    }
   }
 
   void _tickPopulation(double dt) {
@@ -234,8 +303,12 @@ class GameSessionController extends ChangeNotifier {
   void _spawnCustomer({bool first = false}) {
     if (session.restaurants.isEmpty) return;
     final used = session.customers.map((Customer c) => c.id).toSet();
-    final candidates = city.customerPois.where((CityPoi p) => !used.contains(p.id)).toList()..shuffle(_random);
+    final candidates = city.customerPois
+        .where((CityPoi p) => !used.contains(p.id) && isNodeInActiveBounds(p.nodeId))
+        .toList()
+      ..shuffle(_random);
     if (candidates.isEmpty) return;
+
     final cuisine = first
         ? session.restaurants.first.cuisine
         : session.restaurants[_random.nextInt(session.restaurants.length)].cuisine;
@@ -243,10 +316,10 @@ class GameSessionController extends ChangeNotifier {
     final customer = Customer(id: poi.id, nodeId: poi.nodeId, demand: <Cuisine, int>{cuisine: 1});
     session.customers.add(customer);
     _customerAppearance[customer.id] = 0;
-    // The initial demand belongs to the new point and therefore appears with
-    // it rather than popping in a frame later.
     for (final entry in customer.demand.entries) {
-      for (var i = 0; i < entry.value; i++) _demandAppearance[_demandKey(customer, entry.key, i)] = 0;
+      for (var i = 0; i < entry.value; i++) {
+        _demandAppearance[_demandKey(customer, entry.key, i)] = 0;
+      }
     }
     if (first && !persistence.tutorialSeen('routeGesture')) {
       tutorialVisible = true;
@@ -256,7 +329,10 @@ class GameSessionController extends ChangeNotifier {
 
   void _spawnRestaurant() {
     final used = session.restaurants.map((Restaurant r) => r.id).toSet();
-    final candidates = city.restaurantPois.where((CityPoi p) => !used.contains(p.id)).toList()..shuffle(_random);
+    final candidates = city.restaurantPois
+        .where((CityPoi p) => !used.contains(p.id) && isNodeInActiveBounds(p.nodeId))
+        .toList()
+      ..shuffle(_random);
     if (candidates.isEmpty) return;
     final cuisines = city.availableCuisines.map(Cuisine.values.byName).toList();
     if (cuisines.isEmpty) return;
@@ -285,6 +361,7 @@ class GameSessionController extends ChangeNotifier {
   }
 
   LineDraft? get lineDraft => _lineDraft;
+
   int get nextLineColorIndex {
     final used = session.lines.map((DeliveryLine line) => line.colorIndex).toSet();
     for (var i = 0; i < GameConfig.lineColors.length; i++) {
@@ -324,13 +401,26 @@ class GameSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Requirement 20: Smooth startup difficulty multiplier (demand rate slowed 4x on startup,
+  /// ramping to 1.0 over 75s window).
+  double get _startupDifficultyMultiplier {
+    if (session.elapsed >= 75.0) return 1.0;
+    final t = (session.elapsed / 75.0).clamp(0.0, 1.0);
+    // Smoothstep interpolation from 0.25 to 1.0
+    final smoothT = t * t * (3 - 2 * t);
+    return 0.25 + 0.75 * smoothT;
+  }
+
   double get _orderMultiplier {
     var value = session.difficulty == Difficulty.realism
         ? 1.45
         : (session.difficulty == Difficulty.sandbox ? .35 : 1.0);
+    value *= _startupDifficultyMultiplier;
     if (session.weather == WeatherType.rain) value *= 1.35;
     for (final holiday in city.holidays) {
-      if (session.day >= holiday.day && session.day < holiday.day + holiday.durationDays) value *= holiday.multiplier;
+      if (session.day >= holiday.day && session.day < holiday.day + holiday.durationDays) {
+        value *= holiday.multiplier;
+      }
     }
     return value;
   }
@@ -339,8 +429,15 @@ class GameSessionController extends ChangeNotifier {
     _demandTimer -= dt * _orderMultiplier * (1 + session.score / 180);
     if (_demandTimer > 0 || session.customers.isEmpty || session.restaurants.isEmpty) return;
     _demandTimer = 5 + _random.nextDouble() * 5;
+
     final customer = session.customers[_random.nextInt(session.customers.length)];
     if (customer.demandSuspended) return;
+
+    // Requirement 20: Tutorial demand ceiling (max 2 orders until first delivery is completed)
+    if (isTutorial && session.score == 0 && customer.totalDemand >= 2) {
+      return;
+    }
+
     final cuisine = session.restaurants[_random.nextInt(session.restaurants.length)].cuisine;
     final oldCount = customer.demand[cuisine] ?? 0;
     customer.demand[cuisine] = oldCount + 1;
@@ -365,6 +462,8 @@ class GameSessionController extends ChangeNotifier {
   }
 
   void _tickCouriers(double dt) {
+    final mapDimension = city.contentBounds.longestSide > 0 ? city.contentBounds.longestSide : 1400.0;
+
     for (final courier in session.couriers) {
       final line = lineById(courier.lineId);
       if (line == null || line.edgeIds.isEmpty) {
@@ -392,9 +491,12 @@ class GameSessionController extends ChangeNotifier {
         if ((event.type == RoadEventType.trafficJam || event.type == RoadEventType.accident) && courier.type == CourierType.car) modifier *= .35;
         if (event.type == RoadEventType.roadworks && courier.type == CourierType.bike) modifier *= .7;
       }
+
+      // Requirement 21: Base speed as fraction of map dimension
+      final speedPx = courier.type.calculateSpeed(mapDimension);
       final routeLength = line.edgeIds.fold<double>(0, (double sum, String id) => sum + (city.edgeById(id)?.length ?? 0));
       final before = courier.progress;
-      courier.progress += (courier.forward ? 1 : -1) * courier.type.speed * modifier * dt / math.max(1, routeLength);
+      courier.progress += (courier.forward ? 1 : -1) * speedPx * modifier * dt / math.max(1, routeLength);
       if (courier.progress >= 1) {
         courier.progress = 1;
         courier.forward = false;
@@ -525,8 +627,19 @@ class GameSessionController extends ChangeNotifier {
 
   double get networkLoad =>
       session.customers.fold<int>(0, (int value, Customer c) => value + c.totalDemand) + session.couriers.length * 1.5;
-  String get formattedTime =>
-      '${(session.minute ~/ 60).toString().padLeft(2, '0')}:${(session.minute.toInt() % 60).toString().padLeft(2, '0')}';
+
+  /// Requirement 24 & 31: Format only Day and Month (e.g. "24 Дек" / "24 Dec")
+  String formattedDate(BuildContext context) {
+    final isRu = Localizations.localeOf(context).languageCode == 'ru';
+    // Anchor to December 1st for authentic calendar progression
+    final base = DateTime(2026, 12, 1);
+    final current = base.add(Duration(days: session.day - 1));
+    const monthsRu = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+    const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final monthStr = isRu ? monthsRu[current.month - 1] : monthsEn[current.month - 1];
+    return '${current.day} $monthStr';
+  }
+
   String get formattedSurvival {
     final total = session.elapsed.floor();
     final minutes = total ~/ 60;
@@ -543,10 +656,7 @@ class GameSessionController extends ChangeNotifier {
 
   LineGeometry get _lineGeometry => LineGeometry(city, session.lines, nodeForEntity: nodeForEntity);
 
-  /// The initial pointer-down decision is deliberately made once. This keeps
-  /// a drag that started on a POI/line from turning into a camera pan halfway
-  /// through the gesture.
-  Courier? courierNear(Offset point, {double radius = 26}) {
+  Courier? courierNear(Offset point, {double radius = 32}) {
     final geometry = _lineGeometry;
     Courier? result;
     var best = radius;
@@ -562,36 +672,42 @@ class GameSessionController extends ChangeNotifier {
     return result;
   }
 
+  /// Requirement 22 & 26: 44px hit-zone and Mini Metro snap line drag editing
   bool beginLineGesture(Offset point) {
     if (gameOver || rewardPending) return false;
-    final courier = courierNear(point);
+    final courier = courierNear(point, radius: 36);
     if (courier != null) {
       _draggedCourierId = courier.id;
       return true;
     }
-    final nearbyLine = _lineGeometry.lineNear(point, radius: 30);
+
+    // Check hit on existing line (any segment or endpoint)
+    final nearbyLine = _lineGeometry.lineNear(point, radius: 36);
     if (nearbyLine != null) {
       final nearbyRoute = _lineGeometry.offsetRoutePointsFor(nearbyLine, nodeForEntity);
-      final endpoint = nearbyRoute.length < 2
-          ? null
-          : ((point - nearbyRoute.first).distance <= 34
-              ? 0
-              : ((point - nearbyRoute.last).distance <= 34 ? 1 : null));
-      // A line endpoint is an explicit edit affordance even when its POI is
-      // underneath it. This keeps endpoint editing reachable on a phone.
-      if (endpoint != null) {
+      if (nearbyRoute.isNotEmpty) {
+        final distToStart = (point - nearbyRoute.first).distance;
+        final distToEnd = (point - nearbyRoute.last).distance;
+        final endpoint = distToStart <= 38 ? 0 : (distToEnd <= 38 ? 1 : null);
+
+        final fixedNode = endpoint == 0
+            ? nodeForEntity(nearbyLine.stopIds.last)!
+            : nodeForEntity(nearbyLine.stopIds.first)!;
+
         _lineDraft = LineDraft(
           colorIndex: nearbyLine.colorIndex,
-          startNodeId: nodeForEntity(endpoint == 0 ? nearbyLine.stopIds.last : nearbyLine.stopIds.first)!,
+          startNodeId: fixedNode,
           points: List<Offset>.of(nearbyRoute),
           editingLineId: nearbyLine.id,
           editingEndpoint: endpoint,
+          reachProgress: 1.0,
         );
         return true;
       }
     }
 
-    final entity = entityNear(point);
+    // Check hit on POI entity
+    final entity = entityNear(point, radius: 44);
     if (entity != null) {
       final node = nodeForEntity(entity);
       if (node == null) return false;
@@ -600,47 +716,29 @@ class GameSessionController extends ChangeNotifier {
         startNodeId: node,
         startEntityId: entity,
         points: <Offset>[city.nodes[node]!.point],
+        reachProgress: 0.0,
       );
       return true;
     }
 
-    final line = nearbyLine;
-    if (line == null) return false;
-    final route = _lineGeometry.offsetRoutePointsFor(line, nodeForEntity);
-    if (route.length < 2) return false;
-    _lineDraft = LineDraft(
-      colorIndex: line.colorIndex,
-      startNodeId: nodeForEntity(line.stopIds.first)!,
-      points: List<Offset>.of(route),
-      editingLineId: line.id,
-      bodyEdgeIndex: _nearestRouteSegment(point, route),
-    );
-    return true;
-  }
-
-  int _nearestRouteSegment(Offset point, List<Offset> route) {
-    var best = 0;
-    var distance = double.infinity;
-    for (var i = 1; i < route.length; i++) {
-      final current = LineGeometry.distanceToSegment(point, route[i - 1], route[i]);
-      if (current < distance) {
-        distance = current;
-        best = i - 1;
-      }
-    }
-    return best;
+    return false;
   }
 
   void updateLineGesture(Offset point) {
     if (_draggedCourierId != null) return;
     final draft = _lineDraft;
     if (draft == null) return;
-    final target = entityNear(point);
+    final target = entityNear(point, radius: 44);
+
     if (draft.editingLineId == null) {
       if (target != null && target != draft.startEntityId) {
         final path = graph.findPath(draft.startNodeId, nodeForEntity(target)!, allowFerry: session.ferryTokens > 0);
         draft.targetEntityId = target;
-        draft.points = path == null ? _projectionRoute(draft.startNodeId, point).points : _pointsForPath(draft.startNodeId, path.edgeIds);
+        if (path != null && path.edgeIds.isNotEmpty) {
+          draft.points = _pointsForPath(draft.startNodeId, path.edgeIds);
+        } else {
+          draft.points = _projectionRoute(draft.startNodeId, point).points;
+        }
       } else {
         draft.targetEntityId = null;
         draft.points = _projectionRoute(draft.startNodeId, point).points;
@@ -649,35 +747,22 @@ class GameSessionController extends ChangeNotifier {
       return;
     }
 
+    // Line editing drag
     final line = lineById(draft.editingLineId);
     if (line == null) return;
-    if (draft.editingEndpoint != null) {
-      final fixed = draft.editingEndpoint == 0 ? line.stopIds.last : line.stopIds.first;
-      final fixedNode = nodeForEntity(fixed);
-      final targetNode = target == null ? null : nodeForEntity(target);
-      draft.targetEntityId = target;
-      if (targetNode != null && target != fixed) {
-        final path = graph.findPath(targetNode, fixedNode!, allowFerry: session.ferryTokens > 0);
-        draft.points = path == null ? draft.points : _pointsForPath(targetNode, path.edgeIds);
+    final fixedNode = draft.startNodeId;
+    draft.targetEntityId = target;
+
+    if (target != null && nodeForEntity(target) != fixedNode) {
+      final targetNode = nodeForEntity(target)!;
+      final path = graph.findPath(fixedNode, targetNode, allowFerry: session.ferryTokens > 0);
+      if (path != null && path.edgeIds.isNotEmpty) {
+        draft.points = _pointsForPath(fixedNode, path.edgeIds);
       } else {
-        draft.targetEntityId = null;
-        final projected = _projectionRoute(fixedNode!, point);
-        draft.points = projected.points.reversed.toList();
+        draft.points = _projectionRoute(fixedNode, point).points;
       }
     } else {
-      // A body grab previews a local graph-snapped detour. It is committed
-      // only when released over an existing POI, preventing freehand routes.
-      draft.targetEntityId = target;
-      if (target != null) {
-        final start = nodeForEntity(line.stopIds.first)!;
-        final end = nodeForEntity(target)!;
-        final path = graph.findPath(start, end, allowFerry: session.ferryTokens > 0);
-        if (path != null) draft.points = _pointsForPath(start, path.edgeIds);
-      } else {
-        final startPart = _projectionRoute(nodeForEntity(line.stopIds.first)!, point).points;
-        final endPart = _projectionRoute(nodeForEntity(line.stopIds.last)!, point).points;
-        draft.points = <Offset>[...startPart, ...endPart.reversed.skip(1)];
-      }
+      draft.points = _projectionRoute(fixedNode, point).points;
     }
     notifyListeners();
   }
@@ -693,7 +778,7 @@ class GameSessionController extends ChangeNotifier {
           break;
         }
       }
-      final line = _lineGeometry.lineNear(point, radius: 32);
+      final line = _lineGeometry.lineNear(point, radius: 36);
       if (courier != null && line != null) {
         courier.lineId = line.id;
         courier.state = CourierState.reassigning;
@@ -703,13 +788,15 @@ class GameSessionController extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+
     final draft = _lineDraft;
     if (draft == null) return false;
-    // Update one last time so the release position is authoritative.
     updateLineGesture(point);
     final current = _lineDraft;
     _lineDraft = null;
     if (current == null) return false;
+
+    // Creating new line
     if (current.editingLineId == null) {
       final target = current.targetEntityId;
       if (target == null || target == current.startEntityId) {
@@ -721,38 +808,44 @@ class GameSessionController extends ChangeNotifier {
       return true;
     }
 
+    // Committing line modification
     final line = lineById(current.editingLineId);
     final target = current.targetEntityId;
     if (line == null || target == null || nodeForEntity(target) == null) {
       notifyListeners();
       return false;
     }
-    if (current.editingEndpoint != null) {
-      final fixed = current.editingEndpoint == 0 ? line.stopIds.last : line.stopIds.first;
-      final path = graph.findPath(nodeForEntity(target)!, nodeForEntity(fixed)!, allowFerry: session.ferryTokens > 0);
-      if (path != null && path.edgeIds.isNotEmpty) {
-        if (current.editingEndpoint == 0) {
-          line.stopIds[0] = target;
-        } else {
-          line.stopIds[line.stopIds.length - 1] = target;
-        }
+
+    final fixedNode = current.startNodeId;
+    final targetNode = nodeForEntity(target)!;
+    if (fixedNode == targetNode) {
+      notifyListeners();
+      return false;
+    }
+
+    final path = graph.findPath(fixedNode, targetNode, allowFerry: session.ferryTokens > 0);
+    if (path != null && path.edgeIds.isNotEmpty && _validateRouteEdges(path.edgeIds, fixedNode, targetNode)) {
+      if (current.editingEndpoint == 0) {
+        line.stopIds[0] = target;
         line.edgeIds
           ..clear()
-          ..addAll(path.edgeIds);
-      }
-    } else {
-      // Body editing is a purposeful graph edit rather than a new line. The
-      // nearest valid POI becomes the new terminal stop for this MVP route.
-      final path = graph.findPath(nodeForEntity(line.stopIds.first)!, nodeForEntity(target)!, allowFerry: session.ferryTokens > 0);
-      if (path != null && path.edgeIds.isNotEmpty) {
+          ..addAll(path.edgeIds.reversed);
+      } else {
         line.stopIds[line.stopIds.length - 1] = target;
         line.edgeIds
           ..clear()
           ..addAll(path.edgeIds);
       }
+      // Rubber-band adjustment for couriers on this line
+      for (final courier in session.couriers.where((Courier c) => c.lineId == line.id)) {
+        courier.progress = courier.progress.clamp(0.0, 1.0);
+      }
+      notifyListeners();
+      return true;
     }
+
     notifyListeners();
-    return true;
+    return false;
   }
 
   void cancelLineGesture() {
@@ -760,6 +853,25 @@ class GameSessionController extends ChangeNotifier {
     _lineDraft = null;
     _draggedCourierId = null;
     notifyListeners();
+  }
+
+  /// Requirement 30: Strict road graph invariant validation.
+  /// Ensures every consecutive step belongs to an existing edge on the graph.
+  bool _validateRouteEdges(List<String> edgeIds, String fromNode, String toNode) {
+    if (edgeIds.isEmpty) return false;
+    var current = fromNode;
+    for (final id in edgeIds) {
+      final edge = city.edgeById(id);
+      if (edge == null) return false;
+      if (edge.from == current) {
+        current = edge.to;
+      } else if (edge.to == current) {
+        current = edge.from;
+      } else {
+        return false;
+      }
+    }
+    return current == toNode;
   }
 
   List<Offset> _pointsForPath(String startNode, List<String> edgeIds) {
@@ -770,7 +882,11 @@ class GameSessionController extends ChangeNotifier {
       if (edge == null) continue;
       final forward = edge.from == current;
       final points = forward ? edge.points : edge.points.reversed.toList();
-      if (result.isEmpty) result.addAll(points); else result.addAll(points.skip(1));
+      if (result.isEmpty) {
+        result.addAll(points);
+      } else {
+        result.addAll(points.skip(1));
+      }
       current = forward ? edge.to : edge.from;
     }
     return result;
@@ -780,7 +896,7 @@ class GameSessionController extends ChangeNotifier {
     final projection = graph.nearestGraphPoint(point);
     final edge = city.edgeById(projection.edgeId)!;
     final candidates = <_ProjectionRoute>[];
-    final fromPath = graph.findPath(startNode, edge.from, blocked: <String>{edge.id});
+    final fromPath = graph.findPath(startNode, edge.from, blocked: <String>{edge.id}, allowFerry: session.ferryTokens > 0);
     if (fromPath != null) {
       final points = _pointsForPath(startNode, fromPath.edgeIds);
       final segment = _partialEdge(edge, from: edge.from, to: projection.point);
@@ -790,7 +906,7 @@ class GameSessionController extends ChangeNotifier {
         distance: fromPath.distance + projection.along,
       ));
     }
-    final toPath = graph.findPath(startNode, edge.to, blocked: <String>{edge.id});
+    final toPath = graph.findPath(startNode, edge.to, blocked: <String>{edge.id}, allowFerry: session.ferryTokens > 0);
     if (toPath != null) {
       final points = _pointsForPath(startNode, toPath.edgeIds);
       final segment = _partialEdge(edge, from: edge.to, to: projection.point);
@@ -800,8 +916,14 @@ class GameSessionController extends ChangeNotifier {
         distance: toPath.distance + edge.length - projection.along,
       ));
     }
-    if (candidates.isNotEmpty) return candidates.reduce((_ProjectionRoute a, _ProjectionRoute b) => a.distance <= b.distance ? a : b);
-    return _ProjectionRoute(points: <Offset>[city.nodes[startNode]!.point, projection.point], edgeIds: <String>[edge.id], distance: projection.distance);
+    if (candidates.isNotEmpty) {
+      return candidates.reduce((_ProjectionRoute a, _ProjectionRoute b) => a.distance <= b.distance ? a : b);
+    }
+    return _ProjectionRoute(
+      points: <Offset>[city.nodes[startNode]!.point],
+      edgeIds: const <String>[],
+      distance: 0,
+    );
   }
 
   List<Offset> _partialEdge(RoadEdge edge, {required String from, required Offset to}) {
@@ -822,7 +944,7 @@ class GameSessionController extends ChangeNotifier {
   }
 
   void handleMapTap(Offset point) {
-    final entity = entityNear(point);
+    final entity = entityNear(point, radius: 44);
     if (entity == null) {
       selectedEntityId = null;
       notifyListeners();
@@ -852,7 +974,7 @@ class GameSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  String? entityNear(Offset point, {double radius = 54}) {
+  String? entityNear(Offset point, {double radius = 44}) {
     String? result;
     var best = radius;
     for (final restaurant in session.restaurants) {
@@ -880,9 +1002,11 @@ class GameSessionController extends ChangeNotifier {
     if (session.availableLines <= 0 || session.lines.length >= GameConfig.maxLines) return;
     final fromNode = nodeForEntity(fromEntity);
     final toNode = nodeForEntity(toEntity);
-    if (fromNode == null || toNode == null) return;
+    if (fromNode == null || toNode == null || fromNode == toNode) return;
     final path = graph.findPath(fromNode, toNode, allowFerry: session.ferryTokens > 0);
-    if (path == null || path.edgeIds.isEmpty) return;
+    if (path == null || path.edgeIds.isEmpty || !_validateRouteEdges(path.edgeIds, fromNode, toNode)) {
+      return;
+    }
     final line = DeliveryLine(
       id: 'l${_id++}',
       colorIndex: nextLineColorIndex,
@@ -902,8 +1026,6 @@ class GameSessionController extends ChangeNotifier {
   }
 
   void _autoAssignCourier(DeliveryLine line) {
-    // Deterministic priority keeps the two opening Walk couriers predictable,
-    // while still accepting any later unlocked type.
     for (final type in CourierType.values) {
       final available = session.fleet[type] ?? 0;
       if (available <= 0) continue;
@@ -952,7 +1074,9 @@ class GameSessionController extends ChangeNotifier {
     } else {
       result.add(RewardType.values[1 + _random.nextInt(3)]);
     }
-    if (session.customers.any((Customer c) => c.totalDemand >= 6 && !c.houseApplied)) result[2] = RewardType.house;
+    if (session.customers.any((Customer c) => c.totalDemand >= 6 && !c.houseApplied)) {
+      result[2] = RewardType.house;
+    }
     return result;
   }
 
@@ -964,8 +1088,10 @@ class GameSessionController extends ChangeNotifier {
         session.fleet[CourierType.walk] = session.fleet[CourierType.walk]! + 1;
       case RewardType.bike:
         session.fleet[CourierType.bike] = session.fleet[CourierType.bike]! + 1;
+        session.unlockedCourierTypes.add(CourierType.bike);
       case RewardType.car:
         session.fleet[CourierType.car] = session.fleet[CourierType.car]! + 1;
+        session.unlockedCourierTypes.add(CourierType.car);
       case RewardType.ferry:
         session.ferryTokens++;
       case RewardType.house:
@@ -975,6 +1101,9 @@ class GameSessionController extends ChangeNotifier {
     timeScale = TimeScale.normal;
     notifyListeners();
   }
+
+  bool isCourierTypeUnlocked(CourierType type) =>
+      session.unlockedCourierTypes.contains(type) || (session.fleet[type] ?? 0) > 0;
 
   void continueRewarded() {
     final customer = customerById(failedCustomerId);
@@ -989,6 +1118,7 @@ class GameSessionController extends ChangeNotifier {
   }
 
   void restart(Difficulty difficulty) => startSession(difficulty, tutorial: isTutorial);
+
   Future<void> abandon() async {
     gameOver = true;
     timeScale = TimeScale.paused;
@@ -996,6 +1126,7 @@ class GameSessionController extends ChangeNotifier {
   }
 
   Future<void> save() => gameOver ? Future<void>.value() : persistence.saveSession(session);
+
   Restaurant? restaurantById(String? id) {
     for (final value in session.restaurants) {
       if (value.id == id) return value;
