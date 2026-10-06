@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rushhour/game/road_graph.dart';
+import 'package:rushhour/core/geo_projection.dart';
 import 'package:rushhour/models/city.dart';
 import 'package:rushhour/models/entities.dart';
 
@@ -52,6 +53,10 @@ void main() {
     ferryPoints: ferryPoints,
     availableCuisines: const <String>['pizza'],
     holidays: const <Holiday>[],
+    projection: GeoProjection.fromBounds(
+      const GeoBounds(minLat: 51.49, maxLat: 51.53, minLng: -0.13, maxLng: -0.09),
+      const Size(860, 1320),
+    ),
   );
 
   test('Dijkstra uses the shortest compatible route', () {
