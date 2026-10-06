@@ -1,0 +1,103 @@
+=== workspace listing ===
+total 116
+drwxr-xr-x 13 runner runner  4096 Oct  6 23:18 .
+drwxr-xr-x  3 runner runner  4096 Oct  6 23:17 ..
+drwxr-xr-x  4 runner runner  4096 Oct  6 23:18 .dart_tool
+-rw-r--r--  1 runner runner  4922 Oct  6 23:18 .flutter-plugins-dependencies
+drwxr-xr-x  7 runner runner  4096 Oct  6 23:17 .git
+drwxr-xr-x  3 runner runner  4096 Oct  6 23:17 .github
+-rw-r--r--  1 runner runner   746 Oct  6 23:17 .gitignore
+-rw-r--r--  1 runner runner  1706 Oct  6 23:17 .metadata
+-rw-r--r--  1 runner runner  7156 Oct  6 23:17 README.md
+-rw-r--r--  1 runner runner   317 Oct  6 23:17 analysis_options.yaml
+drwxr-xr-x  5 runner runner  4096 Oct  6 23:18 android
+drwxr-xr-x  6 runner runner  4096 Oct  6 23:17 assets
+drwxr-xr-x  5 runner runner  4096 Oct  6 23:18 build
+drwxr-xr-x  7 runner runner  4096 Oct  6 23:17 ios
+drwxr-xr-x 10 runner runner  4096 Oct  6 23:17 lib
+-rw-r--r--  1 runner runner 17904 Oct  6 23:17 pubspec.lock
+-rw-r--r--  1 runner runner   750 Oct  6 23:17 pubspec.yaml
+drwxr-xr-x  2 runner runner  4096 Oct  6 23:18 qa_logs
+drwxr-xr-x  2 runner runner  4096 Oct  6 23:17 test
+drwxr-xr-x  2 runner runner  4096 Oct  6 23:17 tools
+-rwxr-xr-x  1 runner runner 11741 Oct  6 23:17 validate_city_map.py
+=== all png files ===
+./android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+./android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+./android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+./android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+./android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+./ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png
+./ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png
+./ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png
+./ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png
+=== test dir ===
+ls: cannot access 'test/goldens': No such file or directory
+test:
+total 56
+drwxr-xr-x  2 runner runner 4096 Oct  6 23:17 .
+drwxr-xr-x 13 runner runner 4096 Oct  6 23:18 ..
+-rw-r--r--  1 runner runner 1137 Oct  6 23:17 city_data_test.dart
+-rw-r--r--  1 runner runner 2010 Oct  6 23:17 entities_test.dart
+-rw-r--r--  1 runner runner 7371 Oct  6 23:17 game_harness.dart
+-rw-r--r--  1 runner runner 4091 Oct  6 23:17 geo_projection_test.dart
+-rw-r--r--  1 runner runner 4523 Oct  6 23:17 hitbox_evidence_test.dart
+-rw-r--r--  1 runner runner 4227 Oct  6 23:17 map_camera_test.dart
+-rw-r--r--  1 runner runner 7066 Oct  6 23:17 poi_hit_area_test.dart
+-rw-r--r--  1 runner runner 3283 Oct  6 23:17 road_graph_test.dart
+=== test log tail ===
+  lib/ui/game_screen.dart:581:10: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.endLineGesture(_camera(), _lastGestureScreen);
+           ^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:589:10: Error: Method 'cancelLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.cancelLineGesture();
+           ^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:613:14: Error: Method 'beginMapGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+          game.beginMapGesture(camera, details.localFocalPoint)) {
+               ^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:630:12: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+        game.updateLineGesture(_camera(), details.localFocalPoint);
+             ^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:648:12: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+        game.endLineGesture(_camera(), _lastGestureScreen);
+             ^^^^^^^^^^^^^^
+  test/game_harness.dart:167:51: Error: 'Override' isn't a type.
+    final container = ProviderContainer(overrides: <Override>[
+                                                    ^^^^^^^^
+  .
+00:04 +15 -4: /home/runner/work/rushhour/rushhour/test/city_data_test.dart: Rivergate asset produces real OSM geometry with projection and reveal stages
+00:05 +16 -4: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: Dijkstra uses the shortest compatible route
+00:05 +17 -4: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: blocked roads are excluded
+00:05 +18 -4: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: route cannot be built through an unlocked ferry
+00:05 +19 -4: Some tests failed.
+
+Failing tests:
+  /home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart: loading /home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart
+  /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera a world circle of worldRadiusFor(px) is a screen circle of px radius
+  /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera uniform scale keeps screen radii zoom-independent
+  /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart
+=== gitignore check ===

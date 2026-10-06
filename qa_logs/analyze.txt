@@ -1,0 +1,68 @@
+Resolving dependencies...
+Downloading packages...
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.14 available)
+Got dependencies!
+2 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing rushhour...                                           
+
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive • lib/core/palette.dart:1:8 • unnecessary_import
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive • lib/game/game_controller.dart:3:8 • unnecessary_import
+   info • The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive • lib/game/game_controller.dart:5:8 • unnecessary_import
+   info • Statements in a for should be enclosed in a block. Try wrapping the statement in a block • lib/game/game_controller.dart:79:45 • curly_braces_in_flow_control_structures
+   info • Statements in a for should be enclosed in a block. Try wrapping the statement in a block • lib/game/game_controller.dart:203:47 • curly_braces_in_flow_control_structures
+warning • Unused import: 'dart:math'. Try removing the import directive • lib/game/road_graph.dart:1:8 • unused_import
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/services.dart'. Try removing the import directive • lib/models/city.dart:3:8 • unnecessary_import
+   info • Statements in a for should be enclosed in a block. Try wrapping the statement in a block • lib/painters/static_map_painter.dart:116:55 • curly_braces_in_flow_control_structures
+   info • Unnecessary use of multiple underscores. Try using '_' • lib/services/ad_service.dart:135:62 • unnecessary_underscores
+   info • Use an initializing formal to assign a parameter to a field. Try using an initialing formal ('this._enabled') to initialize the field • lib/services/audio_service.dart:6:43 • prefer_initializing_formals
+  error • The method 'MapCamera' isn't defined for the type '_GameScreenState'. Try correcting the name to the name of an existing method, or defining a method named 'MapCamera' • lib/ui/game_screen.dart:385:34 • undefined_method
+  error • The name 'PoiHitRect' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'PoiHitRect' • lib/ui/game_screen.dart:389:30 • non_type_as_type_argument
+  error • Undefined class 'PoiHitRect'. Try changing the name to the name of an existing class, or creating a class with the name 'PoiHitRect' • lib/ui/game_screen.dart:419:36 • undefined_class
+  error • Too many positional arguments: 1 expected, but 2 found. Try removing the extra arguments • lib/ui/game_screen.dart:420:50 • extra_positional_arguments
+  error • The method 'HitBoxDebugPainter' isn't defined for the type '_GameScreenState'. Try correcting the name to the name of an existing method, or defining a method named 'HitBoxDebugPainter' • lib/ui/game_screen.dart:427:40 • undefined_method
+  error • The name 'PoiHitRect' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'PoiHitRect' • lib/ui/game_screen.dart:490:8 • non_type_as_type_argument
+  error • Undefined class 'MapCamera'. Try changing the name to the name of an existing class, or creating a class with the name 'MapCamera' • lib/ui/game_screen.dart:490:61 • undefined_class
+  error • The name 'PoiHitRect' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'PoiHitRect' • lib/ui/game_screen.dart:491:21 • non_type_as_type_argument
+  error • Undefined name 'TouchTargets'. Try correcting the name to one that is defined, or defining the name • lib/ui/game_screen.dart:502:20 • undefined_identifier
+  error • Undefined name 'TouchTargets'. Try correcting the name to one that is defined, or defining the name • lib/ui/game_screen.dart:503:21 • undefined_identifier
+  error • Undefined class 'PoiHitRect'. Try changing the name to the name of an existing class, or creating a class with the name 'PoiHitRect' • lib/ui/game_screen.dart:522:27 • undefined_class
+  error • Undefined name 'game'. Try correcting the name to one that is defined, or defining the name • lib/ui/game_screen.dart:532:44 • undefined_identifier
+  error • Undefined class 'MapCamera'. Try changing the name to the name of an existing class, or creating a class with the name 'MapCamera' • lib/ui/game_screen.dart:544:3 • undefined_class
+  error • The method 'MapCamera' isn't defined for the type '_GameScreenState'. Try correcting the name to the name of an existing method, or defining a method named 'MapCamera' • lib/ui/game_screen.dart:544:26 • undefined_method
+  error • The method 'startLineDraftFromEntity' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!') • lib/ui/game_screen.dart:566:10 • unchecked_use_of_nullable_value
+  error • The method 'updateLineGesture' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!') • lib/ui/game_screen.dart:573:10 • unchecked_use_of_nullable_value
+  error • The method 'endLineGesture' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!') • lib/ui/game_screen.dart:581:10 • unchecked_use_of_nullable_value
+  error • The method 'cancelLineGesture' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!') • lib/ui/game_screen.dart:589:10 • unchecked_use_of_nullable_value
+  error • The method 'beginMapGesture' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!') • lib/ui/game_screen.dart:613:14 • unchecked_use_of_nullable_value
+  error • The method 'updateLineGesture' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!') • lib/ui/game_screen.dart:630:12 • unchecked_use_of_nullable_value
+  error • The method 'endLineGesture' can't be unconditionally invoked because the receiver can be 'null'. Try making the call conditional (using '?.') or adding a null check to the target ('!') • lib/ui/game_screen.dart:648:12 • unchecked_use_of_nullable_value
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • lib/ui/game_screen.dart:659:7 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • lib/ui/game_screen.dart:660:7 • deprecated_member_use
+warning • The value of the field '_clock' isn't used. Try removing the field, or using it • lib/ui/widgets/animated_map_background.dart:69:27 • unused_field
+   info • Statements in a for should be enclosed in a block. Try wrapping the statement in a block • lib/ui/widgets/animated_map_background.dart:148:37 • curly_braces_in_flow_control_structures
+warning • The value of the local variable 'strings' isn't used. Try removing the variable or using it • lib/ui/widgets/hud.dart:26:11 • unused_local_variable
+   info • 'axisAlignment' is deprecated and shouldn't be used. Use alignment instead. This property provides full control over both axes, which is an improvement over the old axisAlignment. This feature was deprecated after v3.41.0-1.0.pre. Try replacing the use of the deprecated member with the replacement • lib/ui/widgets/time_controls.dart:28:9 • deprecated_member_use
+   info • The import of 'dart:typed_data' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/services.dart'. Try removing the import directive • test/game_harness.dart:6:8 • unnecessary_import
+  error • 'FakePersistenceService.saveRecord' ('Future<void> Function(String, Difficulty, double, int)') isn't a valid override of 'PersistenceService.saveRecord' ('Future<void> Function(String, Difficulty, int, double, int)') • test/game_harness.dart:69:16 • invalid_override
+  error • The name 'Override' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'Override' • test/game_harness.dart:167:51 • non_type_as_type_argument
+warning • Unused import: 'dart:ui'. Try removing the import directive • test/geo_projection_test.dart:3:8 • unused_import
+   info • The import of 'package:flutter/material.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter_test/flutter_test.dart'. Try removing the import directive • test/hitbox_evidence_test.dart:1:8 • unnecessary_import
+  error • The argument type 'int' can't be assigned to the parameter type 'double'.  • test/hitbox_evidence_test.dart:96:29 • argument_type_not_assignable
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive • test/map_camera_test.dart:1:8 • unnecessary_import
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:18:11 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:19:11 • deprecated_member_use
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:27:11 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:28:11 • deprecated_member_use
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:36:11 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:37:11 • deprecated_member_use
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:54:13 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:55:13 • deprecated_member_use
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:91:11 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:92:11 • deprecated_member_use
+  error • The argument type 'int' can't be assigned to the parameter type 'double'.  • test/poi_hit_area_test.dart:80:36 • argument_type_not_assignable
+  error • The argument type 'int' can't be assigned to the parameter type 'double'.  • test/poi_hit_area_test.dart:166:34 • argument_type_not_assignable
+   info • Sort directive sections alphabetically. Try sorting the directives • test/road_graph_test.dart:5:1 • directives_ordering
+
+57 issues found. (ran in 5.9s)
