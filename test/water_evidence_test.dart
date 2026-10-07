@@ -187,13 +187,12 @@ double _distanceToRing(Offset point, List<Offset> ring) {
     final b = ring[(i + 1) % ring.length];
     final delta = b - a;
     final lengthSquared = delta.dx * delta.dx + delta.dy * delta.dy;
-    if (lengthSquared == 0) {
-      final d = (point - a).distance;
-      if (d < best) best = d;
-      continue;
+    var t = 0.0;
+    if (lengthSquared > 0) {
+      t = (((point.dx - a.dx) * delta.dx + (point.dy - a.dy) * delta.dy) / lengthSquared)
+          .clamp(0.0, 1.0)
+          .toDouble();
     }
-    final t = (((point.dx - a.dx) * delta.dx + (point.dy - a.dy) * delta.dy) / lengthSquared)
-        .clamp(0.0, 1.0);
     final d = (point - Offset(a.dx + delta.dx * t, a.dy + delta.dy * t)).distance;
     if (d < best) best = d;
   }
