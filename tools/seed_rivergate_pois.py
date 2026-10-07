@@ -26,8 +26,12 @@ Selection rules:
 
 import json
 import math
+import os
 import sys
 from collections import deque
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import water_geometry  # noqa: E402  (path is set up above)
 
 MAP_PATH = "assets/cities/rivergate/map.json"
 
@@ -132,6 +136,84 @@ def min_separation_ok(node, coords, picked):
                for p in picked)
 
 
+def water_free_adjacency(data):
+    """Walk adjacency with the Requirement 46 bridge rule applied.
+
+    A street that crosses water where the map has no bridge (see
+    tools/water_geometry.py) may never be part of a route, so POIs sitting
+    behind such a street would be unreachable in game. Returns the adjacency
+    of the usable graph, the largest connected component, and the node ids
+    that are adjacent to a regular street.
+    """
+    projection = water_geometry.Projection(data["boundingBox"])
+    blocked = water_geometry.blocked_edge_ids(data, projection)
+
+    nodes = {
+        node["id"]: (float(node["lat"]), float(node.get("lng", node.get("lon"))))
+        for node in data["roads"]["nodes"]
+    }
+    adjacency = {node_id: set() for node_id in nodes}
+    street_adjacent = set()
+    for edge in data["roads"]["edges"]:
+        if edge["id"] in blocked or not edge.get("allowWalk", True):
+            continue
+        a, b = edge["from"], edge["to"]
+        if a not in nodes or b not in nodes:
+            continue
+        adjacency[a].add(b)
+        adjacency[b].add(a)
+        if edge.get("type", "street") != "bridge":
+            street_adjacent.add(a)
+            street_adjacent.add(b)
+    print(f"bridge rule blocks {len(blocked)} street edges that cross water")
+    return adjacency, largest_component(adjacency), street_adjacent
+
+
+def repair_stranded_pois(data, poi_pool, adjacency, street_adjacent):
+    """Moves POIs that the bridge rule cut off to the closest reachable node.
+
+    Requirement 46 forbids streets that cross water outside a real bridge.
+    Should such a street be the only way to a POI (a data artefact of the OSM
+    coastline), the POI would never be servable, so it is re-seated on the
+    nearest node that is still reachable, keeping its id and its district.
+    """
+    reachable = largest_component(adjacency)
+    nodes = {node["id"]: (float(node["lat"]), float(node.get("lng", node.get("lon"))))
+             for node in data["roads"]["nodes"]}
+    candidates = sorted(
+        node for node in reachable
+        if len(adjacency[node]) >= 2 and node in street_adjacent
+    )
+
+    entries = list(poi_pool["restaurants"]) + list(poi_pool["customers"])
+    used = {entry["nodeId"] for entry in entries if entry["nodeId"] in reachable}
+    moves = []
+    for entry in entries:
+        node_id = entry["nodeId"]
+        if node_id in reachable:
+            continue
+        ranked = sorted(candidates, key=lambda node: (geo_distance_m(nodes[node_id][0], nodes[node_id][1],
+                                                                    nodes[node][0], nodes[node][1]), node))
+        for candidate in ranked:
+            if candidate in used:
+                continue
+            if all(geo_distance_m(nodes[candidate][0], nodes[candidate][1], nodes[other][0], nodes[other][1])
+                   >= MIN_SEPARATION_M for other in used):
+                moves.append((entry["id"], node_id, candidate,
+                              round(geo_distance_m(nodes[node_id][0], nodes[node_id][1],
+                                                   nodes[candidate][0], nodes[candidate][1]), 1)))
+                entry["nodeId"] = candidate
+                used.add(candidate)
+                break
+        else:  # pragma: no cover - only if the map has no reachable street at all
+            print(f"[warn] no reachable replacement for {entry['id']} (was {node_id})", file=sys.stderr)
+
+    for poi_id, old_node, new_node, distance_m in moves:
+        print(f"bridge rule: moved POI {poi_id} from {old_node} to {new_node} ({distance_m} m)")
+    if not moves:
+        print("bridge rule: no POI was cut off - nothing to re-seat")
+
+
 def main():
     data = load_map(MAP_PATH)
     nodes, adjacency, street_adjacent = build_walk_adjacency(data)
@@ -198,6 +280,10 @@ def main():
         "restaurants": [{"id": f"r{i + 1:03d}", "nodeId": nid} for i, nid in enumerate(restaurants)],
         "customers": [{"id": f"c{i + 1:03d}", "nodeId": nid} for i, nid in enumerate(customers)],
     }
+    # Requirement 46: a POI must stay reachable once streets that cross water
+    # outside a real bridge are forbidden.
+    water_free, reachable, water_street_adjacent = water_free_adjacency(data)
+    repair_stranded_pois(data, poi_pool, water_free, water_street_adjacent)
 
     # Reveal stages: stage 1 widens the start viewport, stage 2 opens the map.
     def inflate(rect, toward, factor):

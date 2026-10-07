@@ -2,7 +2,7 @@ name: Flutter QA
 
 on:
   push:
-    branches: ['arena/c208a14e-rushhour', main']
+    branches: [main, 'arena/**']
   workflow_dispatch:
 
 jobs:
@@ -39,6 +39,15 @@ jobs:
             test/city_data_test.dart test/entities_test.dart \
             test/geo_projection_test.dart test/road_graph_test.dart \
             2>&1 | tee qa_logs/test_existing.txt
+
+      - name: "Test - water crossing (Requirement 46)"
+        if: always()
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 90s --reporter expanded \
+            test/water_crossing_test.dart \
+            2>&1 | tee qa_logs/test_water_crossing.txt
 
       - name: "Test - map camera unit tests"
         if: always()
@@ -97,6 +106,15 @@ jobs:
           flutter test --update-goldens --timeout 180s --reporter expanded \
             test/hitbox_evidence_test.dart \
             2>&1 | tee qa_logs/test_evidence.txt
+
+      - name: "Test - water rendering evidence (Requirement 46)"
+        if: always()
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 120s --reporter expanded \
+            test/water_evidence_test.dart \
+            2>&1 | tee qa_logs/test_water_evidence.txt
 
       - name: Assemble evidence GIF
         if: always()

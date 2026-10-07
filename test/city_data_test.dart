@@ -19,7 +19,12 @@ void main() {
       city.edges.every((RoadEdge edge) => edge.points.length >= 2),
       isTrue,
     );
-    // River segments
+    // Water (Requirement 46, schemaVersion 3): wide stretches are polygons,
+    // narrow stretches are polylines - at least one of the two must be there
+    // for a city that has a river at all.
+    expect(city.hasWater, isTrue);
+    expect(city.riverAreas, isNotEmpty);
+    expect(city.riverAreas.every((List area) => area.length >= 3), isTrue);
     expect(city.riverSegments, isNotEmpty);
     expect(city.riverSegments.every((List segment) => segment.length >= 2), isTrue);
     // Start viewport and reveal stages
