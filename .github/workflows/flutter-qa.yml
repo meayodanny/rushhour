@@ -30,7 +30,7 @@ jobs:
           set -o pipefail
           flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee qa_logs/analyze.txt
 
-      - name: Test — existing suites
+      - name: "Test - existing suites"
         if: always()
         timeout-minutes: 5
         run: |
@@ -40,7 +40,7 @@ jobs:
             test/geo_projection_test.dart test/road_graph_test.dart \
             2>&1 | tee qa_logs/test_existing.txt
 
-      - name: Test — map camera unit tests
+      - name: "Test - map camera unit tests"
         if: always()
         timeout-minutes: 5
         run: |
@@ -49,7 +49,7 @@ jobs:
             test/map_camera_test.dart \
             2>&1 | tee qa_logs/test_map_camera.txt
 
-      - name: Test — POI hit areas: geometry
+      - name: "Test - POI hit areas (geometry)"
         if: always()
         timeout-minutes: 5
         run: |
@@ -59,7 +59,7 @@ jobs:
             test/poi_hit_area_test.dart \
             2>&1 | tee qa_logs/test_poi_geometry.txt
 
-      - name: Test — POI hit areas: acceptance drag
+      - name: "Test - POI hit areas (acceptance drag)"
         if: always()
         timeout-minutes: 5
         run: |
@@ -69,7 +69,7 @@ jobs:
             test/poi_hit_area_test.dart \
             2>&1 | tee qa_logs/test_poi_acceptance.txt
 
-      - name: Test — POI hit areas: tap-tap
+      - name: "Test - POI hit areas (tap-tap)"
         if: always()
         timeout-minutes: 5
         run: |
@@ -79,7 +79,7 @@ jobs:
             test/poi_hit_area_test.dart \
             2>&1 | tee qa_logs/test_poi_taptap.txt
 
-      - name: Test — POI hit areas: camera pan
+      - name: "Test - POI hit areas (camera pan)"
         if: always()
         timeout-minutes: 5
         run: |
@@ -89,7 +89,7 @@ jobs:
             test/poi_hit_area_test.dart \
             2>&1 | tee qa_logs/test_poi_pan.txt
 
-      - name: Test — QA evidence goldens
+      - name: "Test - QA evidence goldens"
         if: always()
         timeout-minutes: 8
         run: |
