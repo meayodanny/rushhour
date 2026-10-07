@@ -152,11 +152,16 @@ class GameHarness {
   }
 }
 
-/// Pumps the real [GameScreen] with the real city and deterministic,
-/// hand-seeded entities (the controller's own random spawning is
-/// unpredictable in tests, so the harness seeds known POIs directly).
+/// Pumps the real [GameScreen] with deterministic, hand-seeded entities (the
+/// controller's own random spawning is unpredictable in tests, so the harness
+/// seeds known POIs directly).
+///
+/// [city] must be preloaded OUTSIDE the widget test body (e.g. in
+/// `setUpAll`): asset loading is real IO and must not run inside the fake
+/// async zone of a `testWidgets` body.
 Future<GameHarness> pumpGameScreen(
   WidgetTester tester, {
+  required CityData city,
   bool debugHitBoxes = false,
   Size logicalSize = const Size(390, 844),
   double devicePixelRatio = 2.0,
@@ -164,7 +169,6 @@ Future<GameHarness> pumpGameScreen(
   List<String> seedCustomers = const ['c001', 'c002', 'c003'],
   bool seedLineBetween = false,
 }) async {
-  final city = await CityData.load('rivergate');
   final persistence = FakePersistenceService();
   final audio = SilentAudioService();
   final ads = StubAdService();

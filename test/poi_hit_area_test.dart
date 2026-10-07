@@ -2,14 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:rushhour/core/touch_targets.dart';
+import 'package:rushhour/models/city.dart';
 
 import 'game_harness.dart';
 
+late CityData _city;
+
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    _city = await CityData.load('rivergate');
+  });
+
   testWidgets('every active POI has a 48x48 hit area centred on the painted icon', (
     WidgetTester tester,
   ) async {
-    final harness = await pumpGameScreen(tester);
+    final harness = await pumpGameScreen(tester, city: _city);
     final game = harness.game;
 
     final entities = <String>[
@@ -51,7 +59,7 @@ void main() {
   testWidgets(
       'ACCEPTANCE: line drawing starts from a touch ~21px off the restaurant icon centre '
       'and commits on the customer', (WidgetTester tester) async {
-    final harness = await pumpGameScreen(tester);
+    final harness = await pumpGameScreen(tester, city: _city);
     final game = harness.game;
 
     final iconCentre = harness.paintedGlobalPosition(harness.nodeOf('r001').point);
@@ -97,7 +105,7 @@ void main() {
   testWidgets('tap-tap routing still works through the POI hit areas', (
     WidgetTester tester,
   ) async {
-    final harness = await pumpGameScreen(tester);
+    final harness = await pumpGameScreen(tester, city: _city);
     final game = harness.game;
 
     await tester.tap(find.byKey(const ValueKey<String>('poi-hit-r001')));
@@ -116,7 +124,7 @@ void main() {
   testWidgets('dragging empty map pans the camera; dragging a POI does not', (
     WidgetTester tester,
   ) async {
-    final harness = await pumpGameScreen(tester);
+    final harness = await pumpGameScreen(tester, city: _city);
     final game = harness.game;
 
     Matrix4 cameraMatrix() =>

@@ -1,8 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:rushhour/models/city.dart';
 import 'package:rushhour/ui/game_screen.dart';
 
 import 'game_harness.dart';
+
+late CityData _city;
 
 /// QA evidence generators for Requirement 44.5 / 45.
 ///
@@ -18,10 +21,16 @@ import 'game_harness.dart';
 ///
 /// Run with `flutter test --update-goldens` to (re)generate the files.
 void main() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    _city = await CityData.load('rivergate');
+  });
+
   testWidgets('evidence: hit boxes over the live map', (WidgetTester tester) async {
     await loadAppFonts(tester);
     final harness = await pumpGameScreen(
       tester,
+      city: _city,
       debugHitBoxes: true,
       seedRestaurants: const ['r001', 'r002'],
       seedCustomers: const ['c001', 'c002', 'c003'],
@@ -71,6 +80,7 @@ void main() {
     await loadAppFonts(tester);
     final harness = await pumpGameScreen(
       tester,
+      city: _city,
       debugHitBoxes: true,
       seedRestaurants: const ['r001'],
       seedCustomers: const ['c001'],

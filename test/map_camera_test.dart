@@ -37,11 +37,11 @@ void main() {
       final centre = projection.project(51.5, -0.005);
       final screenCentre = camera.worldToScreen(centre);
       final edge = camera.worldToScreen(centre + const Offset(worldRadius, 0));
-      // screen distance must equal worldRadius * scale, i.e. what
+      // screen distance must equal worldRadius * scale, i.e. exactly what
       // worldRadiusFor inverts.
       expect(
         (edge - screenCentre).distance,
-        closeTo(worldRadius, 1e-6),
+        closeTo(worldRadius * camera.scale, 1e-6),
       );
       expect(camera.worldRadiusFor(worldRadius * camera.scale), closeTo(worldRadius, 1e-9));
     });
