@@ -29,7 +29,7 @@ def main() -> int:
 
     DOCS.mkdir(parents=True, exist_ok=True)
 
-    for name in ("hitbox_map.png", "hitbox_map_zoomed.png", "river_map.png"):
+    for name in ("hitbox_map.png", "hitbox_map_zoomed.png", "river_map.png", "river_painter.png"):
         source = GOLDENS / name
         if source.exists():
             shutil.copyfile(source, DOCS / name)
