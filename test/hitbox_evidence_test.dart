@@ -32,8 +32,8 @@ void main() {
       tester,
       city: _city,
       debugHitBoxes: true,
-      seedRestaurants: const ['r001', 'r002'],
-      seedCustomers: const ['c001', 'c002', 'c003'],
+      seedRestaurants: const ['r003', 'r002'],
+      seedCustomers: const ['c011', 'c005', 'c023'],
       seedLineBetween: true,
     );
 
@@ -45,7 +45,7 @@ void main() {
     );
 
     // ---- pinch-zoom in with two real pointers -------------------------------
-    final centre = harness.paintedGlobalPosition(harness.nodeOf('r001').point);
+    final centre = harness.paintedGlobalPosition(harness.nodeOf('r003').point);
     final a = await tester.startGesture(centre + const Offset(-45, 0));
     final b = await tester.startGesture(centre + const Offset(45, 0));
     await tester.pump(const Duration(milliseconds: 50));
@@ -60,7 +60,7 @@ void main() {
 
     // After zooming the hit boxes must STILL be 48x48 screen pixels and
     // still centred on the painted icons.
-    for (final entityId in const <String>['r001', 'c001']) {
+    for (final entityId in const <String>['r003', 'c011']) {
       final rect = harness.hitRect(entityId);
       expect(rect.width, 48.0);
       expect(rect.height, 48.0);
@@ -82,17 +82,17 @@ void main() {
       tester,
       city: _city,
       debugHitBoxes: true,
-      seedRestaurants: const ['r001'],
-      seedCustomers: const ['c001'],
+      seedRestaurants: const ['r003'],
+      seedCustomers: const ['c011'],
     );
     final game = harness.game;
 
-    final iconCentre = harness.paintedGlobalPosition(harness.nodeOf('r001').point);
-    final customerCentre = harness.paintedGlobalPosition(harness.nodeOf('c001').point);
+    final iconCentre = harness.paintedGlobalPosition(harness.nodeOf('r003').point);
+    final customerCentre = harness.paintedGlobalPosition(harness.nodeOf('c011').point);
 
     // The finger lands ~21.9px away from the icon centre — NOT on the icon.
     final touchDown = iconCentre + const Offset(16, -15);
-    expect(harness.hitRect('r001').contains(touchDown), isTrue);
+    expect(harness.hitRect('r003').contains(touchDown), isTrue);
 
     final gesture = await tester.startGesture(touchDown);
     await tester.pump(const Duration(milliseconds: 50));

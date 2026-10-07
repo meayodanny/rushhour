@@ -49,8 +49,8 @@ void main() {
 
     // The restaurant icon itself is much smaller than its hit box (the whole
     // point of the fix): a 20-radius circle around the icon stays inside.
-    final restaurantRect = harness.hitRect('r001');
-    final iconCentre = harness.paintedGlobalPosition(harness.nodeOf('r001').point);
+    final restaurantRect = harness.hitRect('r003');
+    final iconCentre = harness.paintedGlobalPosition(harness.nodeOf('r003').point);
     final offCentre = iconCentre + const Offset(16, -15); // ~21.9 px away
     expect(restaurantRect.contains(offCentre), isTrue,
         reason: 'a touch ~22px from the centre must still be inside the hit area');
@@ -62,13 +62,13 @@ void main() {
     final harness = await pumpGameScreen(tester, city: _city);
     final game = harness.game;
 
-    final iconCentre = harness.paintedGlobalPosition(harness.nodeOf('r001').point);
+    final iconCentre = harness.paintedGlobalPosition(harness.nodeOf('r003').point);
     // The finger does NOT touch the icon: ~21.9px away from the centre,
     // inside the 48x48 hit area (the bug of patches #2/#3 made this fail).
     final touchDown = iconCentre + const Offset(16, -15);
-    expect(harness.hitRect('r001').contains(touchDown), isTrue);
+    expect(harness.hitRect('r003').contains(touchDown), isTrue);
 
-    final customerCentre = harness.paintedGlobalPosition(harness.nodeOf('c001').point);
+    final customerCentre = harness.paintedGlobalPosition(harness.nodeOf('c011').point);
 
     final gesture = await tester.startGesture(touchDown);
     await tester.pump(const Duration(milliseconds: 40));
@@ -79,7 +79,7 @@ void main() {
 
     expect(game.lineDraft, isNotNull,
         reason: 'the line draft must start as soon as the finger moves');
-    expect(game.lineDraft!.startEntityId, 'r001');
+    expect(game.lineDraft!.startEntityId, 'r003');
 
     // Drag towards the customer icon in small visible steps.
     const steps = 8;
@@ -91,7 +91,7 @@ void main() {
     }
 
     // The draft must have snapped to the customer.
-    expect(game.lineDraft!.targetEntityId, 'c001');
+    expect(game.lineDraft!.targetEntityId, 'c011');
 
     final linesBefore = game.session.lines.length;
     await gesture.up();
@@ -99,7 +99,7 @@ void main() {
 
     expect(game.session.lines.length, linesBefore + 1,
         reason: 'releasing on the customer must commit the line');
-    expect(game.session.lines.last.stopIds, containsAll(<String>['r001', 'c001']));
+    expect(game.session.lines.last.stopIds, containsAll(<String>['r003', 'c011']));
   });
 
   testWidgets('tap-tap routing still works through the POI hit areas', (
@@ -108,12 +108,12 @@ void main() {
     final harness = await pumpGameScreen(tester, city: _city);
     final game = harness.game;
 
-    await tester.tap(find.byKey(const ValueKey<String>('poi-hit-r001')));
+    await tester.tap(find.byKey(const ValueKey<String>('poi-hit-r003')));
     await tester.pump(const Duration(milliseconds: 60));
-    expect(game.selectedEntityId, 'r001');
+    expect(game.selectedEntityId, 'r003');
 
     final linesBefore = game.session.lines.length;
-    await tester.tap(find.byKey(const ValueKey<String>('poi-hit-c001')));
+    await tester.tap(find.byKey(const ValueKey<String>('poi-hit-c011')));
     await tester.pump(const Duration(milliseconds: 60));
 
     expect(game.session.lines.length, linesBefore + 1);
@@ -134,7 +134,7 @@ void main() {
     // hit box and from the TimeControls overlay in the top-left.
     final mapClip = find
         .ancestor(
-          of: find.byKey(const ValueKey<String>('poi-hit-r001')),
+          of: find.byKey(const ValueKey<String>('poi-hit-r003')),
           matching: find.byType(ClipRect),
         )
         .first;

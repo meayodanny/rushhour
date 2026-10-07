@@ -165,8 +165,8 @@ Future<GameHarness> pumpGameScreen(
   bool debugHitBoxes = false,
   Size logicalSize = const Size(390, 844),
   double devicePixelRatio = 2.0,
-  List<String> seedRestaurants = const ['r001', 'r002'],
-  List<String> seedCustomers = const ['c001', 'c002', 'c003'],
+  List<String> seedRestaurants = const ['r003', 'r002'],
+  List<String> seedCustomers = const ['c011', 'c005', 'c023'],
   bool seedLineBetween = false,
 }) async {
   final persistence = FakePersistenceService();
@@ -179,14 +179,13 @@ Future<GameHarness> pumpGameScreen(
     audioServiceProvider.overrideWithValue(audio),
     adServiceProvider.overrideWithValue(ads),
   ]);
-  addTearDown(container.dispose);
 
   tester.view.physicalSize = logicalSize * devicePixelRatio;
   tester.view.devicePixelRatio = devicePixelRatio;
   addTearDown(tester.view.reset);
 
   await tester.pumpWidget(
-    UncontrolledProviderScope(
+    _HarnessScope(
       container: container,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -216,6 +215,15 @@ Future<GameHarness> pumpGameScreen(
 
   final game = container.read(gameControllerProvider);
 
+  // The controller's random spawn is unpredictable: drop everything it
+  // created so the tests only ever see the deterministic POIs below.
+  game.session.restaurants.removeWhere(
+    (Restaurant r) => !seedRestaurants.contains(r.id),
+  );
+  game.session.customers.removeWhere(
+    (Customer c) => !seedCustomers.contains(c.id),
+  );
+
   // Seed deterministic entities (skip ids the random spawn already used).
   for (final id in seedRestaurants) {
     if (game.restaurantById(id) != null) continue;
@@ -241,4 +249,35 @@ Future<GameHarness> pumpGameScreen(
   await tester.pump(const Duration(milliseconds: 100));
 
   return GameHarness(game: game, city: city, tester: tester);
+}
+
+/// Pumps the [ProviderContainer] into the tree with
+/// [UncontrolledProviderScope] but takes ownership of it: when the widget
+/// tree is torn down at the end of the test, the container is disposed
+/// BEFORE the test framework verifies that no timers are pending, so the
+/// game controller's periodic simulation timer is always cancelled in time.
+class _HarnessScope extends StatefulWidget {
+  const _HarnessScope({required this.container, required this.child});
+
+  final ProviderContainer container;
+  final Widget child;
+
+  @override
+  State<_HarnessScope> createState() => _HarnessScopeState();
+}
+
+class _HarnessScopeState extends State<_HarnessScope> {
+  @override
+  void dispose() {
+    widget.container.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return UncontrolledProviderScope(
+      container: widget.container,
+      child: widget.child,
+    );
+  }
 }
