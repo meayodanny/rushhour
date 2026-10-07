@@ -1,27 +1,27 @@
 === workspace listing ===
 total 120
-drwxr-xr-x 14 runner runner  4096 Oct  7 00:52 .
-drwxr-xr-x  3 runner runner  4096 Oct  7 00:51 ..
-drwxr-xr-x  4 runner runner  4096 Oct  7 00:52 .dart_tool
--rw-r--r--  1 runner runner  4922 Oct  7 00:51 .flutter-plugins-dependencies
-drwxr-xr-x  7 runner runner  4096 Oct  7 00:51 .git
-drwxr-xr-x  3 runner runner  4096 Oct  7 00:51 .github
--rw-r--r--  1 runner runner   746 Oct  7 00:51 .gitignore
--rw-r--r--  1 runner runner  1706 Oct  7 00:51 .metadata
--rw-r--r--  1 runner runner  7156 Oct  7 00:51 README.md
--rw-r--r--  1 runner runner   317 Oct  7 00:51 analysis_options.yaml
-drwxr-xr-x  5 runner runner  4096 Oct  7 00:51 android
-drwxr-xr-x  6 runner runner  4096 Oct  7 00:51 assets
-drwxr-xr-x  5 runner runner  4096 Oct  7 00:52 build
-drwxr-xr-x  3 runner runner  4096 Oct  7 00:51 docs
-drwxr-xr-x  7 runner runner  4096 Oct  7 00:51 ios
-drwxr-xr-x 10 runner runner  4096 Oct  7 00:51 lib
--rw-r--r--  1 runner runner 17904 Oct  7 00:51 pubspec.lock
--rw-r--r--  1 runner runner   750 Oct  7 00:51 pubspec.yaml
-drwxr-xr-x  2 runner runner  4096 Oct  7 00:51 qa_logs
-drwxr-xr-x  3 runner runner  4096 Oct  7 00:51 test
-drwxr-xr-x  2 runner runner  4096 Oct  7 00:51 tools
--rwxr-xr-x  1 runner runner 11741 Oct  7 00:51 validate_city_map.py
+drwxr-xr-x 14 runner runner  4096 Oct  7 08:41 .
+drwxr-xr-x  3 runner runner  4096 Oct  7 08:41 ..
+drwxr-xr-x  4 runner runner  4096 Oct  7 08:41 .dart_tool
+-rw-r--r--  1 runner runner  4922 Oct  7 08:41 .flutter-plugins-dependencies
+drwxr-xr-x  7 runner runner  4096 Oct  7 08:41 .git
+drwxr-xr-x  3 runner runner  4096 Oct  7 08:41 .github
+-rw-r--r--  1 runner runner   746 Oct  7 08:41 .gitignore
+-rw-r--r--  1 runner runner  1706 Oct  7 08:41 .metadata
+-rw-r--r--  1 runner runner  7156 Oct  7 08:41 README.md
+-rw-r--r--  1 runner runner   317 Oct  7 08:41 analysis_options.yaml
+drwxr-xr-x  5 runner runner  4096 Oct  7 08:41 android
+drwxr-xr-x  6 runner runner  4096 Oct  7 08:41 assets
+drwxr-xr-x  5 runner runner  4096 Oct  7 08:41 build
+drwxr-xr-x  3 runner runner  4096 Oct  7 08:41 docs
+drwxr-xr-x  7 runner runner  4096 Oct  7 08:41 ios
+drwxr-xr-x 10 runner runner  4096 Oct  7 08:41 lib
+-rw-r--r--  1 runner runner 17904 Oct  7 08:41 pubspec.lock
+-rw-r--r--  1 runner runner   750 Oct  7 08:41 pubspec.yaml
+drwxr-xr-x  2 runner runner  4096 Oct  7 08:41 qa_logs
+drwxr-xr-x  3 runner runner  4096 Oct  7 08:41 test
+drwxr-xr-x  2 runner runner  4096 Oct  7 08:41 tools
+-rwxr-xr-x  1 runner runner 11741 Oct  7 08:41 validate_city_map.py
 === all png files ===
 ./android/app/src/main/res/mipmap-mdpi/ic_launcher.png
 ./android/app/src/main/res/mipmap-hdpi/ic_launcher.png
@@ -59,45 +59,92 @@ drwxr-xr-x  2 runner runner  4096 Oct  7 00:51 tools
 === test dir ===
 test:
 total 64
-drwxr-xr-x  3 runner runner 4096 Oct  7 00:51 .
-drwxr-xr-x 14 runner runner 4096 Oct  7 00:52 ..
--rw-r--r--  1 runner runner 1137 Oct  7 00:51 city_data_test.dart
--rw-r--r--  1 runner runner 2010 Oct  7 00:51 entities_test.dart
--rw-r--r--  1 runner runner 8933 Oct  7 00:51 game_harness.dart
--rw-r--r--  1 runner runner 4091 Oct  7 00:51 geo_projection_test.dart
-drwxr-xr-x  2 runner runner 4096 Oct  7 00:51 goldens
--rw-r--r--  1 runner runner 4708 Oct  7 00:51 hitbox_evidence_test.dart
--rw-r--r--  1 runner runner 4239 Oct  7 00:51 map_camera_test.dart
--rw-r--r--  1 runner runner 7326 Oct  7 00:51 poi_hit_area_test.dart
--rw-r--r--  1 runner runner 3283 Oct  7 00:51 road_graph_test.dart
+drwxr-xr-x  3 runner runner 4096 Oct  7 08:41 .
+drwxr-xr-x 14 runner runner 4096 Oct  7 08:41 ..
+-rw-r--r--  1 runner runner 1137 Oct  7 08:41 city_data_test.dart
+-rw-r--r--  1 runner runner 2010 Oct  7 08:41 entities_test.dart
+-rw-r--r--  1 runner runner 8933 Oct  7 08:41 game_harness.dart
+-rw-r--r--  1 runner runner 4091 Oct  7 08:41 geo_projection_test.dart
+drwxr-xr-x  2 runner runner 4096 Oct  7 08:41 goldens
+-rw-r--r--  1 runner runner 4708 Oct  7 08:41 hitbox_evidence_test.dart
+-rw-r--r--  1 runner runner 4239 Oct  7 08:41 map_camera_test.dart
+-rw-r--r--  1 runner runner 7326 Oct  7 08:41 poi_hit_area_test.dart
+-rw-r--r--  1 runner runner 3283 Oct  7 08:41 road_graph_test.dart
 
 test/goldens:
 total 1696
-drwxr-xr-x 2 runner runner   4096 Oct  7 00:51 .
-drwxr-xr-x 3 runner runner   4096 Oct  7 00:51 ..
--rw-r--r-- 1 runner runner 215659 Oct  7 00:52 drag_frame_00.png
--rw-r--r-- 1 runner runner 217239 Oct  7 00:52 drag_frame_01.png
--rw-r--r-- 1 runner runner 215659 Oct  7 00:52 drag_frame_02.png
--rw-r--r-- 1 runner runner 217714 Oct  7 00:52 drag_frame_03.png
--rw-r--r-- 1 runner runner 217765 Oct  7 00:52 drag_frame_04.png
--rw-r--r-- 1 runner runner 223052 Oct  7 00:52 drag_frame_final.png
--rw-r--r-- 1 runner runner 232528 Oct  7 00:52 hitbox_map.png
--rw-r--r-- 1 runner runner 168983 Oct  7 00:52 hitbox_map_zoomed.png
+drwxr-xr-x 2 runner runner   4096 Oct  7 08:41 .
+drwxr-xr-x 3 runner runner   4096 Oct  7 08:41 ..
+-rw-r--r-- 1 runner runner 215659 Oct  7 08:41 drag_frame_00.png
+-rw-r--r-- 1 runner runner 217239 Oct  7 08:41 drag_frame_01.png
+-rw-r--r-- 1 runner runner 215659 Oct  7 08:41 drag_frame_02.png
+-rw-r--r-- 1 runner runner 217714 Oct  7 08:41 drag_frame_03.png
+-rw-r--r-- 1 runner runner 217765 Oct  7 08:41 drag_frame_04.png
+-rw-r--r-- 1 runner runner 223052 Oct  7 08:41 drag_frame_final.png
+-rw-r--r-- 1 runner runner 232528 Oct  7 08:41 hitbox_map.png
+-rw-r--r-- 1 runner runner 168983 Oct  7 08:41 hitbox_map_zoomed.png
 === test log tails ===
 --- qa_logs/test_evidence.txt ---
-Resolving dependencies...
-Downloading packages...
-  material_color_utilities 0.13.0 (0.13.1 available)
-  test_api 0.7.12 (0.7.14 available)
-Got dependencies!
 2 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart
 00:00 +0: (setUpAll)
 00:00 +0: evidence: hit boxes over the live map
-00:01 +1: evidence: off-centre drag sequence (finger ~22px off the icon)
-00:01 +2: (tearDownAll)
-00:01 +2: All tests passed!
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      ListBase.firstWhere (dart:collection/list.dart:132:5)
+#1      pumpGameScreen (file:///home/runner/work/rushhour/rushhour/test/game_harness.dart:230:37)
+<asynchronous suspension>
+#2      main.<anonymous closure> (file:///home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart:31:21)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  evidence: hit boxes over the live map
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: evidence: hit boxes over the live map [E]
+  Test failed. See exception logs above.
+  The test description was: evidence: hit boxes over the live map
+  
+00:01 +0 -1: evidence: off-centre drag sequence (finger ~22px off the icon)
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      ListBase.firstWhere (dart:collection/list.dart:132:5)
+#1      pumpGameScreen (file:///home/runner/work/rushhour/rushhour/test/game_harness.dart:230:37)
+<asynchronous suspension>
+#2      main.<anonymous closure> (file:///home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart:81:21)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  evidence: off-centre drag sequence (finger ~22px off the icon)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -2: evidence: off-centre drag sequence (finger ~22px off the icon) [E]
+  Test failed. See exception logs above.
+  The test description was: evidence: off-centre drag sequence (finger ~22px off the icon)
+  
+00:01 +0 -2: (tearDownAll)
+00:01 +0 -2: Some tests failed.
+
+Failing tests:
+  /home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart: evidence: hit boxes over the live map
+  /home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart: evidence: off-centre drag sequence (finger ~22px off the icon)
 --- qa_logs/test_existing.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -107,24 +154,24 @@ Got dependencies!
 2 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/city_data_test.dart
-00:00 +0: /home/runner/work/rushhour/rushhour/test/city_data_test.dart: Rivergate asset produces real OSM geometry with projection and reveal stages
-00:00 +1: /home/runner/work/rushhour/rushhour/test/entities_test.dart: customer limits and demand are deterministic
-00:00 +2: /home/runner/work/rushhour/rushhour/test/entities_test.dart: courier speeds adapt to map dimension and meet minimum speedup
-00:00 +3: /home/runner/work/rushhour/rushhour/test/entities_test.dart: snapshot survives JSON-compatible round trip with unlocked courier types and reveal stages
+00:00 +0: /home/runner/work/rushhour/rushhour/test/entities_test.dart: customer limits and demand are deterministic
+00:00 +1: /home/runner/work/rushhour/rushhour/test/entities_test.dart: courier speeds adapt to map dimension and meet minimum speedup
+00:00 +2: /home/runner/work/rushhour/rushhour/test/entities_test.dart: snapshot survives JSON-compatible round trip with unlocked courier types and reveal stages
+00:00 +3: /home/runner/work/rushhour/rushhour/test/city_data_test.dart: Rivergate asset produces real OSM geometry with projection and reveal stages
 00:00 +4: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: projection matches the required equidistant formula
 00:00 +5: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: both axes share one uniform scale (no angle distortion)
 00:00 +6: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: unproject is the exact inverse of project
-00:00 +7: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: projected bounds stay inside the world rect
-00:00 +8: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
-00:00 +8: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data rendered node geometry equals the shared projection output
-00:00 +9: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data snapping sees exactly the drawn road geometry
-00:01 +10: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data pathfinding lengths equal the drawn polyline lengths
-00:01 +11: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (tearDownAll)
-00:01 +11: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: the projection formula is not duplicated anywhere in lib/
-00:01 +12: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: Dijkstra uses the shortest compatible route
-00:01 +13: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: blocked roads are excluded
-00:01 +14: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: route cannot be built through an unlocked ferry
-00:01 +15: All tests passed!
+00:00 +7: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: Dijkstra uses the shortest compatible route
+00:00 +8: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: Dijkstra uses the shortest compatible route
+00:00 +9: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
+00:00 +10: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
+00:00 +11: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
+00:00 +11: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data rendered node geometry equals the shared projection output
+00:00 +12: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data snapping sees exactly the drawn road geometry
+00:00 +13: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data pathfinding lengths equal the drawn polyline lengths
+00:00 +14: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (tearDownAll)
+00:00 +14: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: the projection formula is not duplicated anywhere in lib/
+00:00 +15: All tests passed!
 --- qa_logs/test_map_camera.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -140,9 +187,21 @@ Try `flutter pub outdated` for more information.
 00:00 +3: MapCamera uniform scale keeps screen radii zoom-independent
 00:00 +4: single projection for painting and hit-testing (Requirement 44.5) (setUpAll)
 00:00 +4: single projection for painting and hit-testing (Requirement 44.5) every POI node paints exactly where geoToScreen places its hit box
-00:00 +5: single projection for painting and hit-testing (Requirement 44.5) geoToScreen composes the same camera matrix that renders the world
-00:00 +6: single projection for painting and hit-testing (Requirement 44.5) (tearDownAll)
-00:00 +6: All tests passed!
+00:00 +4 -1: single projection for painting and hit-testing (Requirement 44.5) every POI node paints exactly where geoToScreen places its hit box [E]
+  Expected: a value greater than <50>
+    Actual: <24>
+     Which: is not a value greater than <50>
+  
+  package:matcher                                     expect
+  package:flutter_test/src/widget_tester.dart 473:18  expect
+  test/map_camera_test.dart 77:7                      main.<fn>.<fn>
+  
+00:00 +4 -1: single projection for painting and hit-testing (Requirement 44.5) geoToScreen composes the same camera matrix that renders the world
+00:00 +5 -1: single projection for painting and hit-testing (Requirement 44.5) (tearDownAll)
+00:00 +5 -1: Some tests failed.
+
+Failing tests:
+  /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: single projection for painting and hit-testing (Requirement 44.5) every POI node paints exactly where geoToScreen places its hit box
 --- qa_logs/test_poi_acceptance.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -154,8 +213,36 @@ Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart
 00:00 +0: (setUpAll)
 00:00 +0: ACCEPTANCE: line drawing starts from a touch ~21px off the restaurant icon centre and commits on the customer
-00:00 +1: (tearDownAll)
-00:01 +1: All tests passed!
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      ListBase.firstWhere (dart:collection/list.dart:132:5)
+#1      pumpGameScreen (file:///home/runner/work/rushhour/rushhour/test/game_harness.dart:230:37)
+<asynchronous suspension>
+#2      main.<anonymous closure> (file:///home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart:62:21)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  ACCEPTANCE: line drawing starts from a touch ~21px off the restaurant icon centre and commits on
+  the customer
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: ACCEPTANCE: line drawing starts from a touch ~21px off the restaurant icon centre and commits on the customer [E]
+  Test failed. See exception logs above.
+  The test description was: ACCEPTANCE: line drawing starts from a touch ~21px off the restaurant icon centre and commits on the customer
+  
+00:01 +0 -1: (tearDownAll)
+00:01 +0 -1: Some tests failed.
+
+Failing tests:
+  /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart: ACCEPTANCE: line drawing starts from a touch ~21px off the restaurant icon centre and commits on the customer
 --- qa_logs/test_poi_geometry.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -167,8 +254,35 @@ Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart
 00:00 +0: (setUpAll)
 00:00 +0: every active POI has a 48x48 hit area centred on the painted icon
-00:00 +1: (tearDownAll)
-00:00 +1: All tests passed!
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      ListBase.firstWhere (dart:collection/list.dart:132:5)
+#1      pumpGameScreen (file:///home/runner/work/rushhour/rushhour/test/game_harness.dart:230:37)
+<asynchronous suspension>
+#2      main.<anonymous closure> (file:///home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart:20:21)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  every active POI has a 48x48 hit area centred on the painted icon
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: every active POI has a 48x48 hit area centred on the painted icon [E]
+  Test failed. See exception logs above.
+  The test description was: every active POI has a 48x48 hit area centred on the painted icon
+  
+00:01 +0 -1: (tearDownAll)
+00:01 +0 -1: Some tests failed.
+
+Failing tests:
+  /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart: every active POI has a 48x48 hit area centred on the painted icon
 --- qa_logs/test_poi_pan.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -180,8 +294,35 @@ Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart
 00:00 +0: (setUpAll)
 00:00 +0: dragging empty map pans the camera; dragging a POI does not
-00:00 +1: (tearDownAll)
-00:00 +1: All tests passed!
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      ListBase.firstWhere (dart:collection/list.dart:132:5)
+#1      pumpGameScreen (file:///home/runner/work/rushhour/rushhour/test/game_harness.dart:230:37)
+<asynchronous suspension>
+#2      main.<anonymous closure> (file:///home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart:127:21)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  dragging empty map pans the camera; dragging a POI does not
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: dragging empty map pans the camera; dragging a POI does not [E]
+  Test failed. See exception logs above.
+  The test description was: dragging empty map pans the camera; dragging a POI does not
+  
+00:01 +0 -1: (tearDownAll)
+00:01 +0 -1: Some tests failed.
+
+Failing tests:
+  /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart: dragging empty map pans the camera; dragging a POI does not
 --- qa_logs/test_poi_taptap.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -193,6 +334,33 @@ Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart
 00:00 +0: (setUpAll)
 00:00 +0: tap-tap routing still works through the POI hit areas
-00:00 +1: (tearDownAll)
-00:00 +1: All tests passed!
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: No element
+
+When the exception was thrown, this was the stack:
+#0      ListBase.firstWhere (dart:collection/list.dart:132:5)
+#1      pumpGameScreen (file:///home/runner/work/rushhour/rushhour/test/game_harness.dart:230:37)
+<asynchronous suspension>
+#2      main.<anonymous closure> (file:///home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart:108:21)
+<asynchronous suspension>
+#3      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#4      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  tap-tap routing still works through the POI hit areas
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -1: tap-tap routing still works through the POI hit areas [E]
+  Test failed. See exception logs above.
+  The test description was: tap-tap routing still works through the POI hit areas
+  
+00:01 +0 -1: (tearDownAll)
+00:01 +0 -1: Some tests failed.
+
+Failing tests:
+  /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart: tap-tap routing still works through the POI hit areas
 === gitignore check ===

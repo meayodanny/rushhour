@@ -36,4 +36,4 @@ warning • Unused import: 'dart:ui'. Try removing the import directive • test
    info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:90:11 • deprecated_member_use
    info • Sort directive sections alphabetically. Try sorting the directives • test/road_graph_test.dart:5:1 • directives_ordering
 
-28 issues found. (ran in 9.4s)
+28 issues found. (ran in 9.8s)
