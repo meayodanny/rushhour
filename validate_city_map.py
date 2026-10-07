@@ -233,26 +233,60 @@ def validate_city_map(file_path):
     else:
         results[6] = (False, "No nodes to compute actual bounds.")
 
-    # Check 7: River format (segments is non-empty list of lists of coords)
-    segments = river.get('segments')
-    if isinstance(segments, list) and len(segments) > 0:
-        valid_segments = True
-        total_pts = 0
-        for seg in segments:
-            if not isinstance(seg, list) or len(seg) < 2:
-                valid_segments = False
-                break
-            for pt in seg:
-                if not isinstance(pt, (list, tuple)) or len(pt) < 2:
-                    valid_segments = False
-                    break
-                total_pts += 1
-        if valid_segments and total_pts >= 4:
-            results[7] = (True, f"River format valid: {len(segments)} segments with {total_pts} total coordinates.")
-        else:
-            results[7] = (False, "River segments format malformed or contains invalid coordinates.")
+    # Check 7: Water format (Requirement 46, schemaVersion 3).
+    #
+    # Water is stored in two independent shapes:
+    #   "river": {
+    #     "segments": [[[lat, lng], ...], ...],   # narrow stretches (lines)
+    #     "areas":    [[[lat, lng], ...], ...]    # wide stretches (polygons)
+    #   }
+    # A city may keep any combination - only segments, only areas, both, or no
+    # river at all - so the check validates whichever fields are present and
+    # never demands both.
+    def validate_features(field, payload, minimum_points):
+        """Returns (feature_count, point_count, error)."""
+        if not isinstance(payload, list):
+            return 0, 0, f"'{field}' is not an array"
+        total = 0
+        for feature in payload:
+            if not isinstance(feature, (list, tuple)) or len(feature) < minimum_points:
+                return 0, 0, f"'{field}' has a feature with fewer than {minimum_points} coordinates"
+            for point in feature:
+                if not isinstance(point, (list, tuple)) or len(point) < 2:
+                    return 0, 0, f"'{field}' has a coordinate that is not a [lat, lng] pair"
+                if not all(isinstance(value, (int, float)) for value in point[:2]):
+                    return 0, 0, f"'{field}' has a non-numeric coordinate"
+                total += 1
+        return len(payload), total, None
+
+    if not isinstance(river, dict):
+        results[7] = (False, "River must be an object carrying optional 'segments' and 'areas' arrays.")
     else:
-        results[7] = (False, "River missing 'segments' non-empty array of arrays.")
+        checks = []
+        errors = []
+        for field, minimum_points in (('segments', 2), ('areas', 3)):
+            if field not in river:
+                continue
+            count, total, error = validate_features(field, river[field], minimum_points)
+            if error is not None:
+                errors.append(error)
+            else:
+                checks.append((field, count, total))
+
+        if errors:
+            results[7] = (False, "River format malformed - " + "; ".join(errors) + ".")
+        elif not checks:
+            # Neither 'segments' nor 'areas' is present: a city without any
+            # river at all is perfectly legal.
+            results[7] = (True, "No 'river.segments' / 'river.areas' - city has no water (allowed).")
+        else:
+            summary = ", ".join(
+                f"{count} {field} with {points} coordinates" for field, count, points in checks
+            )
+            if sum(points for _, _, points in checks) == 0:
+                results[7] = (True, f"River arrays present but empty ({summary}).")
+            else:
+                results[7] = (True, f"River format valid: {summary}.")
 
     # Output report
     print("\n--- VALIDATION RESULTS ---")

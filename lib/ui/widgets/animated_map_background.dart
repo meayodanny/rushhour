@@ -97,11 +97,20 @@ class MenuMapPainter extends CustomPainter {
       canvas.drawPath(path, Paint()..color = color);
     }
 
-    // Draw all river segments
+    // Requirement 46: wide water bodies are filled polygons, narrow stretches
+    // are thin polylines - the same split the static map painter uses.
+    final waterFill = Paint()
+      ..color = palette.water.withValues(alpha: palette.isDark ? .72 : .62)
+      ..style = PaintingStyle.fill;
+    for (final area in city.riverAreas) {
+      if (area.length < 3) continue;
+      canvas.drawPath(_path(area)..close(), waterFill);
+    }
+
     final riverPaint = Paint()
-      ..color = palette.water
+      ..color = palette.water.withValues(alpha: palette.isDark ? .95 : .85)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 96
+      ..strokeWidth = 4
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 

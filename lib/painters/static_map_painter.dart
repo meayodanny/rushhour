@@ -29,29 +29,10 @@ class StaticMapPainter extends CustomPainter {
     // Decorative building fabric
     _drawBuildings(canvas);
 
-    // Requirement 39.1: Draw all river segments separately
-    final riverPaint = Paint()
-      ..color = palette.water
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 96
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final riverGleamPaint = Paint()
-      ..color = palette.isDark ? const Color(0x22ffffff) : const Color(0x66ffffff)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
-    for (final segment in city.riverSegments) {
-      if (segment.length < 2) continue;
-      final riverPath = Path()..moveTo(segment.first.dx, segment.first.dy);
-      for (final p in segment.skip(1)) {
-        riverPath.lineTo(p.dx, p.dy);
-      }
-      canvas.drawPath(riverPath, riverPaint);
-      canvas.drawPath(riverPath, riverGleamPaint);
-    }
+    // Requirement 46 / schemaVersion 3: the water consists of two different
+    // kinds of features and each one is painted the way it is stored.
+    _drawWaterAreas(canvas);
+    _drawWaterSegments(canvas);
 
     // Roads
     for (final edge in city.edges.where((RoadEdge e) => e.type != RoadType.bridge && e.type != RoadType.ferry)) {
@@ -106,6 +87,59 @@ class StaticMapPainter extends CustomPainter {
       for (final node in city.nodes.values) {
         canvas.drawCircle(node.point, 5, debugNode);
       }
+    }
+  }
+
+  /// Wide water bodies (`river.areas`) are stored as closed polygons and are
+  /// painted as **fills** with a translucent water colour, so the road fabric
+  /// drawn on top keeps reading as a coherent map (Requirement 46).
+  void _drawWaterAreas(Canvas canvas) {
+    if (city.riverAreas.isEmpty) return;
+    final fill = Paint()
+      ..color = palette.water.withValues(alpha: palette.isDark ? .72 : .62)
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
+    final shoreline = Paint()
+      ..color = palette.water.withValues(alpha: palette.isDark ? .95 : .85)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..isAntiAlias = true;
+
+    for (final area in city.riverAreas) {
+      if (area.length < 3) continue;
+      final path = Path()
+        // evenOdd keeps self-intersecting OSM outlines visually stable and
+        // renders nested rings as islands instead of double-painting them.
+        ..fillType = PathFillType.evenOdd
+        ..moveTo(area.first.dx, area.first.dy);
+      for (final point in area.skip(1)) {
+        path.lineTo(point.dx, point.dy);
+      }
+      path.close();
+      canvas.drawPath(path, fill);
+      canvas.drawPath(path, shoreline);
+    }
+  }
+
+  /// Narrow stretches (`river.segments`) stay polylines and are painted as
+  /// thin outlines in the very same water colour (Requirement 46).
+  void _drawWaterSegments(Canvas canvas) {
+    if (city.riverSegments.isEmpty) return;
+    final line = Paint()
+      ..color = palette.water.withValues(alpha: palette.isDark ? .95 : .85)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true;
+
+    for (final segment in city.riverSegments) {
+      if (segment.length < 2) continue;
+      final path = Path()..moveTo(segment.first.dx, segment.first.dy);
+      for (final point in segment.skip(1)) {
+        path.lineTo(point.dx, point.dy);
+      }
+      canvas.drawPath(path, line);
     }
   }
 

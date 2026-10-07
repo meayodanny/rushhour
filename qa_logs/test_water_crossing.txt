@@ -1,0 +1,30 @@
+Resolving dependencies...
+Downloading packages...
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.14 available)
+Got dependencies!
+2 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/runner/work/rushhour/rushhour/test/water_crossing_test.dart
+00:00 +0: river.areas - filled polygons a street that passes through the polygon counts as a crossing
+00:00 +1: river.areas - filled polygons a street that merely grazes the shoreline (0.5 m) stays usable
+00:00 +2: river.areas - filled polygons a real bridge is allowed to cross
+00:00 +3: river.areas - filled polygons a street that runs inside the water is a crossing too
+00:00 +4: river.areas - filled polygons roads on land are untouched
+00:00 +5: river.areas - filled polygons tolerance is read in metres, not in world pixels
+00:00 +6: river.areas - filled polygons routing refuses to use the crossing, but uses the bridge
+00:00 +7: river.segments - polylines a street that intersects the water line counts as a crossing
+00:00 +8: river.segments - polylines merely touching the water line is not a crossing
+00:00 +9: river.segments - polylines a route may not be built across the water line
+00:00 +10: both water shapes are consulted at the same time
+00:00 +11: Rivergate map data (Requirement 46 regression) (setUpAll)
+00:00 +11: Rivergate map data (Requirement 46 regression) the map stores both kinds of water
+00:00 +12: Rivergate map data (Requirement 46 regression) streets that cross the water outside a real bridge are found
+Requirement 46: 40 street edges cross water outside bridges.
+Requirement 46: blocked = [e1256, e1564, e1565, e1569, e1570, e1571, e1572, e1576, e1577, e1685, e1711, e1716, e1893, e2004, e2005, e2010, e2011, e2135, e220, e2452, e2534, e2535, e2536, e2570, e2571, e27, e2811, e2855, e2883, e2884, e2885, e2886, e2887, e3130, e3359, e3392, e783, e830, e879, e906]
+00:00 +13: Rivergate map data (Requirement 46 regression) no bridge edge is blocked
+00:00 +14: Rivergate map data (Requirement 46 regression) every POI stays reachable when the crossings are forbidden
+00:00 +15: Rivergate map data (Requirement 46 regression) a courier route across the river keeps to the real bridges
+00:00 +16: Rivergate map data (Requirement 46 regression) snapping never targets a forbidden river crossing
+00:01 +17: Rivergate map data (Requirement 46 regression) (tearDownAll)
+00:01 +17: All tests passed!

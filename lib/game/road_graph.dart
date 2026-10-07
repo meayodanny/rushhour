@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 
 import '../models/city.dart';
 import '../models/entities.dart';
+import 'water_crossing.dart';
 
 class PathResult {
   const PathResult(this.edgeIds, this.distance);
@@ -27,7 +28,8 @@ class _Step {
 }
 
 class RoadGraph {
-  RoadGraph(this.city) {
+  RoadGraph(this.city, {WaterCrossing? water})
+      : water = water ?? WaterCrossing(city) {
     for (final edge in city.edges) {
       _adjacency.putIfAbsent(edge.from, () => <RoadEdge>[]).add(edge);
       _adjacency.putIfAbsent(edge.to, () => <RoadEdge>[]).add(edge);
@@ -35,7 +37,15 @@ class RoadGraph {
   }
 
   final CityData city;
+
+  /// Requirement 46: the authority on which edges count as river crossings.
+  final WaterCrossing water;
+
   final Map<String, List<RoadEdge>> _adjacency = <String, List<RoadEdge>>{};
+
+  /// Edges whose geometry carries a street across water where no real bridge
+  /// exists (Requirement 46). Routes may not use them.
+  Set<String> get waterBlockedEdgeIds => water.blockedEdgeIds;
 
   List<RoadEdge> _ferryEdges() {
     final list = <RoadEdge>[];
@@ -63,9 +73,16 @@ class RoadGraph {
     CourierType? mode,
     Set<String> blocked = const <String>{},
     bool allowFerry = false,
+    bool respectBridges = true,
   }) {
     if (start == goal) return const PathResult(<String>[], 0);
     if (!city.nodes.containsKey(start) || !city.nodes.containsKey(goal)) return null;
+
+    // Requirement 46: a road that crosses water outside the real bridges is
+    // never a valid route, on top of the (event-driven) blocked edges.
+    final blockedEdges = respectBridges
+        ? <String>{...blocked, ...water.blockedEdgeIds}
+        : blocked;
 
     final distances = <String, double>{start: 0};
     final previousNode = <String, String>{};
@@ -87,7 +104,7 @@ class RoadGraph {
       ];
 
       for (final edge in nodeEdges) {
-        if (blocked.contains(edge.id) || !_allowed(edge, mode, allowFerry)) continue;
+        if (blockedEdges.contains(edge.id) || !_allowed(edge, mode, allowFerry)) continue;
         final next = edge.from == current.node ? edge.to : edge.from;
         final candidate = current.distance + edge.length;
         if (candidate < (distances[next] ?? double.infinity)) {
@@ -121,17 +138,28 @@ class RoadGraph {
 
   String nearestEdgeId(double x, double y) => nearestGraphPoint(Offset(x, y)).edgeId;
 
-  GraphProjection nearestGraphPoint(Offset point) {
+  /// Snaps [point] onto the closest road.
+  ///
+  /// Requirement 46: edges that cross the water outside a real bridge are not
+  /// valid snapping targets either - otherwise a free-hand gesture could drag
+  /// the draft line straight across the river. When every edge of the city is
+  /// a forbidden crossing (degenerate data) the method falls back to plain
+  /// nearest-edge behaviour instead of failing.
+  GraphProjection nearestGraphPoint(Offset point, {bool respectBridges = true}) {
     if (city.edges.isEmpty) {
       throw StateError('Cannot snap a gesture without roads.');
     }
+    final allowed = respectBridges
+        ? city.edges.where((RoadEdge e) => !water.blockedEdgeIds.contains(e.id)).toList()
+        : city.edges;
+    final candidates = allowed.isEmpty ? city.edges : allowed;
     var best = GraphProjection(
-      edgeId: city.edges.first.id,
-      point: city.edges.first.points.first,
+      edgeId: candidates.first.id,
+      point: candidates.first.points.first,
       distance: double.infinity,
       along: 0,
     );
-    for (final edge in city.edges) {
+    for (final edge in candidates) {
       var travelled = 0.0;
       for (var i = 1; i < edge.points.length; i++) {
         final a = edge.points[i - 1];

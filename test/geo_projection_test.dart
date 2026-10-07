@@ -72,8 +72,10 @@ void main() {
       for (final edge in city.edges.take(200)) {
         for (final point in edge.points) {
           // The finger is placed exactly on the drawn geometry: the snap must
-          // land on it with (near) zero distance.
-          expect(graph.nearestGraphPoint(point).distance, lessThan(0.001),
+          // land on it with (near) zero distance. This test is about the
+          // projection, not about water, so the Requirement 46 bridge filter
+          // (which deliberately skips river-crossing streets) is disabled.
+          expect(graph.nearestGraphPoint(point, respectBridges: false).distance, lessThan(0.001),
               reason: 'snap drifted away from drawn edge ${edge.id}');
         }
       }

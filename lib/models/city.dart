@@ -225,6 +225,7 @@ class CityData {
     required this.nodes,
     required this.edges,
     required this.riverSegments,
+    this.riverAreas = const <List<Offset>>[],
     required this.restaurantPois,
     required this.customerPois,
     required this.ferryPoints,
@@ -242,7 +243,14 @@ class CityData {
   final List<RevealStage> revealStages;
   final Map<String, RoadNode> nodes;
   final List<RoadEdge> edges;
+
+  /// Requirement 46 / schemaVersion 3: narrow stretches of the river are
+  /// stored as polylines and painted as thin outlines.
   final List<List<Offset>> riverSegments;
+
+  /// Requirement 46 / schemaVersion 3: wide stretches of the river (and other
+  /// water bodies) are stored as closed polygons and painted as fills.
+  final List<List<Offset>> riverAreas;
   final List<CityPoi> restaurantPois;
   final List<CityPoi> customerPois;
   final List<FerryPoint> ferryPoints;
@@ -261,7 +269,15 @@ class CityData {
   /// Inverse of [project]; handy for debugging a snapped world point.
   ({double lat, double lng}) unproject(Offset point) => projection.unproject(point);
 
+  /// Legacy single-polyline accessor kept for callers that only ever had one
+  /// channel; prefer [riverSegments] / [riverAreas].
   List<Offset> get river => riverSegments.isNotEmpty ? riverSegments.first : const <Offset>[];
+
+  /// Requirement 46: a city may have no water at all, so neither
+  /// [riverSegments] nor [riverAreas] is individually mandatory - but at
+  /// least one of them has to be present when the city actually has a river.
+  bool get hasWater => riverSegments.isNotEmpty || riverAreas.isNotEmpty;
+
 
   /// Deprecated shim kept only so no caller can silently re-invent the
   /// formula: it forwards to [GeoProjection], which is the single source of
@@ -322,25 +338,31 @@ class CityData {
           return CityPoi(id: map['id']! as String, nodeId: map['nodeId']! as String, kind: kind);
         }).toList();
 
-    // River segments (Requirement 39.1)
+    // Water features (Requirement 39.1 / 46, schemaVersion 3):
+    //   river.segments - narrow stretches, stored as polylines;
+    //   river.areas    - wide stretches / water bodies, stored as polygons.
+    // A city may have neither (no river at all), either, or both.
     final riverMap = json['river'] as Map<String, Object?>?;
-    final riverSegments = <List<Offset>>[];
-    if (riverMap != null) {
-      if (riverMap.containsKey('segments')) {
-        final segmentsRaw = riverMap['segments'] as List<Object?>? ?? const <Object?>[];
-        for (final segRaw in segmentsRaw) {
-          final ptsRaw = segRaw! as List<Object?>;
-          riverSegments.add(ptsRaw.map((Object? p) {
-            final pair = p! as List<Object?>;
-            return project((pair[0]! as num).toDouble(), (pair[1]! as num).toDouble());
-          }).toList());
-        }
-      } else if (riverMap.containsKey('polyline')) {
-        final ptsRaw = riverMap['polyline'] as List<Object?>? ?? const <Object?>[];
-        riverSegments.add(ptsRaw.map((Object? p) {
+    List<List<Offset>> parseRings(Object? raw) {
+      final result = <List<Offset>>[];
+      for (final featureRaw in (raw as List<Object?>?) ?? const <Object?>[]) {
+        final ptsRaw = featureRaw! as List<Object?>;
+        result.add(ptsRaw.map((Object? p) {
           final pair = p! as List<Object?>;
           return project((pair[0]! as num).toDouble(), (pair[1]! as num).toDouble());
         }).toList());
+      }
+      return result;
+    }
+
+    var riverSegments = <List<Offset>>[];
+    var riverAreas = <List<Offset>>[];
+    if (riverMap != null) {
+      riverSegments = parseRings(riverMap['segments']);
+      riverAreas = parseRings(riverMap['areas']);
+      if (riverSegments.isEmpty && riverAreas.isEmpty && riverMap.containsKey('polyline')) {
+        // Pre-v3 single-channel shape still accepted on load.
+        riverSegments = parseRings(<Object?>[riverMap['polyline']]);
       }
     }
 
@@ -369,6 +391,7 @@ class CityData {
           .where((CityBuilding building) => building.footprint.length >= 3)
           .toList(),
       riverSegments: riverSegments,
+      riverAreas: riverAreas,
       restaurantPois: parsePois('restaurants', PoiKind.restaurant),
       customerPois: parsePois('customers', PoiKind.customer),
       ferryPoints: ((json['ferryPoints'] as List<Object?>?) ?? const <Object?>[]).map((Object? raw) {
@@ -409,6 +432,16 @@ class CityData {
     for (final building in data.buildings) {
       if (building.footprint.length < 3) {
         throw FormatException('City map $path contains invalid building ${building.id}.');
+      }
+    }
+    for (final segment in data.riverSegments) {
+      if (segment.length < 2) {
+        throw FormatException('City map $path contains a river segment with fewer than 2 points.');
+      }
+    }
+    for (final area in data.riverAreas) {
+      if (area.length < 3) {
+        throw FormatException('City map $path contains a river area with fewer than 3 points.');
       }
     }
     return data;
