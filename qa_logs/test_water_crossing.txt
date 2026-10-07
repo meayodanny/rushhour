@@ -25,6 +25,6 @@ Requirement 46: blocked = [e1256, e1564, e1565, e1569, e1570, e1571, e1572, e157
 00:00 +13: Rivergate map data (Requirement 46 regression) no bridge edge is blocked
 00:00 +14: Rivergate map data (Requirement 46 regression) every POI stays reachable when the crossings are forbidden
 00:00 +15: Rivergate map data (Requirement 46 regression) a courier route across the river keeps to the real bridges
-00:00 +16: Rivergate map data (Requirement 46 regression) snapping never targets a forbidden river crossing
+00:01 +16: Rivergate map data (Requirement 46 regression) snapping never targets a forbidden river crossing
 00:01 +17: Rivergate map data (Requirement 46 regression) (tearDownAll)
 00:01 +17: All tests passed!
