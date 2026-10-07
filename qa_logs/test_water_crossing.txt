@@ -24,18 +24,7 @@ Requirement 46: 40 street edges cross water outside bridges.
 Requirement 46: blocked = [e1256, e1564, e1565, e1569, e1570, e1571, e1572, e1576, e1577, e1685, e1711, e1716, e1893, e2004, e2005, e2010, e2011, e2135, e220, e2452, e2534, e2535, e2536, e2570, e2571, e27, e2811, e2855, e2883, e2884, e2885, e2886, e2887, e3130, e3359, e3392, e783, e830, e879, e906]
 00:00 +13: Rivergate map data (Requirement 46 regression) no bridge edge is blocked
 00:00 +14: Rivergate map data (Requirement 46 regression) every POI stays reachable when the crossings are forbidden
-00:00 +15: Rivergate map data (Requirement 46 regression) a route across the river keeps to the bridges
-00:01 +15 -1: Rivergate map data (Requirement 46 regression) a route across the river keeps to the bridges [E]
-  Expected: not null
-    Actual: <null>
-  
-  package:matcher                                     expect
-  package:flutter_test/src/widget_tester.dart 473:18  expect
-  test/water_crossing_test.dart 288:7                 main.<fn>.<fn>
-  
-00:01 +15 -1: Rivergate map data (Requirement 46 regression) snapping never targets a forbidden river crossing
-00:01 +16 -1: Rivergate map data (Requirement 46 regression) (tearDownAll)
-00:01 +16 -1: Some tests failed.
-
-Failing tests:
-  /home/runner/work/rushhour/rushhour/test/water_crossing_test.dart: Rivergate map data (Requirement 46 regression) a route across the river keeps to the bridges
+00:00 +15: Rivergate map data (Requirement 46 regression) a courier route across the river keeps to the real bridges
+00:01 +16: Rivergate map data (Requirement 46 regression) snapping never targets a forbidden river crossing
+00:01 +17: Rivergate map data (Requirement 46 regression) (tearDownAll)
+00:01 +17: All tests passed!
