@@ -9,3 +9,14 @@ Successfully installed pillow-12.3.0
                          ^
 SyntaxError: '(' was never closed
 gif_exit=0
+Collecting pillow
+  Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.1 kB)
+Downloading pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.9 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.9/6.9 MB 59.5 MB/s eta 0:00:00
+Installing collected packages: pillow
+Successfully installed pillow-12.3.0
+  File "/home/runner/work/rushhour/rushhour/tools/make_evidence_gif.py", line 38
+    frames_paths = sorted(
+                         ^
+SyntaxError: '(' was never closed
+gif_exit=0
