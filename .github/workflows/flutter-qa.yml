@@ -101,10 +101,9 @@ jobs:
       - name: Assemble evidence GIF
         if: always()
         run: |
-          set +e
+          set -o pipefail
           python3 -m pip install --user pillow 2>&1 | tee -a qa_logs/gif.txt
           python3 tools/make_evidence_gif.py 2>&1 | tee -a qa_logs/gif.txt
-          echo "gif_exit=$?" | tee -a qa_logs/gif.txt
 
       - name: Commit & push QA evidence and logs
         if: always()

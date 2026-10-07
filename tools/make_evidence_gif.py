@@ -36,7 +36,7 @@ def main() -> int:
             print(f"copied {source} -> {DOCS / name}")
 
     frames_paths = sorted(
-        (p for p in GOLDENS.glob("drag_frame_*.png") if FRAME_PATTERN.match(p.name),
+        (p for p in GOLDENS.glob("drag_frame_*.png") if FRAME_PATTERN.match(p.name)),
         key=lambda p: FRAME_PATTERN.match(p.name).group(1),
     )
     final = GOLDENS / "drag_frame_final.png"
