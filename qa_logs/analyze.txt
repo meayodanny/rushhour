@@ -36,5 +36,6 @@ warning • Unused import: 'dart:ui'. Try removing the import directive • test
    info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:90:11 • deprecated_member_use
    info • Sort directive sections alphabetically. Try sorting the directives • test/road_graph_test.dart:5:1 • directives_ordering
    info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter_test/flutter_test.dart'. Try removing the import directive • test/water_crossing_test.dart:1:8 • unnecessary_import
+   info • The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive • test/water_evidence_test.dart:1:8 • unnecessary_import
 
-29 issues found. (ran in 8.1s)
+30 issues found. (ran in 8.2s)
