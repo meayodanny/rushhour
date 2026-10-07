@@ -7,6 +7,7 @@ import 'package:rushhour/core/geo_projection.dart';
 import 'package:rushhour/game/road_graph.dart';
 import 'package:rushhour/game/water_crossing.dart';
 import 'package:rushhour/models/city.dart';
+import 'package:rushhour/models/entities.dart';
 
 /// Requirement 46: "does this road cross water" has to look at **both**
 /// shapes the river is stored in - the filled `river.areas` polygons and the
@@ -256,7 +257,7 @@ void main() {
       final blocked = RoadGraph(city).waterBlockedEdgeIds;
       final adjacency = <String, List<String>>{};
       for (final edge in city.edges) {
-        if (blocked.contains(edge.id)) continue;
+        if (blocked.contains(edge.id) || !edge.allowWalk) continue;
         adjacency.putIfAbsent(edge.from, () => <String>[]).add(edge.to);
         adjacency.putIfAbsent(edge.to, () => <String>[]).add(edge.from);
       }
@@ -278,18 +279,42 @@ void main() {
       }
     });
 
-    test('a route across the river keeps to the bridges', () {
+    test('a courier route across the river keeps to the real bridges', () {
+      // r001 -> c014 is a POI pair on opposite banks of the Rivergate river
+      // (cross-checked against tools/water_geometry.py): the natural shortest
+      // walk route uses a street that crosses the water, while the routed one
+      // has to detour over a real bridge.
+      final restaurant = city.restaurantPois.firstWhere((CityPoi p) => p.id == 'r001');
+      final customer = city.customerPois.firstWhere((CityPoi p) => p.id == 'c014');
+
       final graph = RoadGraph(city);
       final blocked = graph.waterBlockedEdgeIds;
-      final route = graph.findPath(
-        city.restaurantPois.first.nodeId,
-        city.customerPois.last.nodeId,
-      );
-      expect(route, isNotNull);
-      for (final edgeId in route!.edgeIds) {
+
+      final safe = graph.findPath(restaurant.nodeId, customer.nodeId, mode: CourierType.walk);
+      expect(safe, isNotNull);
+      for (final edgeId in safe!.edgeIds) {
         expect(blocked, isNot(contains(edgeId)),
             reason: 'route used a forbidden river crossing: $edgeId');
       }
+      expect(
+        safe.edgeIds.where((String id) => city.edgeById(id)!.type == RoadType.bridge),
+        isNotEmpty,
+        reason: 'a route that changes banks must go over a real bridge',
+      );
+
+      // Proof the filter actually does the work: without it the very same
+      // query happily walks straight across the water.
+      final unrestricted = graph.findPath(
+        restaurant.nodeId,
+        customer.nodeId,
+        mode: CourierType.walk,
+        respectBridges: false,
+      );
+      expect(unrestricted, isNotNull);
+      expect(unrestricted!.edgeIds.any(blocked.contains), isTrue,
+          reason: 'the unrestricted route is expected to use a river crossing');
+      expect(safe.distance, greaterThan(unrestricted.distance),
+          reason: 'detouring to a bridge must not be free');
     });
 
     test('snapping never targets a forbidden river crossing', () {
