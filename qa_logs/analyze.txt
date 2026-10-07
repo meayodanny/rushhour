@@ -1,0 +1,39 @@
+Resolving dependencies...
+Downloading packages...
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.14 available)
+Got dependencies!
+2 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing rushhour...                                           
+
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive • lib/core/palette.dart:1:8 • unnecessary_import
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive • lib/game/game_controller.dart:3:8 • unnecessary_import
+   info • The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart'. Try removing the import directive • lib/game/game_controller.dart:5:8 • unnecessary_import
+   info • Statements in a for should be enclosed in a block. Try wrapping the statement in a block • lib/game/game_controller.dart:79:45 • curly_braces_in_flow_control_structures
+   info • Statements in a for should be enclosed in a block. Try wrapping the statement in a block • lib/game/game_controller.dart:203:47 • curly_braces_in_flow_control_structures
+warning • Unused import: 'dart:math'. Try removing the import directive • lib/game/road_graph.dart:1:8 • unused_import
+   info • The import of 'dart:ui' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/services.dart'. Try removing the import directive • lib/models/city.dart:3:8 • unnecessary_import
+   info • Statements in a for should be enclosed in a block. Try wrapping the statement in a block • lib/painters/static_map_painter.dart:116:55 • curly_braces_in_flow_control_structures
+   info • Unnecessary use of multiple underscores. Try using '_' • lib/services/ad_service.dart:135:62 • unnecessary_underscores
+   info • Use an initializing formal to assign a parameter to a field. Try using an initialing formal ('this._enabled') to initialize the field • lib/services/audio_service.dart:6:43 • prefer_initializing_formals
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • lib/ui/game_screen.dart:666:7 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • lib/ui/game_screen.dart:667:7 • deprecated_member_use
+warning • The value of the field '_clock' isn't used. Try removing the field, or using it • lib/ui/widgets/animated_map_background.dart:69:27 • unused_field
+   info • Statements in a for should be enclosed in a block. Try wrapping the statement in a block • lib/ui/widgets/animated_map_background.dart:148:37 • curly_braces_in_flow_control_structures
+warning • The value of the local variable 'strings' isn't used. Try removing the variable or using it • lib/ui/widgets/hud.dart:26:11 • unused_local_variable
+   info • 'axisAlignment' is deprecated and shouldn't be used. Use alignment instead. This property provides full control over both axes, which is an improvement over the old axisAlignment. This feature was deprecated after v3.41.0-1.0.pre. Try replacing the use of the deprecated member with the replacement • lib/ui/widgets/time_controls.dart:28:9 • deprecated_member_use
+warning • Unused import: 'dart:ui'. Try removing the import directive • test/geo_projection_test.dart:3:8 • unused_import
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:16:11 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:17:11 • deprecated_member_use
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:25:11 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:26:11 • deprecated_member_use
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:34:11 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:35:11 • deprecated_member_use
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:52:13 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:53:13 • deprecated_member_use
+   info • 'translate' is deprecated and shouldn't be used. Use translateByVector3, translateByVector4, or translateByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:89:11 • deprecated_member_use
+   info • 'scale' is deprecated and shouldn't be used. Use scaleByVector3, scaleByVector4, or scaleByDouble instead. Try replacing the use of the deprecated member with the replacement • test/map_camera_test.dart:90:11 • deprecated_member_use
+   info • Sort directive sections alphabetically. Try sorting the directives • test/road_graph_test.dart:5:1 • directives_ordering
+
+28 issues found. (ran in 9.4s)

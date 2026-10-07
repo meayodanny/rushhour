@@ -7,10 +7,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../core/game_config.dart';
+import '../core/geo_projection.dart';
 import '../core/palette.dart';
+import '../core/touch_targets.dart';
 import '../game/game_controller.dart';
 import '../models/entities.dart';
 import '../painters/game_painter.dart';
+import '../painters/hitbox_debug_painter.dart';
 import '../painters/overlay_painter.dart';
 import '../painters/static_map_painter.dart';
 import 'widgets/fleet_bar.dart';
@@ -20,12 +23,19 @@ import 'widgets/hud.dart';
 import 'widgets/reward_overlay.dart';
 import 'widgets/time_controls.dart';
 
+/// Temporary hit-box debug overlay switch (Requirement 44.5): enabled with
+/// `--dart-define=FLOWLINE_DEBUG_HITBOXES=true` or by passing
+/// `GameScreen.debugHitBoxes` (tests do the latter). Defaults to false, so
+/// release builds never show it.
+const bool kFlowlineDebugHitBoxes = bool.fromEnvironment('FLOWLINE_DEBUG_HITBOXES');
+
 class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({
     required this.difficulty,
     required this.tutorial,
     required this.startNew,
     required this.onReturnToMenu,
+    this.debugHitBoxes = kFlowlineDebugHitBoxes,
     super.key,
   });
 
@@ -33,6 +43,9 @@ class GameScreen extends ConsumerStatefulWidget {
   final bool tutorial;
   final bool startNew;
   final Future<void> Function() onReturnToMenu;
+
+  /// Paints the QA overlay with every touch target (Requirement 44.5).
+  final bool debugHitBoxes;
 
   @override
   ConsumerState<GameScreen> createState() => _GameScreenState();
@@ -55,8 +68,9 @@ class _GameScreenState extends ConsumerState<GameScreen>
   bool _timeOpen = false;
   bool _settingsOpen = false;
   bool _cameraGesture = false;
+  bool _lineGestureActive = false;
   Offset _gestureAnchor = Offset.zero;
-  Offset _lastGestureScene = Offset.zero;
+  Offset _lastGestureScreen = Offset.zero;
   double _gestureStartScale = 1;
   Offset _cameraReturnStart = Offset.zero;
   Offset _cameraReturnEnd = Offset.zero;
@@ -334,6 +348,16 @@ class _GameScreenState extends ConsumerState<GameScreen>
     );
   }
 
+  /// The game map, layered exactly as prescribed by Requirement 44.1:
+  ///
+  /// * layer 1+3 — the painted world (static map, dynamic entities, draft
+  ///   overlay) under the camera `Transform`; not interactive;
+  /// * layer 2 — the pan/zoom recognizer; reacts only when the pointer hit
+  ///   none of the POI hit areas (they sit above it in the Stack, so Flutter
+  ///   resolves the priority natively — Requirement 44.3);
+  /// * layer 4 — one positioned, opaque 48x48 hit-area widget per point of
+  ///   interest (restaurants and customers) — Requirement 44.2;
+  /// * layer 5 — the temporary debug overlay (Requirement 44.5).
   Widget _map(GameSessionController game, FlowlinePalette palette) => LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           final viewport = Size(constraints.maxWidth, constraints.maxHeight);
@@ -350,7 +374,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
               final renderObject = _mapKey.currentContext?.findRenderObject();
               if (renderObject is! RenderBox) return;
               final viewportPoint = renderObject.globalToLocal(details.offset);
-              game.assignCourier(details.data, _transform.toScene(viewportPoint));
+              game.assignCourier(details.data, _camera().screenToWorld(viewportPoint));
             },
             builder: (
               BuildContext context,
@@ -358,60 +382,98 @@ class _GameScreenState extends ConsumerState<GameScreen>
               List<Object?> rejected,
             ) => ClipRect(
               key: _mapKey,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTapUp: (TapUpDetails details) {
-                  if (!_mapMoved) game.handleMapTap(_scenePoint(details.localPosition));
-                },
-                onScaleStart: _onMapScaleStart,
-                onScaleUpdate: _onMapScaleUpdate,
-                onScaleEnd: _onMapScaleEnd,
-                child: SizedBox.expand(
-                  child: ValueListenableBuilder<Matrix4>(
-                    valueListenable: _transform,
-                    builder: (BuildContext context, Matrix4 matrix, Widget? child) => Transform(
-                      alignment: Alignment.topLeft,
-                      transform: matrix,
-                      child: child,
-                    ),
-                    child: OverflowBox(
-                      alignment: Alignment.topLeft,
-                      minWidth: GameConfig.worldSize.width,
-                      maxWidth: GameConfig.worldSize.width,
-                      minHeight: GameConfig.worldSize.height,
-                      maxHeight: GameConfig.worldSize.height,
-                      child: SizedBox(
-                        width: GameConfig.worldSize.width,
-                        height: GameConfig.worldSize.height,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: <Widget>[
-                            RepaintBoundary(
-                              child: CustomPaint(
-                                size: GameConfig.worldSize,
-                                painter: StaticMapPainter(
-                                  game.city,
-                                  palette: palette,
-                                  activeBoundsRect: activeRect,
-                                ),
-                              ),
-                            ),
-                            CustomPaint(
-                              size: GameConfig.worldSize,
-                              painter: GamePainter(game, palette: palette),
-                            ),
-                            CustomPaint(
-                              size: GameConfig.worldSize,
-                              painter: OverlayPainter(
-                                game,
-                                const <Offset>[],
-                                hintAnimation: _hintAnimation,
-                                palette: palette,
-                              ),
-                            ),
-                          ],
+              child: ValueListenableBuilder<Matrix4>(
+                valueListenable: _transform,
+                builder: (BuildContext context, Matrix4 matrix, Widget? worldChild) {
+                  final camera = MapCamera(matrix);
+                  // Requirement 44.5: the hit-box rects are computed ONCE and
+                  // shared by the positioned hit areas (layer 4) and the debug
+                  // overlay (layer 5) — one projection call chain, two consumers.
+                  final List<PoiHitRect> poiHitRects = _poiHitRects(game, camera);
+                  return IgnorePointer(
+                    // While a line gesture owns the pointer, no second pointer
+                    // may start a camera pan or another draft.
+                    ignoring: _lineGestureActive,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: <Widget>[
+                        // Layers 1 & 3: painted world under the camera transform.
+                        Transform(
+                          key: const ValueKey('map-camera-transform'),
+                          alignment: Alignment.topLeft,
+                          transform: matrix,
+                          child: worldChild,
                         ),
-                      ),
+                        // Layer 2: pan/zoom — and courier/line drags for touches
+                        // that did not land in any POI hit area above.
+                        GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTapUp: (TapUpDetails details) {
+                            if (!_mapMoved) {
+                              game.handleMapTap(_camera(), details.localPosition);
+                            }
+                          },
+                          onScaleStart: _onMapScaleStart,
+                          onScaleUpdate: _onMapScaleUpdate,
+                          onScaleEnd: _onMapScaleEnd,
+                          child: const SizedBox.expand(),
+                        ),
+                        // Layer 4 (Requirement 44.2): the points of interest.
+                        for (final PoiHitRect hit in poiHitRects)
+                          _buildPoiHitArea(game, hit),
+                        // Layer 5 (Requirement 44.5): debug overlay, never
+                        // interactive itself.
+                        if (widget.debugHitBoxes)
+                          IgnorePointer(
+                            child: CustomPaint(
+                              size: Size.infinite,
+                              painter: HitBoxDebugPainter(
+                                game: game,
+                                camera: camera,
+                                poiHitRects: poiHitRects,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  minWidth: GameConfig.worldSize.width,
+                  maxWidth: GameConfig.worldSize.width,
+                  minHeight: GameConfig.worldSize.height,
+                  maxHeight: GameConfig.worldSize.height,
+                  child: SizedBox(
+                    width: GameConfig.worldSize.width,
+                    height: GameConfig.worldSize.height,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: <Widget>[
+                        RepaintBoundary(
+                          child: CustomPaint(
+                            size: GameConfig.worldSize,
+                            painter: StaticMapPainter(
+                              game.city,
+                              palette: palette,
+                              activeBoundsRect: activeRect,
+                            ),
+                          ),
+                        ),
+                        CustomPaint(
+                          size: GameConfig.worldSize,
+                          painter: GamePainter(game, palette: palette),
+                        ),
+                        CustomPaint(
+                          size: GameConfig.worldSize,
+                          painter: OverlayPainter(
+                            game,
+                            const <Offset>[],
+                            hintAnimation: _hintAnimation,
+                            palette: palette,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -421,37 +483,164 @@ class _GameScreenState extends ConsumerState<GameScreen>
         },
       );
 
-  Offset _scenePoint(Offset viewportPoint) => _transform.toScene(viewportPoint);
+  /// Builds the 48x48 screen-space hit boxes for every active restaurant and
+  /// customer (Requirement 44.2).
+  ///
+  /// The centre of each rect comes from `GeoProjection.geoToScreen` — the
+  /// same single projection chain that `StaticMapPainter`'s world painting
+  /// goes through (`project(lat, lng)` baked into `RoadNode.point` plus the
+  /// camera matrix that drives the rendering `Transform`).
+  List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+    final result = <PoiHitRect>[];
+    void add(String entityId, String nodeId, bool isCustomer) {
+      final node = game.city.nodes[nodeId];
+      if (node == null) return;
+      final Offset screenPos =
+          game.city.projection.geoToScreen(node.lat, node.lng, camera);
+      result.add(
+        (
+          entityId: entityId,
+          rect: Rect.fromCenter(
+            center: screenPos,
+            width: TouchTargets.poiHitSize,
+            height: TouchTargets.poiHitSize,
+          ),
+          isCustomer: isCustomer,
+        ),
+      );
+    }
+
+    for (final restaurant in game.session.restaurants) {
+      add(restaurant.id, restaurant.nodeId, false);
+    }
+    for (final customer in game.session.customers) {
+      add(customer.id, customer.nodeId, true);
+    }
+    return result;
+  }
+
+  /// Requirement 44.2: each point of interest is its own positioned
+  /// interactive widget, laid over the painted map. Flutter's own hit
+  /// testing resolves "POI vs pan/zoom" — no manual distance checks.
+  Widget _buildPoiHitArea(GameSessionController game, PoiHitRect hit) {
+    return Positioned(
+      key: ValueKey<String>('poi-hit-${hit.entityId}'),
+      left: hit.rect.left,
+      top: hit.rect.top,
+      width: hit.rect.width,
+      height: hit.rect.height,
+      child: GestureDetector(
+        // Mandatory: opaque makes the transparent container hit-testable.
+        behavior: HitTestBehavior.opaque,
+        onTapUp: (TapUpDetails details) => game.handlePoiTap(hit.entityId),
+        onPanStart: (DragStartDetails details) =>
+            _onPoiPanStart(hit.entityId, details.globalPosition),
+        onPanUpdate: (DragUpdateDetails details) =>
+            _onPoiPanUpdate(details.globalPosition),
+        onPanEnd: (DragEndDetails details) => _onPoiPanEnd(),
+        onPanCancel: _onPoiPanCancel,
+        child: Container(color: Colors.transparent),
+      ),
+    );
+  }
+
+  MapCamera _camera() => MapCamera(_transform.value);
+
+  /// The live controller (never null while the screen is mounted).
+  GameSessionController get _activeGame =>
+      (_game ?? ref.read(gameControllerProvider))!;
+
+  /// Converts a global pointer position into the map viewport's local
+  /// coordinates — the space the camera matrix maps from.
+  Offset _mapLocalFromGlobal(Offset globalPoint) {
+    final renderObject = _mapKey.currentContext?.findRenderObject();
+    if (renderObject is! RenderBox) return globalPoint;
+    return renderObject.globalToLocal(globalPoint);
+  }
+
+  // ---------------------------------------------------------------------
+  // POI hit-area gestures (layer 4, Requirement 44.2).
+  // ---------------------------------------------------------------------
+
+  void _onPoiPanStart(String entityId, Offset globalPosition) {
+    _closeTimePanel();
+    _cameraAnimation.stop();
+    _lastGestureScreen = _mapLocalFromGlobal(globalPosition);
+    if (!_lineGestureActive) {
+      setState(() => _lineGestureActive = true);
+    }
+    final game = _activeGame;
+    game.startLineDraftFromEntity(entityId);
+  }
+
+  void _onPoiPanUpdate(Offset globalPosition) {
+    final game = _activeGame;
+    final screenPoint = _mapLocalFromGlobal(globalPosition);
+    _lastGestureScreen = screenPoint;
+    game.updateLineGesture(_camera(), screenPoint);
+  }
+
+  void _onPoiPanEnd() {
+    final game = _activeGame;
+    if (_lineGestureActive) {
+      setState(() => _lineGestureActive = false);
+    }
+    game.endLineGesture(_camera(), _lastGestureScreen);
+  }
+
+  void _onPoiPanCancel() {
+    if (_lineGestureActive) {
+      setState(() => _lineGestureActive = false);
+    }
+    final game = _activeGame;
+    game.cancelLineGesture();
+  }
+
+  // ---------------------------------------------------------------------
+  // Map-level gestures (layer 2): pan/zoom plus courier & line drags for
+  // pointers that missed every POI hit area.
+  // ---------------------------------------------------------------------
 
   void _onMapScaleStart(ScaleStartDetails details) {
     _closeTimePanel();
     _mapMoved = false;
-    final game = _game ?? ref.read(gameControllerProvider);
-    final scene = _scenePoint(details.focalPoint);
-    _lastGestureScene = scene;
+    final game = _activeGame;
+    final camera = _camera();
+    // THE bug of patches #2/#3, fixed: the recognizer used to feed the GLOBAL
+    // focal point into a matrix that expects map-local coordinates. Every
+    // hit test was therefore shifted by the HUD height (~90 px) — the line
+    // only ever started when the finger was that far BELOW the icon. The
+    // local focal point is the coordinate the camera actually understands.
+    final scene = camera.screenToWorld(details.localFocalPoint);
+    _lastGestureScreen = details.localFocalPoint;
     _cameraAnimation.stop();
-    if (game!.beginLineGesture(scene)) {
+    // Courier and line drags are single-finger gestures; a second finger
+    // always means pinch-zoom, never a line edit.
+    if (details.pointerCount < 2 &&
+        game.beginMapGesture(camera, details.localFocalPoint)) {
       _cameraGesture = false;
+      if (!_lineGestureActive) {
+        setState(() => _lineGestureActive = true);
+      }
       return;
     }
     _cameraGesture = true;
     _gestureAnchor = scene;
     _gestureStartScale = _transform.value.getMaxScaleOnAxis();
-    _cameraAnimation.stop();
   }
 
   void _onMapScaleUpdate(ScaleUpdateDetails details) {
     _mapMoved = _mapMoved || details.scale != 1 || details.focalPointDelta.distance > .5;
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     if (!_cameraGesture) {
-      _lastGestureScene = _scenePoint(details.focalPoint);
-      game!.updateLineGesture(_lastGestureScene);
+      _lastGestureScreen = details.localFocalPoint;
+      game.updateLineGesture(_camera(), details.localFocalPoint);
       return;
     }
     final viewport = _viewportSize;
     if (viewport == null) return;
     final scale = _softScale(_gestureStartScale * details.scale, viewport);
-    final focal = details.focalPoint;
+    final focal = details.localFocalPoint;
     final rawTranslation = Offset(
       focal.dx - _gestureAnchor.dx * scale,
       focal.dy - _gestureAnchor.dy * scale,
@@ -461,13 +650,16 @@ class _GameScreenState extends ConsumerState<GameScreen>
   }
 
   void _onMapScaleEnd(ScaleEndDetails details) {
-    final game = _game ?? ref.read(gameControllerProvider);
+    final game = _activeGame;
     if (!_cameraGesture) {
-      game!.endLineGesture(_lastGestureScene);
+      game.endLineGesture(_camera(), _lastGestureScreen);
     } else {
       _animateCameraBack();
     }
     _cameraGesture = false;
+    if (_lineGestureActive) {
+      setState(() => _lineGestureActive = false);
+    }
   }
 
   Matrix4 _matrix(double scale, Offset translation) => Matrix4.identity()
@@ -476,8 +668,8 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   // Requirement 40.2: Camera bounds clamped to active reveal bounds
   Rect _mapBounds() {
-    final game = _game ?? ref.read(gameControllerProvider);
-    final activeGeo = game!.activeRevealBounds;
+    final game = _activeGame;
+    final activeGeo = game.activeRevealBounds;
     final rect = game.city.projectBounds(activeGeo);
     return rect.inflate(45);
   }

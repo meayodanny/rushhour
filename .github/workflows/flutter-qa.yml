@@ -1,0 +1,136 @@
+name: Flutter QA
+
+on:
+  push:
+    branches: ['arena/c208a14e-rushhour', main']
+  workflow_dispatch:
+
+jobs:
+  analyze-test-evidence:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter doctor
+        run: flutter --version
+
+      - name: Pub get
+        run: flutter pub get
+
+      - name: Analyze
+        run: |
+          mkdir -p qa_logs
+          set -o pipefail
+          flutter analyze --no-fatal-infos --no-fatal-warnings 2>&1 | tee qa_logs/analyze.txt
+
+      - name: "Test - existing suites"
+        if: always()
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 90s --reporter expanded \
+            test/city_data_test.dart test/entities_test.dart \
+            test/geo_projection_test.dart test/road_graph_test.dart \
+            2>&1 | tee qa_logs/test_existing.txt
+
+      - name: "Test - map camera unit tests"
+        if: always()
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 90s --reporter expanded \
+            test/map_camera_test.dart \
+            2>&1 | tee qa_logs/test_map_camera.txt
+
+      - name: "Test - POI hit areas (geometry)"
+        if: always()
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 120s --reporter expanded \
+            --plain-name "every active POI has a 48x48 hit area centred on the painted icon" \
+            test/poi_hit_area_test.dart \
+            2>&1 | tee qa_logs/test_poi_geometry.txt
+
+      - name: "Test - POI hit areas (acceptance drag)"
+        if: always()
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 120s --reporter expanded \
+            --plain-name "ACCEPTANCE" \
+            test/poi_hit_area_test.dart \
+            2>&1 | tee qa_logs/test_poi_acceptance.txt
+
+      - name: "Test - POI hit areas (tap-tap)"
+        if: always()
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 120s --reporter expanded \
+            --plain-name "tap-tap routing still works through the POI hit areas" \
+            test/poi_hit_area_test.dart \
+            2>&1 | tee qa_logs/test_poi_taptap.txt
+
+      - name: "Test - POI hit areas (camera pan)"
+        if: always()
+        timeout-minutes: 5
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 120s --reporter expanded \
+            --plain-name "dragging empty map pans the camera" \
+            test/poi_hit_area_test.dart \
+            2>&1 | tee qa_logs/test_poi_pan.txt
+
+      - name: "Test - QA evidence goldens"
+        if: always()
+        timeout-minutes: 8
+        run: |
+          set -o pipefail
+          flutter test --update-goldens --timeout 180s --reporter expanded \
+            test/hitbox_evidence_test.dart \
+            2>&1 | tee qa_logs/test_evidence.txt
+
+      - name: Assemble evidence GIF
+        if: always()
+        run: |
+          set -o pipefail
+          python3 -m pip install --user pillow 2>&1 | tee -a qa_logs/gif.txt
+          python3 tools/make_evidence_gif.py 2>&1 | tee -a qa_logs/gif.txt
+
+      - name: Commit & push QA evidence and logs
+        if: always()
+        run: |
+          {
+            echo "=== workspace listing ==="
+            ls -la
+            echo "=== all png files ==="
+            find . -name '*.png' -not -path './.git/*' -not -path './build/*' | head -50
+            echo "=== test dir ==="
+            ls -la test test/goldens 2>&1 || true
+            echo "=== test log tails ==="
+            for f in qa_logs/test_*.txt; do
+              echo "--- $f ---"
+              tail -60 "$f" 2>&1 || true
+            done
+            echo "=== gitignore check ==="
+            git check-ignore -v test/goldens/hitbox_map.png qa_logs/test.txt 2>&1 || true
+          } > qa_logs/workspace.txt 2>&1
+          git config user.name "arena-agent"
+          git config user.email "arena-agent@users.noreply.github.com"
+          for p in qa_logs test/goldens docs/qa; do
+            if [ -e "$p" ]; then git add -A "$p"; fi
+          done
+          if git diff --cached --quiet; then
+            echo "No evidence changes to commit."
+          else
+            git commit -m "QA: logs and evidence artifacts [skip ci]"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi

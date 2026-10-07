@@ -1,0 +1,550 @@
+Resolving dependencies...
+Downloading packages...
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.14 available)
+Got dependencies!
+2 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /home/runner/work/rushhour/rushhour/test/map_camera_test.dart
+00:00 +0: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera worldToScreen and screenToWorld are exact inverses
+00:00 +1: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera geoToScreen is literally project() followed by the camera transform
+00:00 +2: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera a world circle of worldRadiusFor(px) is a screen circle of px radius
+00:00 +2 -1: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera a world circle of worldRadiusFor(px) is a screen circle of px radius [E]
+  UnimplementedError
+  package:vector_math/src/vector_math_64/matrix4.dart 716:7  Matrix4.translate
+  test/map_camera_test.dart 36:11                            main.<fn>.<fn>
+  
+00:00 +2 -1: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera uniform scale keeps screen radii zoom-independent
+00:00 +2 -2: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera uniform scale keeps screen radii zoom-independent [E]
+  UnimplementedError
+  package:vector_math/src/vector_math_64/matrix4.dart 716:7  Matrix4.translate
+  test/map_camera_test.dart 54:13                            main.<fn>.<fn>
+  
+00:00 +2 -2: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: single projection for painting and hit-testing (Requirement 44.5) (setUpAll)
+00:00 +2 -2: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: single projection for painting and hit-testing (Requirement 44.5) every POI node paints exactly where geoToScreen places its hit box
+00:00 +3 -2: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: single projection for painting and hit-testing (Requirement 44.5) geoToScreen composes the same camera matrix that renders the world
+00:00 +4 -2: /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: single projection for painting and hit-testing (Requirement 44.5) (tearDownAll)
+00:00 +4 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: projection matches the required equidistant formula
+lib/ui/game_screen.dart:490:8: Error: Type 'PoiHitRect' not found.
+  List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+       ^^^^^^^^^^
+lib/ui/game_screen.dart:490:61: Error: Type 'MapCamera' not found.
+  List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+                                                            ^^^^^^^^^
+lib/ui/game_screen.dart:522:27: Error: Type 'PoiHitRect' not found.
+  Widget _buildPoiHitArea(PoiHitRect hit) {
+                          ^^^^^^^^^^
+lib/ui/game_screen.dart:544:3: Error: Type 'MapCamera' not found.
+  MapCamera _camera() => MapCamera(_transform.value);
+  ^^^^^^^^^
+00:00 +5 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: both axes share one uniform scale (no angle distortion)
+00:00 +6 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: unproject is the exact inverse of project
+00:00 +7 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: projected bounds stay inside the world rect
+00:00 +8 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
+00:00 +8 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data rendered node geometry equals the shared projection output
+00:00 +9 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data snapping sees exactly the drawn road geometry
+00:00 +10 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data pathfinding lengths equal the drawn polyline lengths
+00:00 +11 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (tearDownAll)
+00:00 +11 -2: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: the projection formula is not duplicated anywhere in lib/
+test/game_harness.dart:69:16: Error: The method 'FakePersistenceService.saveRecord' has fewer positional arguments than those of overridden method 'PersistenceService.saveRecord'.
+  Future<void> saveRecord(
+               ^
+lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+  Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+               ^
+test/game_harness.dart:72:12: Error: The parameter 'survival' of the method 'FakePersistenceService.saveRecord' has type 'double', which does not match the corresponding type, 'int', in the overridden method, 'PersistenceService.saveRecord'.
+Change to a supertype of 'int', or, for a covariant parameter, a subtype.
+    double survival,
+           ^
+lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+  Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+               ^
+test/game_harness.dart:73:9: Error: The parameter 'networkSize' of the method 'FakePersistenceService.saveRecord' has type 'int', which does not match the corresponding type, 'double', in the overridden method, 'PersistenceService.saveRecord'.
+Change to a supertype of 'double', or, for a covariant parameter, a subtype.
+    int networkSize,
+        ^
+lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+  Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+               ^
+test/poi_hit_area_test.dart:80:36: Error: A value of type 'int' can't be assigned to a variable of type 'double'.
+      await gesture.moveBy(total / steps);
+                                   ^
+test/poi_hit_area_test.dart:166:34: Error: A value of type 'int' can't be assigned to a variable of type 'double'.
+    await gesture.moveBy(delta / steps);
+                                 ^
+test/game_harness.dart:167:51: Error: 'Override' isn't a type.
+  final container = ProviderContainer(overrides: <Override>[
+                                                  ^^^^^^^^
+lib/ui/game_screen.dart:389:30: Error: 'PoiHitRect' isn't a type.
+                  final List<PoiHitRect> poiHitRects = _poiHitRects(game, camera);
+                             ^^^^^^^^^^
+lib/ui/game_screen.dart:419:36: Error: 'PoiHitRect' isn't a type.
+                        for (final PoiHitRect hit in poiHitRects)
+                                   ^^^^^^^^^^
+lib/ui/game_screen.dart:385:34: Error: The method 'MapCamera' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'MapCamera'.
+                  final camera = MapCamera(matrix);
+                                 ^^^^^^^^^
+lib/ui/game_screen.dart:420:43: Error: Too many positional arguments: 1 allowed, but 2 found.
+Try removing the extra positional arguments.
+                          _buildPoiHitArea(game, hit),
+                                          ^
+lib/ui/game_screen.dart:427:40: Error: The method 'HitBoxDebugPainter' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'HitBoxDebugPainter'.
+                              painter: HitBoxDebugPainter(
+                                       ^^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:490:61: Error: 'MapCamera' isn't a type.
+  List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+                                                            ^^^^^^^^^
+lib/ui/game_screen.dart:491:21: Error: 'PoiHitRect' isn't a type.
+    final result = <PoiHitRect>[];
+                    ^^^^^^^^^^
+lib/ui/game_screen.dart:502:20: Error: The getter 'TouchTargets' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TouchTargets'.
+            width: TouchTargets.poiHitSize,
+                   ^^^^^^^^^^^^
+lib/ui/game_screen.dart:503:21: Error: The getter 'TouchTargets' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TouchTargets'.
+            height: TouchTargets.poiHitSize,
+                    ^^^^^^^^^^^^
+lib/ui/game_screen.dart:522:27: Error: 'PoiHitRect' isn't a type.
+  Widget _buildPoiHitArea(PoiHitRect hit) {
+                          ^^^^^^^^^^
+lib/ui/game_screen.dart:532:44: Error: The getter 'game' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'game'.
+        onTapUp: (TapUpDetails details) => game.handlePoiTap(hit.entityId),
+                                           ^^^^
+lib/ui/game_screen.dart:544:26: Error: The method 'MapCamera' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'MapCamera'.
+  MapCamera _camera() => MapCamera(_transform.value);
+                         ^^^^^^^^^
+lib/ui/game_screen.dart:566:10: Error: Method 'startLineDraftFromEntity' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+    game.startLineDraftFromEntity(entityId);
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:573:10: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+    game.updateLineGesture(_camera(), screenPoint);
+         ^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:581:10: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+    game.endLineGesture(_camera(), _lastGestureScreen);
+         ^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:589:10: Error: Method 'cancelLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+    game.cancelLineGesture();
+         ^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:613:14: Error: Method 'beginMapGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+        game.beginMapGesture(camera, details.localFocalPoint)) {
+             ^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:630:12: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+      game.updateLineGesture(_camera(), details.localFocalPoint);
+           ^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:648:12: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+      game.endLineGesture(_camera(), _lastGestureScreen);
+           ^^^^^^^^^^^^^^
+00:01 +12 -3: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart [E]
+  Failed to load "/home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart":
+  Compilation failed for testPath=/home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart: lib/ui/game_screen.dart:490:8: Error: Type 'PoiHitRect' not found.
+    List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+         ^^^^^^^^^^
+  lib/ui/game_screen.dart:490:61: Error: Type 'MapCamera' not found.
+    List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+                                                              ^^^^^^^^^
+  lib/ui/game_screen.dart:522:27: Error: Type 'PoiHitRect' not found.
+    Widget _buildPoiHitArea(PoiHitRect hit) {
+                            ^^^^^^^^^^
+  lib/ui/game_screen.dart:544:3: Error: Type 'MapCamera' not found.
+    MapCamera _camera() => MapCamera(_transform.value);
+    ^^^^^^^^^
+  test/game_harness.dart:69:16: Error: The method 'FakePersistenceService.saveRecord' has fewer positional arguments than those of overridden method 'PersistenceService.saveRecord'.
+    Future<void> saveRecord(
+                 ^
+  lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+    Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+                 ^
+  test/game_harness.dart:72:12: Error: The parameter 'survival' of the method 'FakePersistenceService.saveRecord' has type 'double', which does not match the corresponding type, 'int', in the overridden method, 'PersistenceService.saveRecord'.
+  Change to a supertype of 'int', or, for a covariant parameter, a subtype.
+      double survival,
+             ^
+  lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+    Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+                 ^
+  test/game_harness.dart:73:9: Error: The parameter 'networkSize' of the method 'FakePersistenceService.saveRecord' has type 'int', which does not match the corresponding type, 'double', in the overridden method, 'PersistenceService.saveRecord'.
+  Change to a supertype of 'double', or, for a covariant parameter, a subtype.
+      int networkSize,
+          ^
+  lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+    Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+                 ^
+  test/poi_hit_area_test.dart:80:36: Error: A value of type 'int' can't be assigned to a variable of type 'double'.
+        await gesture.moveBy(total / steps);
+                                     ^
+  test/poi_hit_area_test.dart:166:34: Error: A value of type 'int' can't be assigned to a variable of type 'double'.
+      await gesture.moveBy(delta / steps);
+                                   ^
+  test/game_harness.dart:167:51: Error: 'Override' isn't a type.
+    final container = ProviderContainer(overrides: <Override>[
+                                                    ^^^^^^^^
+  lib/ui/game_screen.dart:389:30: Error: 'PoiHitRect' isn't a type.
+                    final List<PoiHitRect> poiHitRects = _poiHitRects(game, camera);
+                               ^^^^^^^^^^
+  lib/ui/game_screen.dart:419:36: Error: 'PoiHitRect' isn't a type.
+                          for (final PoiHitRect hit in poiHitRects)
+                                     ^^^^^^^^^^
+  lib/ui/game_screen.dart:385:34: Error: The method 'MapCamera' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'MapCamera'.
+                    final camera = MapCamera(matrix);
+                                   ^^^^^^^^^
+  lib/ui/game_screen.dart:420:43: Error: Too many positional arguments: 1 allowed, but 2 found.
+  Try removing the extra positional arguments.
+                            _buildPoiHitArea(game, hit),
+                                            ^
+  lib/ui/game_screen.dart:427:40: Error: The method 'HitBoxDebugPainter' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'HitBoxDebugPainter'.
+                                painter: HitBoxDebugPainter(
+                                         ^^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:490:61: Error: 'MapCamera' isn't a type.
+    List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+                                                              ^^^^^^^^^
+  lib/ui/game_screen.dart:491:21: Error: 'PoiHitRect' isn't a type.
+      final result = <PoiHitRect>[];
+                      ^^^^^^^^^^
+  lib/ui/game_screen.dart:502:20: Error: The getter 'TouchTargets' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'TouchTargets'.
+              width: TouchTargets.poiHitSize,
+                     ^^^^^^^^^^^^
+  lib/ui/game_screen.dart:503:21: Error: The getter 'TouchTargets' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'TouchTargets'.
+              height: TouchTargets.poiHitSize,
+                      ^^^^^^^^^^^^
+  lib/ui/game_screen.dart:522:27: Error: 'PoiHitRect' isn't a type.
+    Widget _buildPoiHitArea(PoiHitRect hit) {
+                            ^^^^^^^^^^
+  lib/ui/game_screen.dart:532:44: Error: The getter 'game' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'game'.
+          onTapUp: (TapUpDetails details) => game.handlePoiTap(hit.entityId),
+                                             ^^^^
+  lib/ui/game_screen.dart:544:26: Error: The method 'MapCamera' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'MapCamera'.
+    MapCamera _camera() => MapCamera(_transform.value);
+                           ^^^^^^^^^
+  lib/ui/game_screen.dart:566:10: Error: Method 'startLineDraftFromEntity' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.startLineDraftFromEntity(entityId);
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:573:10: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.updateLineGesture(_camera(), screenPoint);
+           ^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:581:10: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.endLineGesture(_camera(), _lastGestureScreen);
+           ^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:589:10: Error: Method 'cancelLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.cancelLineGesture();
+           ^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:613:14: Error: Method 'beginMapGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+          game.beginMapGesture(camera, details.localFocalPoint)) {
+               ^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:630:12: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+        game.updateLineGesture(_camera(), details.localFocalPoint);
+             ^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:648:12: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+        game.endLineGesture(_camera(), _lastGestureScreen);
+             ^^^^^^^^^^^^^^
+  .
+00:02 +12 -3: /home/runner/work/rushhour/rushhour/test/entities_test.dart: customer limits and demand are deterministic
+00:02 +13 -3: /home/runner/work/rushhour/rushhour/test/entities_test.dart: courier speeds adapt to map dimension and meet minimum speedup
+00:02 +14 -3: /home/runner/work/rushhour/rushhour/test/entities_test.dart: snapshot survives JSON-compatible round trip with unlocked courier types and reveal stages
+lib/ui/game_screen.dart:490:8: Error: Type 'PoiHitRect' not found.
+  List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+       ^^^^^^^^^^
+lib/ui/game_screen.dart:490:61: Error: Type 'MapCamera' not found.
+  List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+                                                            ^^^^^^^^^
+lib/ui/game_screen.dart:522:27: Error: Type 'PoiHitRect' not found.
+  Widget _buildPoiHitArea(PoiHitRect hit) {
+                          ^^^^^^^^^^
+lib/ui/game_screen.dart:544:3: Error: Type 'MapCamera' not found.
+  MapCamera _camera() => MapCamera(_transform.value);
+  ^^^^^^^^^
+test/game_harness.dart:69:16: Error: The method 'FakePersistenceService.saveRecord' has fewer positional arguments than those of overridden method 'PersistenceService.saveRecord'.
+  Future<void> saveRecord(
+               ^
+lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+  Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+               ^
+test/game_harness.dart:72:12: Error: The parameter 'survival' of the method 'FakePersistenceService.saveRecord' has type 'double', which does not match the corresponding type, 'int', in the overridden method, 'PersistenceService.saveRecord'.
+Change to a supertype of 'int', or, for a covariant parameter, a subtype.
+    double survival,
+           ^
+lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+  Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+               ^
+test/game_harness.dart:73:9: Error: The parameter 'networkSize' of the method 'FakePersistenceService.saveRecord' has type 'int', which does not match the corresponding type, 'double', in the overridden method, 'PersistenceService.saveRecord'.
+Change to a supertype of 'double', or, for a covariant parameter, a subtype.
+    int networkSize,
+        ^
+lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+  Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+               ^
+test/hitbox_evidence_test.dart:96:29: Error: A value of type 'int' can't be assigned to a variable of type 'double'.
+      final delta = total / steps;
+                            ^
+lib/ui/game_screen.dart:389:30: Error: 'PoiHitRect' isn't a type.
+                  final List<PoiHitRect> poiHitRects = _poiHitRects(game, camera);
+                             ^^^^^^^^^^
+lib/ui/game_screen.dart:419:36: Error: 'PoiHitRect' isn't a type.
+                        for (final PoiHitRect hit in poiHitRects)
+                                   ^^^^^^^^^^
+lib/ui/game_screen.dart:385:34: Error: The method 'MapCamera' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'MapCamera'.
+                  final camera = MapCamera(matrix);
+                                 ^^^^^^^^^
+lib/ui/game_screen.dart:420:43: Error: Too many positional arguments: 1 allowed, but 2 found.
+Try removing the extra positional arguments.
+                          _buildPoiHitArea(game, hit),
+                                          ^
+lib/ui/game_screen.dart:427:40: Error: The method 'HitBoxDebugPainter' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'HitBoxDebugPainter'.
+                              painter: HitBoxDebugPainter(
+                                       ^^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:490:61: Error: 'MapCamera' isn't a type.
+  List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+                                                            ^^^^^^^^^
+lib/ui/game_screen.dart:491:21: Error: 'PoiHitRect' isn't a type.
+    final result = <PoiHitRect>[];
+                    ^^^^^^^^^^
+lib/ui/game_screen.dart:502:20: Error: The getter 'TouchTargets' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TouchTargets'.
+            width: TouchTargets.poiHitSize,
+                   ^^^^^^^^^^^^
+lib/ui/game_screen.dart:503:21: Error: The getter 'TouchTargets' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'TouchTargets'.
+            height: TouchTargets.poiHitSize,
+                    ^^^^^^^^^^^^
+lib/ui/game_screen.dart:522:27: Error: 'PoiHitRect' isn't a type.
+  Widget _buildPoiHitArea(PoiHitRect hit) {
+                          ^^^^^^^^^^
+lib/ui/game_screen.dart:532:44: Error: The getter 'game' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing getter, or defining a getter or field named 'game'.
+        onTapUp: (TapUpDetails details) => game.handlePoiTap(hit.entityId),
+                                           ^^^^
+lib/ui/game_screen.dart:544:26: Error: The method 'MapCamera' isn't defined for the type '_GameScreenState'.
+ - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+Try correcting the name to the name of an existing method, or defining a method named 'MapCamera'.
+  MapCamera _camera() => MapCamera(_transform.value);
+                         ^^^^^^^^^
+lib/ui/game_screen.dart:566:10: Error: Method 'startLineDraftFromEntity' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+    game.startLineDraftFromEntity(entityId);
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:573:10: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+    game.updateLineGesture(_camera(), screenPoint);
+         ^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:581:10: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+    game.endLineGesture(_camera(), _lastGestureScreen);
+         ^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:589:10: Error: Method 'cancelLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+    game.cancelLineGesture();
+         ^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:613:14: Error: Method 'beginMapGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+        game.beginMapGesture(camera, details.localFocalPoint)) {
+             ^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:630:12: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+      game.updateLineGesture(_camera(), details.localFocalPoint);
+           ^^^^^^^^^^^^^^^^^
+lib/ui/game_screen.dart:648:12: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+ - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+Try calling using ?. instead.
+      game.endLineGesture(_camera(), _lastGestureScreen);
+           ^^^^^^^^^^^^^^
+test/game_harness.dart:167:51: Error: 'Override' isn't a type.
+  final container = ProviderContainer(overrides: <Override>[
+                                                  ^^^^^^^^
+00:03 +15 -4: loading /home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart [E]
+  Failed to load "/home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart":
+  Compilation failed for testPath=/home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart: lib/ui/game_screen.dart:490:8: Error: Type 'PoiHitRect' not found.
+    List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+         ^^^^^^^^^^
+  lib/ui/game_screen.dart:490:61: Error: Type 'MapCamera' not found.
+    List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+                                                              ^^^^^^^^^
+  lib/ui/game_screen.dart:522:27: Error: Type 'PoiHitRect' not found.
+    Widget _buildPoiHitArea(PoiHitRect hit) {
+                            ^^^^^^^^^^
+  lib/ui/game_screen.dart:544:3: Error: Type 'MapCamera' not found.
+    MapCamera _camera() => MapCamera(_transform.value);
+    ^^^^^^^^^
+  test/game_harness.dart:69:16: Error: The method 'FakePersistenceService.saveRecord' has fewer positional arguments than those of overridden method 'PersistenceService.saveRecord'.
+    Future<void> saveRecord(
+                 ^
+  lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+    Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+                 ^
+  test/game_harness.dart:72:12: Error: The parameter 'survival' of the method 'FakePersistenceService.saveRecord' has type 'double', which does not match the corresponding type, 'int', in the overridden method, 'PersistenceService.saveRecord'.
+  Change to a supertype of 'int', or, for a covariant parameter, a subtype.
+      double survival,
+             ^
+  lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+    Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+                 ^
+  test/game_harness.dart:73:9: Error: The parameter 'networkSize' of the method 'FakePersistenceService.saveRecord' has type 'int', which does not match the corresponding type, 'double', in the overridden method, 'PersistenceService.saveRecord'.
+  Change to a supertype of 'double', or, for a covariant parameter, a subtype.
+      int networkSize,
+          ^
+  lib/services/persistence_service.dart:64:16: Context: This is the overridden method ('saveRecord').
+    Future<void> saveRecord(String cityId, Difficulty difficulty, int score, double survival, int networkSize) async {
+                 ^
+  test/hitbox_evidence_test.dart:96:29: Error: A value of type 'int' can't be assigned to a variable of type 'double'.
+        final delta = total / steps;
+                              ^
+  lib/ui/game_screen.dart:389:30: Error: 'PoiHitRect' isn't a type.
+                    final List<PoiHitRect> poiHitRects = _poiHitRects(game, camera);
+                               ^^^^^^^^^^
+  lib/ui/game_screen.dart:419:36: Error: 'PoiHitRect' isn't a type.
+                          for (final PoiHitRect hit in poiHitRects)
+                                     ^^^^^^^^^^
+  lib/ui/game_screen.dart:385:34: Error: The method 'MapCamera' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'MapCamera'.
+                    final camera = MapCamera(matrix);
+                                   ^^^^^^^^^
+  lib/ui/game_screen.dart:420:43: Error: Too many positional arguments: 1 allowed, but 2 found.
+  Try removing the extra positional arguments.
+                            _buildPoiHitArea(game, hit),
+                                            ^
+  lib/ui/game_screen.dart:427:40: Error: The method 'HitBoxDebugPainter' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'HitBoxDebugPainter'.
+                                painter: HitBoxDebugPainter(
+                                         ^^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:490:61: Error: 'MapCamera' isn't a type.
+    List<PoiHitRect> _poiHitRects(GameSessionController game, MapCamera camera) {
+                                                              ^^^^^^^^^
+  lib/ui/game_screen.dart:491:21: Error: 'PoiHitRect' isn't a type.
+      final result = <PoiHitRect>[];
+                      ^^^^^^^^^^
+  lib/ui/game_screen.dart:502:20: Error: The getter 'TouchTargets' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'TouchTargets'.
+              width: TouchTargets.poiHitSize,
+                     ^^^^^^^^^^^^
+  lib/ui/game_screen.dart:503:21: Error: The getter 'TouchTargets' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'TouchTargets'.
+              height: TouchTargets.poiHitSize,
+                      ^^^^^^^^^^^^
+  lib/ui/game_screen.dart:522:27: Error: 'PoiHitRect' isn't a type.
+    Widget _buildPoiHitArea(PoiHitRect hit) {
+                            ^^^^^^^^^^
+  lib/ui/game_screen.dart:532:44: Error: The getter 'game' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'game'.
+          onTapUp: (TapUpDetails details) => game.handlePoiTap(hit.entityId),
+                                             ^^^^
+  lib/ui/game_screen.dart:544:26: Error: The method 'MapCamera' isn't defined for the type '_GameScreenState'.
+   - '_GameScreenState' is from 'package:rushhour/ui/game_screen.dart' ('lib/ui/game_screen.dart').
+  Try correcting the name to the name of an existing method, or defining a method named 'MapCamera'.
+    MapCamera _camera() => MapCamera(_transform.value);
+                           ^^^^^^^^^
+  lib/ui/game_screen.dart:566:10: Error: Method 'startLineDraftFromEntity' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.startLineDraftFromEntity(entityId);
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:573:10: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.updateLineGesture(_camera(), screenPoint);
+           ^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:581:10: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.endLineGesture(_camera(), _lastGestureScreen);
+           ^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:589:10: Error: Method 'cancelLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+      game.cancelLineGesture();
+           ^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:613:14: Error: Method 'beginMapGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+          game.beginMapGesture(camera, details.localFocalPoint)) {
+               ^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:630:12: Error: Method 'updateLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+        game.updateLineGesture(_camera(), details.localFocalPoint);
+             ^^^^^^^^^^^^^^^^^
+  lib/ui/game_screen.dart:648:12: Error: Method 'endLineGesture' cannot be called on 'GameSessionController?' because it is potentially null.
+   - 'GameSessionController' is from 'package:rushhour/game/game_controller.dart' ('lib/game/game_controller.dart').
+  Try calling using ?. instead.
+        game.endLineGesture(_camera(), _lastGestureScreen);
+             ^^^^^^^^^^^^^^
+  test/game_harness.dart:167:51: Error: 'Override' isn't a type.
+    final container = ProviderContainer(overrides: <Override>[
+                                                    ^^^^^^^^
+  .
+00:04 +15 -4: /home/runner/work/rushhour/rushhour/test/city_data_test.dart: Rivergate asset produces real OSM geometry with projection and reveal stages
+00:05 +16 -4: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: Dijkstra uses the shortest compatible route
+00:05 +17 -4: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: blocked roads are excluded
+00:05 +18 -4: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: route cannot be built through an unlocked ferry
+00:05 +19 -4: Some tests failed.
+
+Failing tests:
+  /home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart: loading /home/runner/work/rushhour/rushhour/test/hitbox_evidence_test.dart
+  /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera a world circle of worldRadiusFor(px) is a screen circle of px radius
+  /home/runner/work/rushhour/rushhour/test/map_camera_test.dart: MapCamera uniform scale keeps screen radii zoom-independent
+  /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart
