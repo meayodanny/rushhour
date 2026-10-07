@@ -1,27 +1,27 @@
 === workspace listing ===
 total 124
-drwxr-xr-x 14 runner runner  4096 Oct  7 09:13 .
-drwxr-xr-x  3 runner runner  4096 Oct  7 09:12 ..
-drwxr-xr-x  4 runner runner  4096 Oct  7 09:13 .dart_tool
--rw-r--r--  1 runner runner  4922 Oct  7 09:13 .flutter-plugins-dependencies
-drwxr-xr-x  7 runner runner  4096 Oct  7 09:12 .git
-drwxr-xr-x  3 runner runner  4096 Oct  7 09:12 .github
--rw-r--r--  1 runner runner   746 Oct  7 09:12 .gitignore
--rw-r--r--  1 runner runner  1706 Oct  7 09:12 .metadata
--rw-r--r--  1 runner runner  7156 Oct  7 09:12 README.md
--rw-r--r--  1 runner runner   317 Oct  7 09:12 analysis_options.yaml
-drwxr-xr-x  5 runner runner  4096 Oct  7 09:13 android
-drwxr-xr-x  6 runner runner  4096 Oct  7 09:12 assets
-drwxr-xr-x  5 runner runner  4096 Oct  7 09:13 build
-drwxr-xr-x  3 runner runner  4096 Oct  7 09:12 docs
-drwxr-xr-x  7 runner runner  4096 Oct  7 09:12 ios
-drwxr-xr-x 10 runner runner  4096 Oct  7 09:12 lib
--rw-r--r--  1 runner runner 17904 Oct  7 09:12 pubspec.lock
--rw-r--r--  1 runner runner   750 Oct  7 09:12 pubspec.yaml
-drwxr-xr-x  2 runner runner  4096 Oct  7 09:12 qa_logs
-drwxr-xr-x  3 runner runner  4096 Oct  7 09:12 test
-drwxr-xr-x  2 runner runner  4096 Oct  7 09:12 tools
--rwxr-xr-x  1 runner runner 13470 Oct  7 09:12 validate_city_map.py
+drwxr-xr-x 14 runner runner  4096 Oct  7 09:16 .
+drwxr-xr-x  3 runner runner  4096 Oct  7 09:15 ..
+drwxr-xr-x  4 runner runner  4096 Oct  7 09:16 .dart_tool
+-rw-r--r--  1 runner runner  4922 Oct  7 09:16 .flutter-plugins-dependencies
+drwxr-xr-x  7 runner runner  4096 Oct  7 09:15 .git
+drwxr-xr-x  3 runner runner  4096 Oct  7 09:15 .github
+-rw-r--r--  1 runner runner   746 Oct  7 09:15 .gitignore
+-rw-r--r--  1 runner runner  1706 Oct  7 09:15 .metadata
+-rw-r--r--  1 runner runner  7156 Oct  7 09:15 README.md
+-rw-r--r--  1 runner runner   317 Oct  7 09:15 analysis_options.yaml
+drwxr-xr-x  5 runner runner  4096 Oct  7 09:16 android
+drwxr-xr-x  6 runner runner  4096 Oct  7 09:15 assets
+drwxr-xr-x  5 runner runner  4096 Oct  7 09:16 build
+drwxr-xr-x  3 runner runner  4096 Oct  7 09:15 docs
+drwxr-xr-x  7 runner runner  4096 Oct  7 09:15 ios
+drwxr-xr-x 10 runner runner  4096 Oct  7 09:15 lib
+-rw-r--r--  1 runner runner 17904 Oct  7 09:15 pubspec.lock
+-rw-r--r--  1 runner runner   750 Oct  7 09:15 pubspec.yaml
+drwxr-xr-x  2 runner runner  4096 Oct  7 09:15 qa_logs
+drwxr-xr-x  3 runner runner  4096 Oct  7 09:15 test
+drwxr-xr-x  2 runner runner  4096 Oct  7 09:15 tools
+-rwxr-xr-x  1 runner runner 13470 Oct  7 09:15 validate_city_map.py
 === all png files ===
 ./android/app/src/main/res/mipmap-mdpi/ic_launcher.png
 ./android/app/src/main/res/mipmap-hdpi/ic_launcher.png
@@ -65,34 +65,34 @@ drwxr-xr-x  2 runner runner  4096 Oct  7 09:12 tools
 === test dir ===
 test:
 total 92
-drwxr-xr-x  3 runner runner  4096 Oct  7 09:12 .
-drwxr-xr-x 14 runner runner  4096 Oct  7 09:13 ..
--rw-r--r--  1 runner runner  1465 Oct  7 09:12 city_data_test.dart
--rw-r--r--  1 runner runner  2010 Oct  7 09:12 entities_test.dart
--rw-r--r--  1 runner runner  8933 Oct  7 09:12 game_harness.dart
--rw-r--r--  1 runner runner  4291 Oct  7 09:12 geo_projection_test.dart
-drwxr-xr-x  2 runner runner  4096 Oct  7 09:14 goldens
--rw-r--r--  1 runner runner  4708 Oct  7 09:12 hitbox_evidence_test.dart
--rw-r--r--  1 runner runner  4239 Oct  7 09:12 map_camera_test.dart
--rw-r--r--  1 runner runner  7326 Oct  7 09:12 poi_hit_area_test.dart
--rw-r--r--  1 runner runner  3283 Oct  7 09:12 road_graph_test.dart
--rw-r--r--  1 runner runner 12525 Oct  7 09:12 water_crossing_test.dart
--rw-r--r--  1 runner runner  7279 Oct  7 09:12 water_evidence_test.dart
+drwxr-xr-x  3 runner runner  4096 Oct  7 09:15 .
+drwxr-xr-x 14 runner runner  4096 Oct  7 09:16 ..
+-rw-r--r--  1 runner runner  1465 Oct  7 09:15 city_data_test.dart
+-rw-r--r--  1 runner runner  2010 Oct  7 09:15 entities_test.dart
+-rw-r--r--  1 runner runner  8933 Oct  7 09:15 game_harness.dart
+-rw-r--r--  1 runner runner  4291 Oct  7 09:15 geo_projection_test.dart
+drwxr-xr-x  2 runner runner  4096 Oct  7 09:15 goldens
+-rw-r--r--  1 runner runner  4708 Oct  7 09:15 hitbox_evidence_test.dart
+-rw-r--r--  1 runner runner  4239 Oct  7 09:15 map_camera_test.dart
+-rw-r--r--  1 runner runner  7326 Oct  7 09:15 poi_hit_area_test.dart
+-rw-r--r--  1 runner runner  3283 Oct  7 09:15 road_graph_test.dart
+-rw-r--r--  1 runner runner 12525 Oct  7 09:15 water_crossing_test.dart
+-rw-r--r--  1 runner runner  7279 Oct  7 09:15 water_evidence_test.dart
 
 test/goldens:
 total 2336
-drwxr-xr-x 2 runner runner   4096 Oct  7 09:14 .
-drwxr-xr-x 3 runner runner   4096 Oct  7 09:12 ..
--rw-r--r-- 1 runner runner 220001 Oct  7 09:14 drag_frame_00.png
--rw-r--r-- 1 runner runner 221570 Oct  7 09:14 drag_frame_01.png
--rw-r--r-- 1 runner runner 220001 Oct  7 09:14 drag_frame_02.png
--rw-r--r-- 1 runner runner 222123 Oct  7 09:14 drag_frame_03.png
--rw-r--r-- 1 runner runner 222078 Oct  7 09:14 drag_frame_04.png
--rw-r--r-- 1 runner runner 227681 Oct  7 09:14 drag_frame_final.png
--rw-r--r-- 1 runner runner 237141 Oct  7 09:14 hitbox_map.png
--rw-r--r-- 1 runner runner 170112 Oct  7 09:14 hitbox_map_zoomed.png
--rw-r--r-- 1 runner runner 219674 Oct  7 09:14 river_map.png
--rw-r--r-- 1 runner runner 402973 Oct  7 09:14 river_painter.png
+drwxr-xr-x 2 runner runner   4096 Oct  7 09:15 .
+drwxr-xr-x 3 runner runner   4096 Oct  7 09:15 ..
+-rw-r--r-- 1 runner runner 220001 Oct  7 09:17 drag_frame_00.png
+-rw-r--r-- 1 runner runner 221570 Oct  7 09:17 drag_frame_01.png
+-rw-r--r-- 1 runner runner 220001 Oct  7 09:17 drag_frame_02.png
+-rw-r--r-- 1 runner runner 222123 Oct  7 09:17 drag_frame_03.png
+-rw-r--r-- 1 runner runner 222078 Oct  7 09:17 drag_frame_04.png
+-rw-r--r-- 1 runner runner 227732 Oct  7 09:17 drag_frame_final.png
+-rw-r--r-- 1 runner runner 237080 Oct  7 09:17 hitbox_map.png
+-rw-r--r-- 1 runner runner 170263 Oct  7 09:17 hitbox_map_zoomed.png
+-rw-r--r-- 1 runner runner 219540 Oct  7 09:17 river_map.png
+-rw-r--r-- 1 runner runner 402973 Oct  7 09:17 river_painter.png
 === test log tails ===
 --- qa_logs/test_evidence.txt ---
 Resolving dependencies...
@@ -106,8 +106,8 @@ Try `flutter pub outdated` for more information.
 00:00 +0: (setUpAll)
 00:00 +0: evidence: hit boxes over the live map
 00:01 +1: evidence: off-centre drag sequence (finger ~22px off the icon)
-00:01 +2: (tearDownAll)
-00:01 +2: All tests passed!
+00:02 +2: (tearDownAll)
+00:02 +2: All tests passed!
 --- qa_logs/test_existing.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -117,24 +117,24 @@ Got dependencies!
 2 packages have newer versions incompatible with dependency constraints.
 Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/city_data_test.dart
-00:00 +0: /home/runner/work/rushhour/rushhour/test/city_data_test.dart: Rivergate asset produces real OSM geometry with projection and reveal stages
-00:00 +1: /home/runner/work/rushhour/rushhour/test/entities_test.dart: customer limits and demand are deterministic
-00:00 +2: /home/runner/work/rushhour/rushhour/test/entities_test.dart: courier speeds adapt to map dimension and meet minimum speedup
-00:00 +3: /home/runner/work/rushhour/rushhour/test/entities_test.dart: snapshot survives JSON-compatible round trip with unlocked courier types and reveal stages
+00:00 +0: /home/runner/work/rushhour/rushhour/test/entities_test.dart: customer limits and demand are deterministic
+00:00 +1: /home/runner/work/rushhour/rushhour/test/city_data_test.dart: Rivergate asset produces real OSM geometry with projection and reveal stages
+00:00 +2: /home/runner/work/rushhour/rushhour/test/city_data_test.dart: Rivergate asset produces real OSM geometry with projection and reveal stages
+00:00 +3: /home/runner/work/rushhour/rushhour/test/city_data_test.dart: Rivergate asset produces real OSM geometry with projection and reveal stages
 00:00 +4: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: projection matches the required equidistant formula
 00:00 +5: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: both axes share one uniform scale (no angle distortion)
 00:00 +6: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: unproject is the exact inverse of project
 00:00 +7: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: projected bounds stay inside the world rect
 00:00 +8: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
-00:00 +8: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data rendered node geometry equals the shared projection output
-00:01 +9: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data snapping sees exactly the drawn road geometry
-00:01 +10: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data pathfinding lengths equal the drawn polyline lengths
-00:01 +11: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (tearDownAll)
-00:01 +11: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: the projection formula is not duplicated anywhere in lib/
-00:01 +12: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: Dijkstra uses the shortest compatible route
-00:01 +13: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: blocked roads are excluded
-00:01 +14: /home/runner/work/rushhour/rushhour/test/road_graph_test.dart: route cannot be built through an unlocked ferry
-00:01 +15: All tests passed!
+00:00 +9: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
+00:00 +10: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
+00:00 +11: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (setUpAll)
+00:00 +11: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data rendered node geometry equals the shared projection output
+00:00 +12: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data snapping sees exactly the drawn road geometry
+00:00 +13: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data pathfinding lengths equal the drawn polyline lengths
+00:00 +14: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: real city data (tearDownAll)
+00:00 +14: /home/runner/work/rushhour/rushhour/test/geo_projection_test.dart: the projection formula is not duplicated anywhere in lib/
+00:00 +15: All tests passed!
 --- qa_logs/test_map_camera.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -190,7 +190,7 @@ Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart
 00:00 +0: (setUpAll)
 00:00 +0: dragging empty map pans the camera; dragging a POI does not
-00:00 +1: (tearDownAll)
+00:01 +1: (tearDownAll)
 00:01 +1: All tests passed!
 --- qa_logs/test_poi_taptap.txt ---
 Resolving dependencies...
@@ -203,8 +203,8 @@ Try `flutter pub outdated` for more information.
 00:00 +0: loading /home/runner/work/rushhour/rushhour/test/poi_hit_area_test.dart
 00:00 +0: (setUpAll)
 00:00 +0: tap-tap routing still works through the POI hit areas
-00:00 +1: (tearDownAll)
-00:00 +1: All tests passed!
+00:01 +1: (tearDownAll)
+00:01 +1: All tests passed!
 --- qa_logs/test_water_crossing.txt ---
 Resolving dependencies...
 Downloading packages...
@@ -233,7 +233,7 @@ Requirement 46: blocked = [e1256, e1564, e1565, e1569, e1570, e1571, e1572, e157
 00:00 +13: Rivergate map data (Requirement 46 regression) no bridge edge is blocked
 00:00 +14: Rivergate map data (Requirement 46 regression) every POI stays reachable when the crossings are forbidden
 00:00 +15: Rivergate map data (Requirement 46 regression) a courier route across the river keeps to the real bridges
-00:00 +16: Rivergate map data (Requirement 46 regression) snapping never targets a forbidden river crossing
+00:01 +16: Rivergate map data (Requirement 46 regression) snapping never targets a forbidden river crossing
 00:01 +17: Rivergate map data (Requirement 46 regression) (tearDownAll)
 00:01 +17: All tests passed!
 --- qa_logs/test_water_evidence.txt ---
